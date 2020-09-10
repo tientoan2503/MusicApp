@@ -1,5 +1,6 @@
 package com.example.music.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -23,6 +24,8 @@ import com.example.music.Song;
 
 import java.text.SimpleDateFormat;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class MediaPlaybackFragment extends Fragment implements View.OnClickListener {
 
     private Song mSong;
@@ -35,6 +38,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private IMediaControl mMediaControl;
     private IPassData mPassData;
     private Bundle mBundle;
+    private SharedPreferences mSharedPrf;
 
     private boolean mIsShuffle;
     private String mRepeat;
@@ -104,7 +108,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 //        mImgRepeat.setOnClickListener(this);
 //        mImgShuffle.setOnClickListener(this);
 //        mImgQueue.setOnClickListener(this);
-
+        mSharedPrf = getActivity().getSharedPreferences("PRF_NAME", MODE_PRIVATE);
+        mRepeat = mSharedPrf.getString("PRF_NAME", FALSE);
+        mIsShuffle = mSharedPrf.getBoolean("PRF_NAME", false);
+//        mPosition = mSharedPrf.getInt("PRF_NAME", -1);
 
         // TODO TrungTH tách hàm để dùng lại -> DONE Đã tạo hàm checkShuffle()
         //shuffle
@@ -126,10 +133,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 //                setImgRepeat(R.drawable.ic_play_repeat_1);
 //                break;
 //        }
+        Log.d("ToanNTe", "onCreateView: " + mRepeat + mIsShuffle);
 
         checkShuffle();
         checkRepeat();
-        Log.d("ToanNTe", "onCreateView: " + mRepeat + mIsShuffle);
 
         // TODO TrungTH sai vị trí -> DONE Đã đặt lên onCreateView
         //event seek bar change

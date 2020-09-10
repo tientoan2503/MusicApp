@@ -558,7 +558,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 if (mActionBar != null) {
                     mActionBar.hide();
                 }
-
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(BUNDLE_SONG_KEY, mSong);
                 bundle.putBoolean(BUNDLE_IS_PLAYING, mService.isPlaying());
