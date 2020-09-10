@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_music_portrait"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- TrungTH các mã màu, các kích thước, cần được dưa vào các file res tương ứng  -->
+    <FrameLayout
+        android:id="@+id/all_song"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_above="@+id/song_info"
+        android:layout_alignParentTop="true" />
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/song_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:id="@+id/layout_shadow"
+            android:background="#33131313"/>
+
+        <LinearLayout
+            android:layout_below="@id/layout_shadow"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/sub_art"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="11dp"
+                android:layout_marginLeft="11dp"
+                android:layout_marginTop="9dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="9dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <!-- TrungTH hiểu sai ý nghĩa của layout_weight="1" -->
+                <TextView
+                    android:id="@+id/sub_title"
+                    style="@style/song_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/sub_artist"
+                    style="@style/artist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/img_action_play"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp" />
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>

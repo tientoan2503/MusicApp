@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mediaPlayback_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:scaleType="fitXY"
+        android:id="@+id/music_art"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:id="@+id/song_info_top"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:background="#CCFFFFFF"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/sub_art_top"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="11dp"
+            android:layout_marginLeft="11dp"
+            android:layout_marginTop="9dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="9dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/sub_title_top"
+                style="@style/song_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/sub_artist_top"
+                style="@style/artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_marginRight="10dp"
+            android:id="@+id/img_queu"
+            android:layout_width="25dp"
+            android:src="@drawable/ic_queue_music_default"
+            android:layout_height="25dp"
+            android:layout_gravity="center"/>
+
+        <ImageView
+            android:id="@+id/img_more_top"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
+            android:src="@drawable/ic_action_more" />
+
+    </LinearLayout>
+    
+    <FrameLayout
+        android:id="@+id/layout_list_song"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/song_info_top"
+        android:layout_above="@id/layout_time_control"/>
+
+
+    <ImageView
+        android:id="@+id/img_favorite"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_above="@id/layout_time_control"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="35dp"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/ic_favorite_default" />
+
+    <LinearLayout
+        android:id="@+id/layout_time_control"
+        android:layout_width="match_parent"
+        android:layout_height="125dp"
+        android:layout_alignParentBottom="true"
+        android:background="#CCFFFFFF"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+
+            <SeekBar
+                android:id="@+id/sb_duration"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:theme="@style/SeekBarColor" />
+
+            <TextView
+                android:id="@+id/tv_current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/sb_duration"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="8dp"
+                android:textColor="#292727" />
+
+            <TextView
+                android:id="@+id/tv_total_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/sb_duration"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:textColor="#292727" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_marginBottom="20dp"
+            android:id="@+id/layout_control_media"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <ImageView
+                android:id="@+id/img_repeat"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1.5"
+                android:src="@drawable/ic_play_repeat_default" />
+
+            <ImageView
+                android:id="@+id/img_prev"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="2"
+                android:src="@drawable/ic_action_prev" />
+
+            <ImageView
+                android:id="@+id/img_play"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="3"
+                android:src="@drawable/ic_action_pause" />
+
+            <ImageView
+                android:id="@+id/img_next"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="2"
+                android:src="@drawable/ic_action_next" />
+
+            <ImageView
+                android:id="@+id/img_shuffle"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1.5"
+                android:src="@drawable/ic_play_shuffle_default" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+</RelativeLayout>
