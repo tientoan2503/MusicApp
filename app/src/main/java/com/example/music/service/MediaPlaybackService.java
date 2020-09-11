@@ -6,19 +6,20 @@ import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 
 import com.example.music.ActivityMusic;
 import com.example.music.Song;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class MediaPlaybackService extends Service implements MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener,
         MediaPlayer.OnErrorListener {
 
-    private static final String ACTION_PLAY = "ACTION.PLAY";
     public static final String BROAD_POSITION = "BROAD_POSITION";
     public static final String PRF_NAME = "PRF_NAME";
     public static final String PRF_POSITION = "PRF_POSITION";
@@ -39,11 +40,11 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public final String FALSE = "false";
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
+    private MediaPlaybackService mMediaPlaybackService;
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
 
-        mPlayer = mediaPlayer;
         if (mIsShuffle) {
             if (mRepeat.equals(REPEAT)) {
                 playSong();
@@ -78,13 +79,17 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-        mPlayer.reset();
-        mUri = Uri.parse(mArraySongs.get(mPosition).getResource());
-        try {
-            mPlayer.setDataSource(getApplicationContext(), mUri);
-            mPlayer.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (mPosition != -1) {
+            mPlayer.reset();
+            mUri = Uri.parse(mArraySongs.get(mPosition).getResource());
+
+            try {
+                mPlayer.setDataSource(getApplicationContext(), mUri);
+                mPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
         }
         return true;
     }
@@ -164,11 +169,11 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public int shuffle() {
         Random random = new Random();
         // TODO TRungth ban đầu gán luôn = pos đỡ bị lặp code random.nextInt(mArraySongs.size());
-        int ranNumber = random.nextInt(mArraySongs.size());
-        while (mPosition == ranNumber) {
-            ranNumber = random.nextInt(mArraySongs.size());
-        }
-        return ranNumber;
+//        int ranNumber = random.nextInt(mArraySongs.size());
+//        while (mPosition == ranNumber) {
+//            ranNumber = random.nextInt(mArraySongs.size());
+//        }
+        return mPosition = random.nextInt(mArraySongs.size());
     }
 
     public void playShuffle() {
@@ -238,5 +243,4 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 //        mEditor.putInt(PRF_DURATION, mDuration);
         mEditor.commit();
     }
-
 }

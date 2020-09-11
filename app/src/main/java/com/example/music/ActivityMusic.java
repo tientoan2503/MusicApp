@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -60,7 +61,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     private Song mSong;
     private ArrayList<Song> mArraySongs;
     private SongAdapter mAdapter;
-    private Intent mIntent;
     private int mPosition;
     private MediaPlaybackService mService;
     private MediaPlayer mPlayer;
@@ -72,8 +72,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     private int mCurrentTime;
     private int mDuration;
     private BroadcastReceiver mBroadcast;
-    private IntentFilter mFilter;
     private boolean mBound;
+    private Bundle mBundle;
 
     public class BroadcastMusic extends BroadcastReceiver {
         @Override
@@ -101,10 +101,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                     } else {
                         mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_play);
                     }
+//                    sendBundleToMediaPlaybackFragment();
                 }
 
                 mAdapter.setPositionClicked(mPosition);
-
             }
         }
     }
@@ -131,7 +131,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 //        mService = new MediaPlaybackService();
 
         //TODO TrungTH khởi tạo ở đây chưa chuẩn
-        mMediaPlaybackFragment = new MediaPlaybackFragment(ActivityMusic.this, ActivityMusic.this);
+//        mMediaPlaybackFragment = new MediaPlaybackFragment(ActivityMusic.this, ActivityMusic.this);
 
         if (mIsPortrait) {
 
@@ -140,12 +140,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 
             //event click song info
             mInfoLayout.setOnClickListener(ActivityMusic.this);
+        } else {
+
         }
 
         //if app in landscape mode
-        else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
-        }
+//        else {
+//            getSupportFragmentManager().beginTransaction().replace(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
+//        }
 
         //get data from SharedPreference -> set variable of shuffle, repeat, stop
 //        mSharedPrf = getSharedPreferences(mService.PRF_NAME, MODE_PRIVATE);
@@ -182,31 +184,21 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 
     protected void onResume() {
         super.onResume();
-        //get data from SharedPreference -> set variable of shuffle, repeat, stop
-        mSharedPrf = getSharedPreferences(mService.PRF_NAME, MODE_PRIVATE);
-        mRepeat = mSharedPrf.getString(mService.PRF_REPEAT, FALSE);
-        mIsShuffle = mSharedPrf.getBoolean(mService.PRF_SHUFFLE, false);
-        mPosition = mSharedPrf.getInt(mService.PRF_POSITION, -1);
 
+        //get data from SharedPreference -> set variable of shuffle, repeat, stop
+        getDataSharedPrf();
         //register BroadcastMusic
-        mBroadcast = new BroadcastMusic();
-        mFilter = new IntentFilter();
-        mFilter.addAction(ACTION_PLAY_COMPLETE);
-        this.registerReceiver(mBroadcast, mFilter);
+        registerReceiver();
 
         //get adapter from AllSongsFragment
-        //TODO TrungTH lấy đối tượng mAdapter này ra đây làm gì ? ko cần thiết => xem lại
-        mAdapter = mAllSongsFragment.getAdapter();
-        mArraySongs = mAdapter.getArraySongs();
+//        //TODO TrungTH lấy đối tượng mAdapter này ra đây làm gì ? ko cần thiết => xem lại
+//        mAdapter = mAllSongsFragment.getAdapter();
+//        mArraySongs = mAdapter.getArraySongs();
 
         //TODO TrungTH trường hợp dọc có cần thiết gọi cái này không ? -> DONE Đã check trường hợp dọc thì không set nữa
-        if (!mIsPortrait) {
-            setShuffleAndRepeat(mIsShuffle, mRepeat);
-            Log.d("ToanNTe", "onResume: " + mRepeat + mIsShuffle);
-        }
-
-        //send position to Adapter
-        mAdapter.setPositionClicked(mPosition);
+//        if (!mIsPortrait) {
+//            setShuffleAndRepeat(mIsShuffle, mRepeat);
+//        }
 
     }
 
@@ -219,20 +211,19 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     public void onBackPressed() {
         super.onBackPressed();
         // TODO TrungTH : đoạn dưới này xử lý cho trường hợp từ playback sang all all song ? thế từ all song cũng chạy à?
+        // DONE đã kiểm tra nếu ờ màn hình dọc thì sẽ xử lí
 
         if (mIsPortrait) {
-            if (findViewById(R.id.mediaPlayback_layout) != null) {
-                //check Media Player is play or not to set play icon
-                checkPlaying();
+            //check Media Player is play or not to set play icon
+            checkPlaying();
 
-                //show Action Bar, InfoLayout
-                mActionBar.show();
-                mInfoLayout.setVisibility(View.VISIBLE);
-                setSongInfo(mSong);
-                mAdapter.setPositionClicked(mPosition);
+            //show Action Bar, InfoLayout
+            mActionBar.show();
+            mInfoLayout.setVisibility(View.VISIBLE);
+            setSongInfo(mSong);
+            mAdapter.setPositionClicked(mPosition);
 
-                getDataFromStorage();
-            }
+            getDataFromStorage();
         }
     }
 
@@ -248,8 +239,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             unbindService(mConnection);
             mBound = false;
         }
-
-        mService.putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
     }
 
     private void getDataFromStorage() {
@@ -261,7 +250,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == REQUEST_PERMISSION_CODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (grantResults.length > 0 && requestCode == REQUEST_PERMISSION_CODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //if permission granted -> get data from external storage
                 getDataFromStorage();
@@ -290,9 +279,23 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     }
 
     private void startMediaPlaybackService() {
-        mIntent = new Intent(this, MediaPlaybackService.class);
+        Intent mIntent = new Intent(this, MediaPlaybackService.class);
         bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
         startService(mIntent);
+    }
+
+    private void registerReceiver() {
+        mBroadcast = new BroadcastMusic();
+        IntentFilter mFilter = new IntentFilter();
+        mFilter.addAction(ACTION_PLAY_COMPLETE);
+        this.registerReceiver(mBroadcast, mFilter);
+    }
+
+    private void getDataSharedPrf() {
+        mSharedPrf = getSharedPreferences(mService.PRF_NAME, MODE_PRIVATE);
+        mRepeat = mSharedPrf.getString(mService.PRF_REPEAT, FALSE);
+        mIsShuffle = mSharedPrf.getBoolean(mService.PRF_SHUFFLE, false);
+        mPosition = mSharedPrf.getInt(mService.PRF_POSITION, -1);
     }
 
     //create icon Search on Action Bar
@@ -311,12 +314,12 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 
             //get MediaPlaybackService from iBinder
             mService = binder.getService();
+            mAdapter = mAllSongsFragment.getAdapter();
+            mArraySongs = mAdapter.getArraySongs();
 
             //send position to Adapter
             if (mPosition != -1) {
                 mAdapter.setPositionClicked(mPosition);
-                mAdapter = mAllSongsFragment.getAdapter();
-                mArraySongs = mAdapter.getArraySongs();
             }
 
             //send ArraySongs to MediaPlaybackService
@@ -330,23 +333,20 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             //if app in landscape mode
             if (!mIsPortrait) {
 
-
                 if (mPosition == -1) mPosition = 0;
 
                 mSong = mArraySongs.get(mPosition);
 
-                //get Song from ArraySongs -> set Info layout
-                mMediaPlaybackFragment.setSongInfo(mSong);
                 // TODO TrungTH đưa hàm vào trong lớp mMediaPlaybackFragment giảm thiểu sự phụ thuộc của lớp mMediaPlaybackFragment vào activity
-                //  => chưa hiểu rõ ý nghĩa của fragment thì phải
-                if (mService.isPlaying()) {
-                    mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_pause);
-                } else {
-                    mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_play);
-                }
+                //  => chưa hiểu rõ ý nghĩa của fragment thì phải -
+                mMediaPlaybackFragment = new MediaPlaybackFragment(ActivityMusic.this, ActivityMusic.this);
+                sendBundleToMediaPlaybackFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
 
                 //update real time of song
                 updateTimeSong();
+                setShuffleAndRepeat(mIsShuffle, mRepeat);
+
             }
 
             //if app in portrait mode
@@ -423,12 +423,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         }
         //in landscape mode
         else {
-            if (mService.isPlaying()) {
-                mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_pause);
-            } else {
-                mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_play);
-            }
+            Log.d("ToanNTe", "onClickItem: " + mService.isPlaying());
+//            sendBundleToMediaPlaybackFragment();
             mMediaPlaybackFragment.setSongInfo(mSong);
+            sendBundleToMediaPlaybackFragment();
         }
     }
 
@@ -460,11 +458,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_play);
             mService.pauseSong();
         } else {
-            if (mService.getPosition() == 0) {
-                mService.playSong();
-            } else {
-                mService.resumeSong();
-            }
+            mService.resumeSong();
+
             mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_pause);
         }
     }
@@ -503,7 +498,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     }
 
     //method update real time of song
-    // TODO TrungTH Thường thì chỉ cần 1 s chạy 1 lần ngoài ra giao diện playbac
+    // TODO TrungTH Thường thì chỉ cần 1 s chạy 1 lần, ngoài ra giao diện playback
     //  quan tâm đến việc update thì đặt code trong giao diện play back,
     //  thoát app cũng ko thấy cancel cái này
 
@@ -544,12 +539,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                     mService.pauseSong();
                     mActionPlay.setImageResource(R.drawable.ic_media_play);
                 } else {
-                    mActionPlay.setImageResource(R.drawable.ic_media_pause);
-                    if (mService.getPlayer().getCurrentPosition() != 0) {
-                        mService.resumeSong();
-                    } else {
+                    Log.d("ToanNTe", "onClick: " + mPlayer);
+                    if (mPlayer == null) {
                         mService.playSong();
+                        mPlayer = mService.getPlayer();
+                    } else {
+                        mService.resumeSong();
                     }
+                    mActionPlay.setImageResource(R.drawable.ic_media_pause);
                 }
                 break;
 
@@ -558,10 +555,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 if (mActionBar != null) {
                     mActionBar.hide();
                 }
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(BUNDLE_SONG_KEY, mSong);
-                bundle.putBoolean(BUNDLE_IS_PLAYING, mService.isPlaying());
-                mMediaPlaybackFragment.setArguments(bundle);
+                sendBundleToMediaPlaybackFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mMediaPlaybackFragment).addToBackStack(null).commit();
 
                 //hide InfoLayout
@@ -578,6 +572,17 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     private void setShuffleAndRepeat(boolean isShuffle, String repeat) {
         mMediaPlaybackFragment.setShuffle(isShuffle);
         mMediaPlaybackFragment.setRepeat(repeat);
+    }
+
+    private void setMediaPlaybackService() {
+        mMediaPlaybackFragment.setService(mService);
+    }
+
+    private void sendBundleToMediaPlaybackFragment() {
+        mBundle = new Bundle();
+        mBundle.putParcelable(BUNDLE_SONG_KEY, mSong);
+        mBundle.putBoolean(BUNDLE_IS_PLAYING, mService.isPlaying());
+        mMediaPlaybackFragment.setArguments(mBundle);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.music.fragment;
 
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.example.music.Interface.IMediaControl;
 import com.example.music.Interface.IPassData;
 import com.example.music.R;
 import com.example.music.Song;
+import com.example.music.service.MediaPlaybackService;
 
 import java.text.SimpleDateFormat;
 
@@ -47,6 +49,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public final String FALSE = "false";
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
+    private MediaPlaybackService mMediaPlaybackService;
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IPassData passData) {
         // TODO TrungTH gọp vào 1 cũng đc
@@ -78,13 +81,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mTvTotalTime = view.findViewById(R.id.tv_total_time);
         mSbDuration = view.findViewById(R.id.sb_duration);
 
-        mBundle = getArguments();
-        if (mBundle != null) {
-            mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
-            mIsPlaying = mBundle.getBoolean(ActivityMusic.BUNDLE_IS_PLAYING);
-            setSongInfo(mSong);
-        }
-
         //event click play, pause, next, prev, shuffle, repeat, queue music
         mImgPlay.setOnClickListener(this);
         mImgNext.setOnClickListener(this);
@@ -92,6 +88,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mImgRepeat.setOnClickListener(this);
         mImgShuffle.setOnClickListener(this);
         mImgQueue.setOnClickListener(this);
+
         //event seek bar change
         seekBarChange();
         return view;
@@ -100,6 +97,16 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
+
+        mBundle = getArguments();
+        Log.d("ToanNTe", "onResume: " + mBundle);
+        if (mBundle != null) {
+            mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
+            mIsPlaying = mBundle.getBoolean(ActivityMusic.BUNDLE_IS_PLAYING);
+            setSongInfo(mSong);
+            Log.d("ToanNTe", "onResume: " + mIsPlaying);
+        }
+
         // TODO TrungTH để sai chỗ -> DONE Đã đặt lên onCreateView
         //event click play, pause, next, prev, shuffle, repeat, queue music
 //        mImgPlay.setOnClickListener(this);
@@ -108,10 +115,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 //        mImgRepeat.setOnClickListener(this);
 //        mImgShuffle.setOnClickListener(this);
 //        mImgQueue.setOnClickListener(this);
+
         mSharedPrf = getActivity().getSharedPreferences("PRF_NAME", MODE_PRIVATE);
         mRepeat = mSharedPrf.getString("PRF_NAME", FALSE);
         mIsShuffle = mSharedPrf.getBoolean("PRF_NAME", false);
-//        mPosition = mSharedPrf.getInt("PRF_NAME", -1);
 
         // TODO TrungTH tách hàm để dùng lại -> DONE Đã tạo hàm checkShuffle()
         //shuffle
@@ -133,8 +140,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 //                setImgRepeat(R.drawable.ic_play_repeat_1);
 //                break;
 //        }
-        Log.d("ToanNTe", "onCreateView: " + mRepeat + mIsShuffle);
-
         checkShuffle();
         checkRepeat();
 
@@ -289,20 +294,24 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 //                break;
         }
     }
-//
-//    private void updateTimeSong() {
-//        final Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-//                mPlayer = mService.getPlayer();
-//                mCurrentTime = mPlayer.getCurrentPosition();
-//                mDuration = mPlayer.getDuration();
-//                mMediaPlaybackFragment.setCurrentTime(format.format(mCurrentTime));
-//                mMediaPlaybackFragment.setCurrentSeekBar(mCurrentTime, mDuration);
-//                handler.postDelayed(this, 1000);
-//            }
-//        }, 0);
-//    }
+
+    private void updateTimeSong() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
+                MediaPlayer player = mMediaPlaybackService.getPlayer();
+                int mCurrentTime = player.getCurrentPosition();
+                int mDuration = player.getDuration();
+                setCurrentTime(format.format(mCurrentTime));
+                setCurrentSeekBar(mCurrentTime, mDuration);
+                handler.postDelayed(this, 1000);
+            }
+        }, 0);
+    }
+
+    public void setService(MediaPlaybackService service) {
+        mMediaPlaybackService = service;
+    }
 }
