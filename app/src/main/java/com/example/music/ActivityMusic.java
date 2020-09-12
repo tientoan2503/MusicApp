@@ -13,7 +13,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
@@ -100,7 +99,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                     updateUIMediaPlayback();
                 }
 
-                mAdapter.setPositionClicked(mSong.getAlbumID());
+//                mAdapter.setSongId(mSong.getId());
             }
         }
     }
@@ -217,7 +216,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             mActionBar.show();
             mInfoLayout.setVisibility(View.VISIBLE);
             setSongInfo(mSong);
-            mAdapter.setPositionClicked(mSong.getAlbumID());
+//            mAdapter.setSongId(mSong.getId());
 
             getDataFromStorage();
         }
@@ -395,7 +394,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         mService.setArraySongs(mArraySongs);
 
         //set position clicked in Adapter
-        mAdapter.setPositionClicked(mSong.getAlbumID());
+//        mAdapter.setSongId(mSong.getId());
 
         //play song
         mService.playSong();
@@ -473,7 +472,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         setSongInfoFragment();
 
         //set position clicked in Adapter
-        mAdapter.setPositionClicked(mSong.getAlbumID());
+//        mAdapter.setSongId(mSong.getId());
     }
 
     @Override
@@ -487,7 +486,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         setSongInfoFragment();
 
         //set position clicked in Adapter
-        mAdapter.setPositionClicked(mSong.getAlbumID());
+//        mAdapter.setSongId(mSong.getId());
     }
 
     //method update real time of song

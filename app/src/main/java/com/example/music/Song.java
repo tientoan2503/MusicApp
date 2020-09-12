@@ -13,15 +13,13 @@ import com.bumptech.glide.Glide;
 //TrungTH sai convention
 public class Song implements Parcelable {
     private String title, artist, duration, resource;
-    private int albumID;
-    private int order;
-    private Bitmap art;
+    private int order, albumID, id;
 
-    public Song(int order, String title, String artist, int albumID, String duration, String resource) {
+    public Song(int order, String title, String artist, int id, int albumID, String duration, String resource) {
         this.order = order;
         this.title = title;
         this.artist = artist;
-        this.art = art;
+        this.id = id;
         this.albumID = albumID;
         this.duration = duration;
         this.resource = resource;
@@ -37,7 +35,7 @@ public class Song implements Parcelable {
         albumID = in.readInt();
         resource = in.readString();
         order = in.readInt();
-        art = in.readParcelable(Bitmap.class.getClassLoader());
+        id = in.readInt();
     }
 
     public static final Creator<Song> CREATOR = new Creator<Song>() {
@@ -76,14 +74,6 @@ public class Song implements Parcelable {
         this.artist = artist;
     }
 
-    public Bitmap getArt() {
-        return art;
-    }
-
-    public void setArt(Bitmap art) {
-        this.art = art;
-    }
-
     public String getDuration() {
         return duration;
     }
@@ -92,11 +82,19 @@ public class Song implements Parcelable {
         this.duration = duration;
     }
 
-    public Integer getAlbumID() {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getAlbumID() {
         return albumID;
     }
 
-    public void setAlbumID(Integer albumID) {
+    public void setAlbumID(int albumID) {
         this.albumID = albumID;
     }
 

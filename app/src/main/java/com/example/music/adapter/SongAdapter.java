@@ -27,7 +27,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public ArrayList<Song> mArraySongs;
     private IClickItem IClickItem;
     public int mPosition;
-    private int mPositionClicked;
+    private int mSongId;
 
     @NonNull
     @Override
@@ -44,11 +44,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         holder.mSongOrder.setText(song.getOrder() + "");
         holder.mTvSongName.setText(song.getTitle());
         holder.mTvDuration.setText(song.getDuration());
-        if (mArraySongs.get(position).getAlbumID() == mPositionClicked) {
+        if (mArraySongs.get(position).getId() == mSongId) {
             holder.mTvSongName.setTypeface(Typeface.DEFAULT_BOLD);
         }
-        Log.d("ToanNTe", "onBindViewHolder: " + mArraySongs.get(position).getAlbumID() + " - " +
-                mPositionClicked);
+        Log.d("ToanNTe", "onBindViewHolder: " + mArraySongs.get(position).getId() + " - " +
+                mSongId);
     }
 
     @Override
@@ -70,7 +70,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             mTvSongName = itemView.findViewById(R.id.song_title);
             mTvDuration = itemView.findViewById(R.id.duration);
             mActionMore = itemView.findViewById(R.id.action_more);
-//            mEqualizer = itemView.findViewById(R.id.equalizer_view);
 
             //initialize event click item in recyclerview
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +78,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                     mAdapter.get().mPosition = getAdapterPosition();
                     IClickItem = (IClickItem) view.getContext();
                     IClickItem.onClickItem(mPosition);
+                    setSongId(mArraySongs.get(getAdapterPosition()).getId());
                 }
             });
 
@@ -100,13 +100,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                 int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                 int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
 
                 //format duration to mm:ss
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
                 String duration = simpleDateFormat.format(time);
 
                 //add Song to songList
-                Song song = new Song(order, title, artist, albumId, duration, resource);
+                Song song = new Song(order, title, artist, songId, albumId, duration, resource);
                 mArraySongs.add(song);
             }
             cursor.close();
@@ -117,8 +118,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return mArraySongs;
     }
 
-    public void setPositionClicked(int id) {
-        mPositionClicked = id;
+    public void setSongId(int id) {
+        mSongId = id;
         notifyDataSetChanged();
     }
 
