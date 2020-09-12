@@ -338,7 +338,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 mSong = mArraySongs.get(mPosition);
 
                 // TODO TrungTH đưa hàm vào trong lớp mMediaPlaybackFragment giảm thiểu sự phụ thuộc của lớp mMediaPlaybackFragment vào activity
-                //  => chưa hiểu rõ ý nghĩa của fragment thì phải -
+                //  => chưa hiểu rõ ý nghĩa của fragment thì phải
                 mMediaPlaybackFragment = new MediaPlaybackFragment(ActivityMusic.this, ActivityMusic.this);
                 sendBundleToMediaPlaybackFragment();
                 getSupportFragmentManager().beginTransaction().add(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
@@ -426,7 +426,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             Log.d("ToanNTe", "onClickItem: " + mService.isPlaying());
 //            sendBundleToMediaPlaybackFragment();
             mMediaPlaybackFragment.setSongInfo(mSong);
-            sendBundleToMediaPlaybackFragment();
         }
     }
 
@@ -555,6 +554,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 if (mActionBar != null) {
                     mActionBar.hide();
                 }
+                mMediaPlaybackFragment = new MediaPlaybackFragment(this, this);
                 sendBundleToMediaPlaybackFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mMediaPlaybackFragment).addToBackStack(null).commit();
 

@@ -99,12 +99,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         super.onResume();
 
         mBundle = getArguments();
-        Log.d("ToanNTe", "onResume: " + mBundle);
         if (mBundle != null) {
             mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
             mIsPlaying = mBundle.getBoolean(ActivityMusic.BUNDLE_IS_PLAYING);
             setSongInfo(mSong);
-            Log.d("ToanNTe", "onResume: " + mIsPlaying);
         }
 
         // TODO TrungTH để sai chỗ -> DONE Đã đặt lên onCreateView
@@ -143,7 +141,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         checkShuffle();
         checkRepeat();
 
-        // TODO TrungTH sai vị trí -> DONE Đã đặt lên onCreateView
+        // TODO TrungTH sai vị trí -> DONE Đã đặt lên onCreateView()
         //event seek bar change
 //        seekBarChange();
 
