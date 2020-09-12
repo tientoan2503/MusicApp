@@ -74,7 +74,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             //initialize event click item in recyclerview
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
+                public void onClick(View view=) {
                     mAdapter.get().mPosition = getAdapterPosition();
                     IClickItem = (IClickItem) view.getContext();
                     IClickItem.onClickItem(mPosition);
