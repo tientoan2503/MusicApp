@@ -30,6 +30,7 @@
             android:layout_below="@id/layout_shadow"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:weightSum="10"
             android:orientation="horizontal">
 
             <ImageView
@@ -41,12 +42,12 @@
                 android:layout_marginTop="9dp" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginLeft="12dp"
+                android:layout_weight="9"
                 android:layout_marginTop="9dp"
-                android:layout_weight="1"
                 android:orientation="vertical">
                 <!-- TrungTH hiểu sai ý nghĩa của layout_weight="1" -->
                 <TextView
@@ -64,11 +65,10 @@
 
             <ImageView
                 android:id="@+id/img_action_play"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="15dp"
-                android:layout_marginRight="15dp" />
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"/>
 
         </LinearLayout>
     </RelativeLayout>

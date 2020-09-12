@@ -41,6 +41,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
     private MediaPlaybackService mMediaPlaybackService;
+    private int mCurrentTime, mDuration;
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
@@ -110,6 +111,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mIntent = new Intent();
         mSharedPrf = getSharedPreferences(PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
+
     }
 
     @Override
@@ -242,5 +244,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 //        mEditor.putInt(PRF_CURRENT_TIME, mCurrentTime);
 //        mEditor.putInt(PRF_DURATION, mDuration);
         mEditor.commit();
+    }
+
+    private void getTime() {
+        mCurrentTime = getPlayer().getCurrentPosition();
+        mDuration = getPlayer().getDuration();
     }
 }

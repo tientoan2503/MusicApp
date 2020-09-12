@@ -50,6 +50,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
     private MediaPlaybackService mMediaPlaybackService;
+    private Handler mHandler;
+    private Runnable mRunnable;
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IPassData passData) {
         // TODO TrungTH gọp vào 1 cũng đc
@@ -91,6 +93,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         //event seek bar change
         seekBarChange();
+        updateTimeSong();
         return view;
     }
 
@@ -144,6 +147,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         // TODO TrungTH sai vị trí -> DONE Đã đặt lên onCreateView()
         //event seek bar change
 //        seekBarChange();
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
     }
 
@@ -201,6 +210,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         } else {
             setImgPlay(R.drawable.ic_action_play);
         }
+        Log.d("ToanNTe", "setSongInfo: " + mIsPlaying);
     }
 
     @Override
@@ -231,7 +241,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mPassData.positionSeekBarReceived(mSbDuration.getProgress());
+//                mPassData.positionSeekBarReceived(mSbDuration.getProgress());
+                mMediaPlaybackService.getPlayer().seekTo(mSbDuration.getProgress());
             }
         });
     }
@@ -294,8 +305,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
     private void updateTimeSong() {
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat format = new SimpleDateFormat("mm:ss");
@@ -304,7 +315,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 int mDuration = player.getDuration();
                 setCurrentTime(format.format(mCurrentTime));
                 setCurrentSeekBar(mCurrentTime, mDuration);
-                handler.postDelayed(this, 1000);
+                mHandler.postDelayed(this, 1000);
             }
         }, 0);
     }

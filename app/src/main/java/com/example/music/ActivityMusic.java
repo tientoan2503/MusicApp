@@ -10,11 +10,9 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -23,7 +21,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -95,13 +92,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 
                 //if app in landscape mode
                 else {
-                    mMediaPlaybackFragment.setSongInfo(mSong);
+//                    mMediaPlaybackFragment.setSongInfo(mSong);
                     if (mService.isPlaying()) {
                         mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_pause);
                     } else {
                         mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_play);
                     }
-//                    sendBundleToMediaPlaybackFragment();
+
+                    updateUIMediaPlayback();
                 }
 
                 mAdapter.setPositionClicked(mPosition);
@@ -339,12 +337,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 
                 // TODO TrungTH đưa hàm vào trong lớp mMediaPlaybackFragment giảm thiểu sự phụ thuộc của lớp mMediaPlaybackFragment vào activity
                 //  => chưa hiểu rõ ý nghĩa của fragment thì phải
-                mMediaPlaybackFragment = new MediaPlaybackFragment(ActivityMusic.this, ActivityMusic.this);
-                sendBundleToMediaPlaybackFragment();
-                getSupportFragmentManager().beginTransaction().add(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
+                updateUIMediaPlayback();
 
                 //update real time of song
-                updateTimeSong();
+//                updateTimeSong();
+                setMediaPlaybackService();
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
 
             }
@@ -423,9 +420,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         }
         //in landscape mode
         else {
-            Log.d("ToanNTe", "onClickItem: " + mService.isPlaying());
-//            sendBundleToMediaPlaybackFragment();
-            mMediaPlaybackFragment.setSongInfo(mSong);
+            setMediaPlaybackService();
+            updateUIMediaPlayback();
         }
     }
 
@@ -501,21 +497,21 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     //  quan tâm đến việc update thì đặt code trong giao diện play back,
     //  thoát app cũng ko thấy cancel cái này
 
-    private void updateTimeSong() {
-        mHandler = new Handler();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-                mPlayer = mService.getPlayer();
-                mCurrentTime = mPlayer.getCurrentPosition();
-                mDuration = mPlayer.getDuration();
-                mMediaPlaybackFragment.setCurrentTime(format.format(mCurrentTime));
-                mMediaPlaybackFragment.setCurrentSeekBar(mCurrentTime, mDuration);
-                mHandler.postDelayed(this, 1000);
-            }
-        }, 0);
-    }
+//    private void updateTimeSong() {
+//        mHandler = new Handler();
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
+//                mPlayer = mService.getPlayer();
+//                mCurrentTime = mPlayer.getCurrentPosition();
+//                mDuration = mPlayer.getDuration();
+//                mMediaPlaybackFragment.setCurrentTime(format.format(mCurrentTime));
+//                mMediaPlaybackFragment.setCurrentSeekBar(mCurrentTime, mDuration);
+//                mHandler.postDelayed(this, 1000);
+//            }
+//        }, 0);
+//    }
 
     @Override
     public void onClickShuffle(boolean isShuffle) {
@@ -538,13 +534,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                     mService.pauseSong();
                     mActionPlay.setImageResource(R.drawable.ic_media_play);
                 } else {
-                    Log.d("ToanNTe", "onClick: " + mPlayer);
-                    if (mPlayer == null) {
-                        mService.playSong();
-                        mPlayer = mService.getPlayer();
-                    } else {
-                        mService.resumeSong();
-                    }
+//                    if (mPlayer == null) {
+//                        mService.playSong();
+//                        mPlayer = mService.getPlayer();
+//                    } else {
+//                        mService.resumeSong();
+//                    }
+                    Log.d("ToanNTe", "onClick: " + mService.getPlayer());
+                    mService.resumeSong();
                     mActionPlay.setImageResource(R.drawable.ic_media_pause);
                 }
                 break;
@@ -554,6 +551,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 if (mActionBar != null) {
                     mActionBar.hide();
                 }
+
                 mMediaPlaybackFragment = new MediaPlaybackFragment(this, this);
                 sendBundleToMediaPlaybackFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mMediaPlaybackFragment).addToBackStack(null).commit();
@@ -564,7 +562,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
 
                 //update real time of song
-                updateTimeSong();
+//                updateTimeSong();
+                setMediaPlaybackService();
                 break;
         }
     }
@@ -583,6 +582,12 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         mBundle.putParcelable(BUNDLE_SONG_KEY, mSong);
         mBundle.putBoolean(BUNDLE_IS_PLAYING, mService.isPlaying());
         mMediaPlaybackFragment.setArguments(mBundle);
+    }
+
+    private void updateUIMediaPlayback() {
+        mMediaPlaybackFragment = new MediaPlaybackFragment(this, this);
+        sendBundleToMediaPlaybackFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
     }
 
 }
