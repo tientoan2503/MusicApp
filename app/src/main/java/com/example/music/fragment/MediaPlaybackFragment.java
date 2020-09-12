@@ -46,12 +46,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private String mRepeat;
     private boolean mIsQueueSelected = false;
     private boolean mIsPlaying;
-    public final String FALSE = "false";
-    public final String TRUE = "true";
-    public final String REPEAT = "repeat";
     private MediaPlaybackService mMediaPlaybackService;
     private Handler mHandler;
     private Runnable mRunnable;
+    private MediaPlayer mPlayer;
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IPassData passData) {
         // TODO TrungTH gọp vào 1 cũng đc
@@ -93,7 +91,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         //event seek bar change
         seekBarChange();
-        updateTimeSong();
+
+        if (mMediaPlaybackService != null) {
+            updateTimeSong();
+            mHandler.postDelayed(mRunnable, 0);
+        }
         return view;
     }
 
@@ -108,52 +110,21 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             setSongInfo(mSong);
         }
 
-        // TODO TrungTH để sai chỗ -> DONE Đã đặt lên onCreateView
-        //event click play, pause, next, prev, shuffle, repeat, queue music
-//        mImgPlay.setOnClickListener(this);
-//        mImgNext.setOnClickListener(this);
-//        mImgPrev.setOnClickListener(this);
-//        mImgRepeat.setOnClickListener(this);
-//        mImgShuffle.setOnClickListener(this);
-//        mImgQueue.setOnClickListener(this);
+        mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
+        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
+        mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
 
-        mSharedPrf = getActivity().getSharedPreferences("PRF_NAME", MODE_PRIVATE);
-        mRepeat = mSharedPrf.getString("PRF_NAME", FALSE);
-        mIsShuffle = mSharedPrf.getBoolean("PRF_NAME", false);
-
-        // TODO TrungTH tách hàm để dùng lại -> DONE Đã tạo hàm checkShuffle()
-        //shuffle
-//        if (mIsShuffle) {
-//            setImgShuffle(R.drawable.ic_play_shuffle_selected);
-//        } else {
-//            setImgShuffle(R.drawable.ic_play_shuffle_default);
-//        }
-//        // TODO TrungTH tách hàm để dùng lại -> DONE Đã tạo hàm checkRepeat()
-//        //repeat
-//        switch (mRepeat) {
-//            case FALSE:
-//                setImgRepeat(R.drawable.ic_play_repeat_default);
-//                break;
-//            case TRUE:
-//                setImgRepeat(R.drawable.ic_play_repeat_selected);
-//                break;
-//            case REPEAT:
-//                setImgRepeat(R.drawable.ic_play_repeat_1);
-//                break;
-//        }
         checkShuffle();
         checkRepeat();
-
-        // TODO TrungTH sai vị trí -> DONE Đã đặt lên onCreateView()
-        //event seek bar change
-//        seekBarChange();
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
+        if (mHandler != null) {
+            mHandler.removeCallbacks(mRunnable);
+        }
     }
 
     private void checkShuffle() {
@@ -166,13 +137,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private void checkRepeat() {
         switch (mRepeat) {
-            case FALSE:
+            case ActivityMusic.FALSE:
                 setImgRepeat(R.drawable.ic_play_repeat_default);
                 break;
-            case TRUE:
+            case ActivityMusic.TRUE:
                 setImgRepeat(R.drawable.ic_play_repeat_selected);
                 break;
-            case REPEAT:
+            case ActivityMusic.REPEAT:
                 setImgRepeat(R.drawable.ic_play_repeat_1);
                 break;
         }
@@ -210,7 +181,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         } else {
             setImgPlay(R.drawable.ic_action_play);
         }
-        Log.d("ToanNTe", "setSongInfo: " + mIsPlaying);
     }
 
     @Override
@@ -236,12 +206,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-//                mSbDuration.setProgress(mSbDuration.getProgress());
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-//                mPassData.positionSeekBarReceived(mSbDuration.getProgress());
                 mMediaPlaybackService.getPlayer().seekTo(mSbDuration.getProgress());
             }
         });
@@ -273,51 +241,36 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
             case R.id.img_repeat:
                 switch (mRepeat) {
-                    case FALSE:
-                        mRepeat = TRUE;
+                    case ActivityMusic.FALSE:
+                        mRepeat = ActivityMusic.TRUE;
                         break;
-                    case TRUE:
-                        mRepeat = REPEAT;
+                    case ActivityMusic.TRUE:
+                        mRepeat = ActivityMusic.REPEAT;
                         break;
-                    case REPEAT:
-                        mRepeat = FALSE;
+                    case ActivityMusic.REPEAT:
+                        mRepeat = ActivityMusic.FALSE;
                         break;
                 }
                 checkRepeat();
                 mMediaControl.onClickRepeat(mRepeat);
                 break;
-//            case R.id.img_queu:
-//                //TODO TrungTH không thấy chạy thì phải
-//                AllSongsFragment allSongsFragment = new AllSongsFragment();
-//                FrameLayout frameLayout = getActivity().findViewById(R.id.layout_list_song);
-//                if (mIsQueueSelected) {
-//                    frameLayout.setVisibility(View.GONE);
-//                    mIsQueueSelected = false;
-//                    mImgQueue.setImageResource(R.drawable.ic_queue_music_default);
-//                } else {
-//                    frameLayout.setVisibility(View.VISIBLE);
-//                    getFragmentManager().beginTransaction().replace(R.id.layout_list_song, allSongsFragment).commit();
-//                    mIsQueueSelected = true;
-//                    mImgQueue.setImageResource(R.drawable.ic_queue_music_selected);
-//                }
-//                break;
         }
     }
 
     private void updateTimeSong() {
         mHandler = new Handler();
-        mHandler.postDelayed(new Runnable() {
+        mPlayer = mMediaPlaybackService.getPlayer();
+        mRunnable =  new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-                MediaPlayer player = mMediaPlaybackService.getPlayer();
-                int mCurrentTime = player.getCurrentPosition();
-                int mDuration = player.getDuration();
+                int mCurrentTime = mPlayer.getCurrentPosition();
+                int mDuration = mPlayer.getDuration();
                 setCurrentTime(format.format(mCurrentTime));
                 setCurrentSeekBar(mCurrentTime, mDuration);
                 mHandler.postDelayed(this, 1000);
             }
-        }, 0);
+        };
     }
 
     public void setService(MediaPlaybackService service) {

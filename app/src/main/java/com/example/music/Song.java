@@ -10,20 +10,19 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
-import java.io.Serializable;
 //TrungTH sai convention
 public class Song implements Parcelable {
     private String title, artist, duration, resource;
-    private int album;
+    private int albumID;
     private int order;
     private Bitmap art;
 
-    public Song(int order, String title, String artist, int album, String duration, String resource) {
+    public Song(int order, String title, String artist, int albumID, String duration, String resource) {
         this.order = order;
         this.title = title;
         this.artist = artist;
         this.art = art;
-        this.album = album;
+        this.albumID = albumID;
         this.duration = duration;
         this.resource = resource;
     }
@@ -35,7 +34,7 @@ public class Song implements Parcelable {
         title = in.readString();
         artist = in.readString();
         duration = in.readString();
-        album = in.readInt();
+        albumID = in.readInt();
         resource = in.readString();
         order = in.readInt();
         art = in.readParcelable(Bitmap.class.getClassLoader());
@@ -93,12 +92,12 @@ public class Song implements Parcelable {
         this.duration = duration;
     }
 
-    public Integer getAlbum() {
-        return album;
+    public Integer getAlbumID() {
+        return albumID;
     }
 
-    public void setAlbum(Integer album) {
-        this.album = album;
+    public void setAlbumID(Integer albumID) {
+        this.albumID = albumID;
     }
 
     public String getResource() {
@@ -121,7 +120,7 @@ public class Song implements Parcelable {
 
     public Uri getUri() {
         Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(sArtworkUri, album);
+        return ContentUris.withAppendedId(sArtworkUri, albumID);
     }
 
     public void setImage(Context context, ImageView imageView) {

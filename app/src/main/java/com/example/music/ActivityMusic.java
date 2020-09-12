@@ -34,7 +34,6 @@ import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.MediaPlaybackFragment;
 import com.example.music.service.MediaPlaybackService;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IPassData, IMediaControl, View.OnClickListener {
@@ -43,10 +42,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     public static final String ACTION_PLAY_COMPLETE = "ACTION_PLAY_COMPLETE";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
     public static final String BUNDLE_IS_PLAYING = "BUNDLE_IS_PLAYING";
-    //TODO TrungTH những cái bên dưới này nên đặt là hằng số cho tiện so sánh và đỡ tốn tài nguyên
-    public final String FALSE = "false";
-    public final String TRUE = "true";
-    public final String REPEAT = "repeat";
+    public static final String FALSE = "false";
+    public static final String TRUE = "true";
+    public static final String REPEAT = "repeat";
 
 
     private ActionBar mActionBar;
@@ -102,7 +100,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                     updateUIMediaPlayback();
                 }
 
-                mAdapter.setPositionClicked(mPosition);
+                mAdapter.setPositionClicked(mSong.getAlbumID());
             }
         }
     }
@@ -219,7 +217,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             mActionBar.show();
             mInfoLayout.setVisibility(View.VISIBLE);
             setSongInfo(mSong);
-            mAdapter.setPositionClicked(mPosition);
+            mAdapter.setPositionClicked(mSong.getAlbumID());
 
             getDataFromStorage();
         }
@@ -290,10 +288,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
     }
 
     private void getDataSharedPrf() {
-        mSharedPrf = getSharedPreferences(mService.PRF_NAME, MODE_PRIVATE);
-        mRepeat = mSharedPrf.getString(mService.PRF_REPEAT, FALSE);
-        mIsShuffle = mSharedPrf.getBoolean(mService.PRF_SHUFFLE, false);
-        mPosition = mSharedPrf.getInt(mService.PRF_POSITION, -1);
+        mSharedPrf = getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
+        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, FALSE);
+        mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
+        mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
     }
 
     //create icon Search on Action Bar
@@ -317,7 +315,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 
             //send position to Adapter
             if (mPosition != -1) {
-                mAdapter.setPositionClicked(mPosition);
+//                mAdapter.setPositionClicked(mSong.getAlbumID());
             }
 
             //send ArraySongs to MediaPlaybackService
@@ -397,7 +395,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         mService.setArraySongs(mArraySongs);
 
         //set position clicked in Adapter
-        mAdapter.setPositionClicked(mPosition);
+        mAdapter.setPositionClicked(mSong.getAlbumID());
 
         //play song
         mService.playSong();
@@ -420,8 +418,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         }
         //in landscape mode
         else {
-            setMediaPlaybackService();
             updateUIMediaPlayback();
+            setMediaPlaybackService();
         }
     }
 
@@ -475,7 +473,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         setSongInfoFragment();
 
         //set position clicked in Adapter
-        mAdapter.setPositionClicked(mPosition);
+        mAdapter.setPositionClicked(mSong.getAlbumID());
     }
 
     @Override
@@ -489,7 +487,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         setSongInfoFragment();
 
         //set position clicked in Adapter
-        mAdapter.setPositionClicked(mPosition);
+        mAdapter.setPositionClicked(mSong.getAlbumID());
     }
 
     //method update real time of song
@@ -540,7 +538,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 //                    } else {
 //                        mService.resumeSong();
 //                    }
-                    Log.d("ToanNTe", "onClick: " + mService.getPlayer());
                     mService.resumeSong();
                     mActionPlay.setImageResource(R.drawable.ic_media_pause);
                 }
@@ -562,7 +559,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
 
                 //update real time of song
-//                updateTimeSong();
                 setMediaPlaybackService();
                 break;
         }

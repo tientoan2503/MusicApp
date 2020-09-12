@@ -27,7 +27,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public ArrayList<Song> mArraySongs;
     private IClickItem IClickItem;
     public int mPosition;
-    private int mPositionClicked = -1;
+    private int mPositionClicked;
 
     @NonNull
     @Override
@@ -40,15 +40,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull SongAdapter.ViewHolder holder, int position) {
-//        Log.d("ToanNTe", "onBindViewHolder: " + Log.getStackTraceString(new Exception()));
-//        Log.d("ToanNTe", "onBindViewHolder: " + mPositionClicked);
         Song song = mArraySongs.get(position);
         holder.mSongOrder.setText(song.getOrder() + "");
         holder.mTvSongName.setText(song.getTitle());
         holder.mTvDuration.setText(song.getDuration());
-        if (position == mPositionClicked) {
+        if (mArraySongs.get(position).getAlbumID() == mPositionClicked) {
             holder.mTvSongName.setTypeface(Typeface.DEFAULT_BOLD);
         }
+        Log.d("ToanNTe", "onBindViewHolder: " + mArraySongs.get(position).getAlbumID() + " - " +
+                mPositionClicked);
     }
 
     @Override
@@ -71,6 +71,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             mTvDuration = itemView.findViewById(R.id.duration);
             mActionMore = itemView.findViewById(R.id.action_more);
 //            mEqualizer = itemView.findViewById(R.id.equalizer_view);
+
             //initialize event click item in recyclerview
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -116,8 +117,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return mArraySongs;
     }
 
-    public void setPositionClicked(int position) {
-        mPositionClicked = position;
+    public void setPositionClicked(int id) {
+        mPositionClicked = id;
         notifyDataSetChanged();
     }
 
