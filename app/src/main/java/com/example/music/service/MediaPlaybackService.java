@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.example.music.ActivityMusic;
 import com.example.music.Song;
@@ -33,14 +34,12 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private int mPosition;
     private boolean mIsShuffle;
     private String mRepeat;
-    private boolean mStop = false;
     private Intent mIntent;
     private SharedPreferences mSharedPrf;
     private SharedPreferences.Editor mEditor;
     public final String FALSE = "false";
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
-    private MediaPlaybackService mMediaPlaybackService;
     private int mCurrentTime, mDuration;
 
     @Override
@@ -68,6 +67,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
 
+        Log.d("ToanNTe", "onCompletion: " + mRepeat);
         putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
         setIntent(ActivityMusic.ACTION_PLAY_COMPLETE);
         sendBroadcast(mIntent);
@@ -80,7 +80,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-        if (mPosition != -1) {
+//        if (mPosition != -1) {
             mPlayer.reset();
             mUri = Uri.parse(mArraySongs.get(mPosition).getResource());
 
@@ -90,8 +90,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
-        }
+//            putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
+            Log.d("ToanNTe", "onError: " + mPosition +" " +mCurrentTime);
+//        }
         return true;
     }
 

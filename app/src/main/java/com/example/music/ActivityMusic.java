@@ -96,10 +96,12 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                         mMediaPlaybackFragment.setImgPlay(R.drawable.ic_action_play);
                     }
 
+                    setMediaPlaybackService();
                     updateUIMediaPlayback();
+
                 }
 
-//                mAdapter.setSongId(mSong.getId());
+                mAdapter.setSongId(mSong.getId());
             }
         }
     }
@@ -216,8 +218,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             mActionBar.show();
             mInfoLayout.setVisibility(View.VISIBLE);
             setSongInfo(mSong);
-//            mAdapter.setSongId(mSong.getId());
 
+            mAdapter = mAllSongsFragment.getAdapter();
+            mAdapter.setSongId(mSong.getId());
             getDataFromStorage();
         }
     }
@@ -234,6 +237,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             unbindService(mConnection);
             mBound = false;
         }
+
     }
 
     private void getDataFromStorage() {
@@ -312,11 +316,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
             mAdapter = mAllSongsFragment.getAdapter();
             mArraySongs = mAdapter.getArraySongs();
 
-            //send position to Adapter
-            if (mPosition != -1) {
-//                mAdapter.setPositionClicked(mSong.getAlbumID());
-            }
-
             //send ArraySongs to MediaPlaybackService
             mService.setArraySongs(mArraySongs);
             mService.setPosition(mPosition);
@@ -332,12 +331,15 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
 
                 mSong = mArraySongs.get(mPosition);
 
+                //send position to Adapter
+                if (mPosition != -1) {
+                    mAdapter.setSongId(mSong.getId());
+                }
                 // TODO TrungTH đưa hàm vào trong lớp mMediaPlaybackFragment giảm thiểu sự phụ thuộc của lớp mMediaPlaybackFragment vào activity
                 //  => chưa hiểu rõ ý nghĩa của fragment thì phải
                 updateUIMediaPlayback();
 
                 //update real time of song
-//                updateTimeSong();
                 setMediaPlaybackService();
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
 
@@ -363,17 +365,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                     //check Media Player is playing or not to set play icon
                     checkPlaying();
                 }
-
-                //TODO TrungTH lắng sự kiện click để ở chỗ find view
-                //event click play or pause
-//                mActionPlay.setOnClickListener(ActivityMusic.this);
-//
-//                //event click song info
-//                mInfoLayout.setOnClickListener(ActivityMusic.this);
             }
-
-//            mDuration = mSharedPrf.getInt(mService.PRF_DURATION, 0);
-//            mCurrentTime = mSharedPrf.getInt(mService.PRF_CURRENT_TIME, 0);
         }
 
         @Override
@@ -392,9 +384,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         mPosition = position;
         mService.setPosition(mPosition);
         mService.setArraySongs(mArraySongs);
+        mSong = mArraySongs.get(mPosition);
 
         //set position clicked in Adapter
-//        mAdapter.setSongId(mSong.getId());
+        mAdapter.setSongId(mSong.getId());
 
         //play song
         mService.playSong();
@@ -472,7 +465,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         setSongInfoFragment();
 
         //set position clicked in Adapter
-//        mAdapter.setSongId(mSong.getId());
+        mAdapter.setSongId(mSong.getId());
     }
 
     @Override
@@ -486,29 +479,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
         setSongInfoFragment();
 
         //set position clicked in Adapter
-//        mAdapter.setSongId(mSong.getId());
+        mAdapter.setSongId(mSong.getId());
     }
-
-    //method update real time of song
-    // TODO TrungTH Thường thì chỉ cần 1 s chạy 1 lần, ngoài ra giao diện playback
-    //  quan tâm đến việc update thì đặt code trong giao diện play back,
-    //  thoát app cũng ko thấy cancel cái này
-
-//    private void updateTimeSong() {
-//        mHandler = new Handler();
-//        mHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-//                mPlayer = mService.getPlayer();
-//                mCurrentTime = mPlayer.getCurrentPosition();
-//                mDuration = mPlayer.getDuration();
-//                mMediaPlaybackFragment.setCurrentTime(format.format(mCurrentTime));
-//                mMediaPlaybackFragment.setCurrentSeekBar(mCurrentTime, mDuration);
-//                mHandler.postDelayed(this, 1000);
-//            }
-//        }, 0);
-//    }
 
     @Override
     public void onClickShuffle(boolean isShuffle) {

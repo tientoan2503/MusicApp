@@ -96,6 +96,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             updateTimeSong();
             mHandler.postDelayed(mRunnable, 0);
         }
+
+        mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
+        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
+        mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
+
         return view;
     }
 
@@ -109,11 +114,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mIsPlaying = mBundle.getBoolean(ActivityMusic.BUNDLE_IS_PLAYING);
             setSongInfo(mSong);
         }
-
-        mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
-        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
-        mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
-
         checkShuffle();
         checkRepeat();
     }
@@ -125,6 +125,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         if (mHandler != null) {
             mHandler.removeCallbacks(mRunnable);
         }
+
+//        mMediaPlaybackService.putDataToSharedPrf(0, mRepeat, mIsShuffle);
     }
 
     private void checkShuffle() {
@@ -210,7 +212,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mMediaPlaybackService.getPlayer().seekTo(mSbDuration.getProgress());
+                mPlayer.seekTo(mSbDuration.getProgress());
             }
         });
     }

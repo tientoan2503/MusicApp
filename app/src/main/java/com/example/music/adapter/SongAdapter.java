@@ -44,11 +44,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         holder.mSongOrder.setText(song.getOrder() + "");
         holder.mTvSongName.setText(song.getTitle());
         holder.mTvDuration.setText(song.getDuration());
-        if (mArraySongs.get(position).getId() == mSongId) {
+        if (song.getId() == mSongId) {
             holder.mTvSongName.setTypeface(Typeface.DEFAULT_BOLD);
+        } else {
+            holder.mTvSongName.setTypeface(Typeface.DEFAULT);
         }
-        Log.d("ToanNTe", "onBindViewHolder: " + mArraySongs.get(position).getId() + " - " +
-                mSongId);
     }
 
     @Override
@@ -74,11 +74,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             //initialize event click item in recyclerview
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view=) {
+                public void onClick(View view) {
                     mAdapter.get().mPosition = getAdapterPosition();
                     IClickItem = (IClickItem) view.getContext();
                     IClickItem.onClickItem(mPosition);
-                    setSongId(mArraySongs.get(getAdapterPosition()).getId());
                 }
             });
 
