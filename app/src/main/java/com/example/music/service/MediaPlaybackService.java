@@ -45,6 +45,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
 
+        mIsShuffle = mSharedPrf.getBoolean(PRF_SHUFFLE, false);
+        mRepeat = mSharedPrf.getString(PRF_REPEAT, ActivityMusic.FALSE);
+
         if (mIsShuffle) {
             if (mRepeat.equals(REPEAT)) {
                 playSong();
@@ -67,10 +70,12 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
 
-        Log.d("ToanNTe", "onCompletion: " + mRepeat);
-//        putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
         setIntent(ActivityMusic.ACTION_PLAY_COMPLETE);
         sendBroadcast(mIntent);
+
+        mEditor.putInt(PRF_POSITION, mPosition);
+        mEditor.putBoolean(PRF_SHUFFLE, mIsShuffle);
+        mEditor.putString(PRF_REPEAT, mRepeat);
     }
 
     @Override
@@ -91,6 +96,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 e.printStackTrace();
             }
         }
+
         return true;
     }
 
@@ -110,7 +116,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mIntent = new Intent();
         mSharedPrf = getSharedPreferences(PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
-
     }
 
     @Override
@@ -239,15 +244,15 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mIntent.putExtra(BROAD_POSITION, mPosition);
     }
 
-    public void putDataToSharedPrf(int position, String repeat, boolean isShuffle) {
-        //put data to SharedPreference
-        mEditor.putInt(PRF_POSITION, position);
-        mEditor.putString(PRF_REPEAT, repeat);
-        mEditor.putBoolean(PRF_SHUFFLE, isShuffle);
-//        mEditor.putInt(PRF_CURRENT_TIME, mCurrentTime);
-//        mEditor.putInt(PRF_DURATION, mDuration);
-        mEditor.commit();
-    }
+//    public void putDataToSharedPrf(int position, String repeat, boolean isShuffle) {
+//        //put data to SharedPreference
+//        mEditor.putInt(PRF_POSITION, position);
+//        mEditor.putString(PRF_REPEAT, repeat);
+//        mEditor.putBoolean(PRF_SHUFFLE, isShuffle);
+////        mEditor.putInt(PRF_CURRENT_TIME, mCurrentTime);
+////        mEditor.putInt(PRF_DURATION, mDuration);
+//        mEditor.commit();
+//    }
 
     public void putRepeatToPrf(String repeat) {
         mEditor.putString(PRF_REPEAT, repeat);
@@ -257,16 +262,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public void putShuffleToPrf(boolean isShuffle) {
         mEditor.putBoolean(PRF_SHUFFLE, isShuffle);
         mEditor.commit();
-
     }
 
     public void putPositionToPrf(int position) {
         mEditor.putInt(PRF_POSITION, position);
         mEditor.commit();
-    }
-
-    private void getTime() {
-        mCurrentTime = mPlayer.getCurrentPosition();
-        mDuration = mPlayer.getDuration();
     }
 }

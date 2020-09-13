@@ -98,9 +98,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
 
         mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
-        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
         mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
-        Log.d("ToanNTe", "onCreateView: " + mIsShuffle);
+        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
 
         return view;
     }
@@ -115,6 +114,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mIsPlaying = mBundle.getBoolean(ActivityMusic.BUNDLE_IS_PLAYING);
             setSongInfo(mSong);
         }
+
         checkShuffle();
         checkRepeat();
     }

@@ -1,5 +1,6 @@
 package com.example.music.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,22 +44,17 @@ public class AllSongsFragment extends Fragment {
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
-    public SongAdapter getAdapter() {
-        return mSongAdapter;
-    }
-
     public void getAllSongs() {
         mSongAdapter.getAllSongs(getContext());
     }
-
 
     public void setSongId(int id) {
         mSongAdapter.mSongId = id;
         mSongAdapter.notifyDataSetChanged();
     }
 
-
     public ArrayList<Song> getArraySongs() {
         return mSongAdapter.mArraySongs;
     }
+
 }
