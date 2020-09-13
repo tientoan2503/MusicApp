@@ -22,12 +22,14 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import es.claucookie.miniequalizerlibrary.EqualizerView;
+
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     public ArrayList<Song> mArraySongs;
     private IClickItem IClickItem;
     public int mPosition;
-    private int mSongId;
+    public int mSongId;
 
     @NonNull
     @Override
@@ -44,10 +46,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         holder.mSongOrder.setText(song.getOrder() + "");
         holder.mTvSongName.setText(song.getTitle());
         holder.mTvDuration.setText(song.getDuration());
+
         if (song.getId() == mSongId) {
             holder.mTvSongName.setTypeface(Typeface.DEFAULT_BOLD);
+            holder.mSongOrder.setVisibility(View.INVISIBLE);
+            holder.mEqualizer.setVisibility(View.VISIBLE);
+            holder.mEqualizer.animateBars();
+
         } else {
             holder.mTvSongName.setTypeface(Typeface.DEFAULT);
+            holder.mEqualizer.stopBars();
+            holder.mEqualizer.setVisibility(View.GONE);
+            holder.mSongOrder.setVisibility(View.VISIBLE);
         }
     }
 
@@ -59,6 +69,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView mActionMore;
         TextView mTvSongName, mTvDuration, mSongOrder;
+        EqualizerView mEqualizer;
 
         WeakReference<SongAdapter> mAdapter;
 
@@ -70,6 +81,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             mTvSongName = itemView.findViewById(R.id.song_title);
             mTvDuration = itemView.findViewById(R.id.duration);
             mActionMore = itemView.findViewById(R.id.action_more);
+            mEqualizer = itemView.findViewById(R.id.equalizer);
 
             //initialize event click item in recyclerview
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -112,14 +124,4 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             cursor.close();
         }
     }
-
-    public ArrayList<Song> getArraySongs() {
-        return mArraySongs;
-    }
-
-    public void setSongId(int id) {
-        mSongId = id;
-        notifyDataSetChanged();
-    }
-
 }

@@ -14,7 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.music.R;
+import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
+
+import java.util.ArrayList;
 
 public class AllSongsFragment extends Fragment {
 
@@ -46,5 +49,16 @@ public class AllSongsFragment extends Fragment {
 
     public void getAllSongs() {
         mSongAdapter.getAllSongs(getContext());
+    }
+
+
+    public void setSongId(int id) {
+        mSongAdapter.mSongId = id;
+        mSongAdapter.notifyDataSetChanged();
+    }
+
+
+    public ArrayList<Song> getArraySongs() {
+        return mSongAdapter.mArraySongs;
     }
 }

@@ -100,6 +100,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
         mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
         mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
+        Log.d("ToanNTe", "onCreateView: " + mIsShuffle);
 
         return view;
     }
@@ -125,8 +126,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         if (mHandler != null) {
             mHandler.removeCallbacks(mRunnable);
         }
-
-//        mMediaPlaybackService.putDataToSharedPrf(0, mRepeat, mIsShuffle);
     }
 
     private void checkShuffle() {
@@ -212,7 +211,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mPlayer.seekTo(mSbDuration.getProgress());
+                mMediaPlaybackService.playerSeekTo(mSbDuration.getProgress());
             }
         });
     }
@@ -239,7 +238,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 }
                 checkShuffle();
                 mMediaControl.onClickShuffle(mIsShuffle);
-
+                mMediaPlaybackService.putShuffleToPrf(mIsShuffle);
                 break;
             case R.id.img_repeat:
                 switch (mRepeat) {
@@ -255,19 +254,19 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 }
                 checkRepeat();
                 mMediaControl.onClickRepeat(mRepeat);
+                mMediaPlaybackService.putRepeatToPrf(mRepeat);
                 break;
         }
     }
 
     private void updateTimeSong() {
         mHandler = new Handler();
-        mPlayer = mMediaPlaybackService.getPlayer();
         mRunnable =  new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-                int mCurrentTime = mPlayer.getCurrentPosition();
-                int mDuration = mPlayer.getDuration();
+                int mCurrentTime = mMediaPlaybackService.getCurrentTime();
+                int mDuration = mMediaPlaybackService.getDuration();
                 setCurrentTime(format.format(mCurrentTime));
                 setCurrentSeekBar(mCurrentTime, mDuration);
                 mHandler.postDelayed(this, 1000);

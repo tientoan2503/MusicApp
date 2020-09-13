@@ -68,7 +68,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         }
 
         Log.d("ToanNTe", "onCompletion: " + mRepeat);
-        putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
+//        putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
         setIntent(ActivityMusic.ACTION_PLAY_COMPLETE);
         sendBroadcast(mIntent);
     }
@@ -80,7 +80,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-//        if (mPosition != -1) {
+        if (mPosition != -1) {
             mPlayer.reset();
             mUri = Uri.parse(mArraySongs.get(mPosition).getResource());
 
@@ -90,9 +90,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
-            Log.d("ToanNTe", "onError: " + mPosition +" " +mCurrentTime);
-//        }
+        }
         return true;
     }
 
@@ -147,22 +145,22 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public void setPosition(int position) {
         mPosition = position;
     }
+
     // TODO TrungTH lặp code với playShuffle cần tách hàm sao để dùng chung
     public void playSong() {
-        mPlayer.reset();
-        mUri = Uri.parse(mArraySongs.get(mPosition).getResource());
-        try {
-            mPlayer.setDataSource(getApplicationContext(), mUri);
-            mPlayer.prepare();
-            mPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        putDataToSharedPrf(mPosition, mRepeat, mIsShuffle);
+        createUri(mPosition);
     }
 
-    public MediaPlayer getPlayer() {
-        return mPlayer;
+    public void playerSeekTo(int i) {
+        mPlayer.seekTo(i);
+    }
+
+    public int getCurrentTime() {
+        return mPlayer.getCurrentPosition();
+    }
+
+    public int getDuration() {
+        return mPlayer.getDuration();
     }
 
     public int getPosition() {
@@ -172,17 +170,16 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public int shuffle() {
         Random random = new Random();
         // TODO TRungth ban đầu gán luôn = pos đỡ bị lặp code random.nextInt(mArraySongs.size());
-//        int ranNumber = random.nextInt(mArraySongs.size());
-//        while (mPosition == ranNumber) {
-//            ranNumber = random.nextInt(mArraySongs.size());
-//        }
-        return mPosition = random.nextInt(mArraySongs.size());
+        int ranNumber = random.nextInt(mArraySongs.size());
+        while (mPosition == ranNumber) {
+            ranNumber = random.nextInt(mArraySongs.size());
+        }
+        return ranNumber;
     }
 
-    public void playShuffle() {
-        mPosition = shuffle();
-        mUri = Uri.parse(mArraySongs.get(mPosition).getResource());
+    private void createUri(int position) {
         mPlayer.reset();
+        mUri = Uri.parse(mArraySongs.get(position).getResource());
         try {
             mPlayer.setDataSource(getApplicationContext(), mUri);
             mPlayer.prepare();
@@ -190,6 +187,11 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void playShuffle() {
+        mPosition = shuffle();
+        createUri(mPosition);
     }
 
     public void pauseSong() {
@@ -247,8 +249,24 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mEditor.commit();
     }
 
+    public void putRepeatToPrf(String repeat) {
+        mEditor.putString(PRF_REPEAT, repeat);
+        mEditor.commit();
+    }
+
+    public void putShuffleToPrf(boolean isShuffle) {
+        mEditor.putBoolean(PRF_SHUFFLE, isShuffle);
+        mEditor.commit();
+
+    }
+
+    public void putPositionToPrf(int position) {
+        mEditor.putInt(PRF_POSITION, position);
+        mEditor.commit();
+    }
+
     private void getTime() {
-        mCurrentTime = getPlayer().getCurrentPosition();
-        mDuration = getPlayer().getDuration();
+        mCurrentTime = mPlayer.getCurrentPosition();
+        mDuration = mPlayer.getDuration();
     }
 }
