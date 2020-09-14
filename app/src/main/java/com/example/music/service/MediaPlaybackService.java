@@ -1,17 +1,27 @@
 package com.example.music.service;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.RemoteViews;
+
+import androidx.core.app.NotificationCompat;
 
 import com.example.music.ActivityMusic;
+import com.example.music.R;
 import com.example.music.Song;
+import com.example.music.notification.Notification;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -41,6 +51,11 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
     private int mCurrentTime, mDuration;
+
+    private static final int NOTIFICATION_ID = 1;
+    private static final String CHANNEL_ID = "CHANNEL_ID";
+    private NotificationManager mNotifyManager;
+    private Context mContext;
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
@@ -116,6 +131,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mIntent = new Intent();
         mSharedPrf = getSharedPreferences(PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
+        mContext = getApplicationContext();
+        createChannel();
+
     }
 
     @Override
@@ -125,6 +143,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -154,6 +173,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     // TODO TrungTH lặp code với playShuffle cần tách hàm sao để dùng chung
     public void playSong() {
         createUri(mPosition);
+        createNotification();
+
     }
 
     public void playerSeekTo(int i) {
@@ -271,5 +292,35 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     public ArrayList<Song> getArraySongs() {
         return mArraySongs;
+    }
+
+    public void createChannel() {
+        mNotifyManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Music Notification",
+                    NotificationManager.IMPORTANCE_HIGH);
+
+            mNotifyManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
+    public void createNotification() {
+        RemoteViews normalLayout = new RemoteViews(mContext.getPackageName(), R.layout.custom_normal_notification);
+        RemoteViews expandedLayout = new RemoteViews(mContext.getPackageName(), R.layout.custom_expanded_notification);
+
+        Intent intent = new Intent(mContext, ActivityMusic.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(mContext, CHANNEL_ID)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCustomContentView(normalLayout)
+                .setCustomBigContentView(expandedLayout)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("You've been notified!")
+                .setContentText("This is your notification text.");
+
+        mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
+        startForeground(1, notifyBuilder.build());
     }
 }

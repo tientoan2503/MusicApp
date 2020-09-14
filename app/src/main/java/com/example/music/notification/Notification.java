@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -49,8 +48,7 @@ public class Notification {
                 .setCustomBigContentView(expandedLayout)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("You've been notified!")
-                .setContentText("This is your notification text.")
-                .setDefaults(NotificationCompat.DEFAULT_ALL);
+                .setContentText("This is your notification text.");
 
         mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
     }

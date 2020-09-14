@@ -174,10 +174,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     protected void onPause() {
         super.onPause();
-
-        Notification notification = new Notification(this);
-        notification.createChannel();
-        notification.createNotification();
     }
 
     @Override
@@ -348,6 +344,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickItem(int position) {
         //TODO TrungTH tinh chỉnh lại đoạn này cho gọn lại , ko lặp code
 
+
+
         mPosition = position;
         mService.setPosition(mPosition);
         mService.setArraySongs(mArraySongs);
@@ -449,6 +447,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 }
                 //set animation of Equalizer view
                 mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+
+
+
                 break;
 
             case R.id.song_info:
