@@ -555,6 +555,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IPas
                 if (mActionBar != null) {
                     mActionBar.hide();
                 }
+                mMediaPlaybackFragment = new MediaPlaybackFragment(this, this);
                 sendBundleToMediaPlaybackFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mMediaPlaybackFragment).addToBackStack(null).commit();
 
