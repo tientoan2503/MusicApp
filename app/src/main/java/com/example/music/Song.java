@@ -10,20 +10,17 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 
-import java.io.Serializable;
 //TrungTH sai convention
 public class Song implements Parcelable {
     private String title, artist, duration, resource;
-    private int album;
-    private int order;
-    private Bitmap art;
+    private int order, albumID, id;
 
-    public Song(int order, String title, String artist, int album, String duration, String resource) {
+    public Song(int order, String title, String artist, int id, int albumID, String duration, String resource) {
         this.order = order;
         this.title = title;
         this.artist = artist;
-        this.art = art;
-        this.album = album;
+        this.id = id;
+        this.albumID = albumID;
         this.duration = duration;
         this.resource = resource;
     }
@@ -35,10 +32,10 @@ public class Song implements Parcelable {
         title = in.readString();
         artist = in.readString();
         duration = in.readString();
-        album = in.readInt();
+        albumID = in.readInt();
         resource = in.readString();
         order = in.readInt();
-        art = in.readParcelable(Bitmap.class.getClassLoader());
+        id = in.readInt();
     }
 
     public static final Creator<Song> CREATOR = new Creator<Song>() {
@@ -77,14 +74,6 @@ public class Song implements Parcelable {
         this.artist = artist;
     }
 
-    public Bitmap getArt() {
-        return art;
-    }
-
-    public void setArt(Bitmap art) {
-        this.art = art;
-    }
-
     public String getDuration() {
         return duration;
     }
@@ -93,12 +82,20 @@ public class Song implements Parcelable {
         this.duration = duration;
     }
 
-    public Integer getAlbum() {
-        return album;
+    public int getId() {
+        return id;
     }
 
-    public void setAlbum(Integer album) {
-        this.album = album;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getAlbumID() {
+        return albumID;
+    }
+
+    public void setAlbumID(int albumID) {
+        this.albumID = albumID;
     }
 
     public String getResource() {
@@ -121,7 +118,7 @@ public class Song implements Parcelable {
 
     public Uri getUri() {
         Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(sArtworkUri, album);
+        return ContentUris.withAppendedId(sArtworkUri, albumID);
     }
 
     public void setImage(Context context, ImageView imageView) {

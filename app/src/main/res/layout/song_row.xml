@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/song_row"
     android:layout_width="match_parent"
     android:layout_height="66dp"
     android:orientation="horizontal">
@@ -15,14 +16,25 @@
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@android:color/black" />
+
+    <es.claucookie.miniequalizerlibrary.EqualizerView
+        android:layout_width="20dp"
+        android:layout_height="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="25dp"
+        android:visibility="gone"
+        android:gravity="center"
+        android:id="@+id/equalizer"/>
+
     <LinearLayout
-        android:layout_alignRight="@id/action_more"
-        android:layout_marginRight="50dp"
         android:id="@+id/linear_info"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_alignRight="@id/action_more"
         android:layout_marginLeft="25dp"
         android:layout_marginTop="15dp"
+        android:layout_marginRight="50dp"
         android:layout_marginBottom="15dp"
         android:layout_toEndOf="@id/song_order"
         android:layout_toRightOf="@id/song_order"
@@ -32,8 +44,7 @@
             android:id="@+id/song_title"
             style="@style/song_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/duration"

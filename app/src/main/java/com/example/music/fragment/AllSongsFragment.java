@@ -1,5 +1,6 @@
 package com.example.music.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.example.music.R;
+import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
+
+import java.util.ArrayList;
 
 public class AllSongsFragment extends Fragment {
 
@@ -40,11 +44,18 @@ public class AllSongsFragment extends Fragment {
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
-    public SongAdapter getAdapter() {
-        return mSongAdapter;
-    }
-
     public void getAllSongs() {
         mSongAdapter.getAllSongs(getContext());
     }
+
+    public ArrayList<Song> getArraySongs() {
+        return mSongAdapter.mArraySongs;
+    }
+
+    public void setAnimation(int id, boolean isPlaying) {
+        mSongAdapter.mSongId = id;
+        mSongAdapter.notifyDataSetChanged();
+        mSongAdapter.mIsPlaying = isPlaying;
+    }
+
 }

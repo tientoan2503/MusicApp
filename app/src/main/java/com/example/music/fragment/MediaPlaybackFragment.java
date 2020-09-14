@@ -1,14 +1,12 @@
 package com.example.music.fragment;
 
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -19,12 +17,12 @@ import androidx.fragment.app.Fragment;
 
 import com.example.music.ActivityMusic;
 import com.example.music.Interface.IMediaControl;
-import com.example.music.Interface.IPassData;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.service.MediaPlaybackService;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -38,7 +36,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private TextView mTvSongTitle, mTvArtist, mTvCurrentTime, mTvTotalTime;
     private SeekBar mSbDuration;
     private IMediaControl mMediaControl;
-    private IPassData mPassData;
     private Bundle mBundle;
     private SharedPreferences mSharedPrf;
 
@@ -46,15 +43,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private String mRepeat;
     private boolean mIsQueueSelected = false;
     private boolean mIsPlaying;
-    public final String FALSE = "false";
-    public final String TRUE = "true";
-    public final String REPEAT = "repeat";
     private MediaPlaybackService mMediaPlaybackService;
+    private Handler mHandler;
+    private Runnable mRunnable;
+    private ArrayList<Song> mArraySongs;
 
-    public MediaPlaybackFragment(IMediaControl mediaControl, IPassData passData) {
-        // TODO TrungTH gọp vào 1 cũng đc
+    public MediaPlaybackFragment(IMediaControl mediaControl) {
         mMediaControl = mediaControl;
-        mPassData = passData;
     }
 
     public MediaPlaybackFragment() {
@@ -91,6 +86,16 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         //event seek bar change
         seekBarChange();
+
+        if (mMediaPlaybackService != null) {
+            updateTimeSong();
+            mHandler.postDelayed(mRunnable, 0);
+        }
+
+        mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
+        mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
+        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
+
         return view;
     }
 
@@ -99,54 +104,23 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         super.onResume();
 
         mBundle = getArguments();
-        Log.d("ToanNTe", "onResume: " + mBundle);
         if (mBundle != null) {
             mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
             mIsPlaying = mBundle.getBoolean(ActivityMusic.BUNDLE_IS_PLAYING);
             setSongInfo(mSong);
-            Log.d("ToanNTe", "onResume: " + mIsPlaying);
         }
 
-        // TODO TrungTH để sai chỗ -> DONE Đã đặt lên onCreateView
-        //event click play, pause, next, prev, shuffle, repeat, queue music
-//        mImgPlay.setOnClickListener(this);
-//        mImgNext.setOnClickListener(this);
-//        mImgPrev.setOnClickListener(this);
-//        mImgRepeat.setOnClickListener(this);
-//        mImgShuffle.setOnClickListener(this);
-//        mImgQueue.setOnClickListener(this);
-
-        mSharedPrf = getActivity().getSharedPreferences("PRF_NAME", MODE_PRIVATE);
-        mRepeat = mSharedPrf.getString("PRF_NAME", FALSE);
-        mIsShuffle = mSharedPrf.getBoolean("PRF_NAME", false);
-
-        // TODO TrungTH tách hàm để dùng lại -> DONE Đã tạo hàm checkShuffle()
-        //shuffle
-//        if (mIsShuffle) {
-//            setImgShuffle(R.drawable.ic_play_shuffle_selected);
-//        } else {
-//            setImgShuffle(R.drawable.ic_play_shuffle_default);
-//        }
-//        // TODO TrungTH tách hàm để dùng lại -> DONE Đã tạo hàm checkRepeat()
-//        //repeat
-//        switch (mRepeat) {
-//            case FALSE:
-//                setImgRepeat(R.drawable.ic_play_repeat_default);
-//                break;
-//            case TRUE:
-//                setImgRepeat(R.drawable.ic_play_repeat_selected);
-//                break;
-//            case REPEAT:
-//                setImgRepeat(R.drawable.ic_play_repeat_1);
-//                break;
-//        }
         checkShuffle();
         checkRepeat();
+    }
 
-        // TODO TrungTH sai vị trí -> DONE Đã đặt lên onCreateView
-        //event seek bar change
-//        seekBarChange();
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
+        if (mHandler != null) {
+            mHandler.removeCallbacks(mRunnable);
+        }
     }
 
     private void checkShuffle() {
@@ -159,13 +133,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private void checkRepeat() {
         switch (mRepeat) {
-            case FALSE:
+            case ActivityMusic.FALSE:
                 setImgRepeat(R.drawable.ic_play_repeat_default);
                 break;
-            case TRUE:
+            case ActivityMusic.TRUE:
                 setImgRepeat(R.drawable.ic_play_repeat_selected);
                 break;
-            case REPEAT:
+            case ActivityMusic.REPEAT:
                 setImgRepeat(R.drawable.ic_play_repeat_1);
                 break;
         }
@@ -228,30 +202,57 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-//                mSbDuration.setProgress(mSbDuration.getProgress());
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mPassData.positionSeekBarReceived(mSbDuration.getProgress());
+                mMediaPlaybackService.playerSeekTo(mSbDuration.getProgress());
             }
         });
     }
 
     @Override
     public void onClick(View view) {
+        mArraySongs = mMediaPlaybackService.getArraySongs();
         switch (view.getId()) {
-            case R.id.img_next:
-                mMediaControl.onClickNext(mImgNext);
-                setImgPlay(R.drawable.ic_action_pause);
-                break;
+
             case R.id.img_play:
-                mMediaControl.onClickPlay(mImgPlay);
+                if (mMediaPlaybackService.isPlaying()) {
+                    setImgPlay(R.drawable.ic_action_play);
+                    mMediaPlaybackService.pauseSong();
+                } else {
+                    mMediaPlaybackService.resumeSong();
+                    setImgPlay(R.drawable.ic_action_pause);
+                }
+                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                mMediaControl.onClickPlay(mSong.getId(), mMediaPlaybackService.isPlaying());
                 break;
-            case R.id.img_prev:
-                mMediaControl.onClickPrev(mImgPrev);
+
+            case R.id.img_next:
+                if (mIsShuffle) {
+                    mMediaPlaybackService.playShuffle();
+                } else {
+                    mMediaPlaybackService.playNext();
+                }
+                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                setSongInfo(mSong);
                 setImgPlay(R.drawable.ic_action_pause);
+                mMediaControl.onClickNext(mSong.getId(), mMediaPlaybackService.isPlaying());
                 break;
+
+            case R.id.img_prev:
+                if (mMediaPlaybackService.getCurrentTime() < 3000) {
+                    mMediaPlaybackService.playPrev();
+                } else {
+                    mMediaPlaybackService.playSong();
+                }
+                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                setSongInfo(mSong);
+                setImgPlay(R.drawable.ic_action_pause);
+                mMediaControl.onClickPrev(mSong.getId(), mMediaPlaybackService.isPlaying());
+
+                break;
+
             case R.id.img_shuffle:
                 if (mIsShuffle) {
                     mIsShuffle = false;
@@ -259,56 +260,43 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     mIsShuffle = true;
                 }
                 checkShuffle();
-                mMediaControl.onClickShuffle(mIsShuffle);
 
+                mMediaPlaybackService.putShuffleToPrf(mIsShuffle);
+                mMediaControl.onClickShuffle(mIsShuffle);
                 break;
+
             case R.id.img_repeat:
                 switch (mRepeat) {
-                    case FALSE:
-                        mRepeat = TRUE;
+                    case ActivityMusic.FALSE:
+                        mRepeat = ActivityMusic.TRUE;
                         break;
-                    case TRUE:
-                        mRepeat = REPEAT;
+                    case ActivityMusic.TRUE:
+                        mRepeat = ActivityMusic.REPEAT;
                         break;
-                    case REPEAT:
-                        mRepeat = FALSE;
+                    case ActivityMusic.REPEAT:
+                        mRepeat = ActivityMusic.FALSE;
                         break;
                 }
                 checkRepeat();
                 mMediaControl.onClickRepeat(mRepeat);
+                mMediaPlaybackService.putRepeatToPrf(mRepeat);
                 break;
-//            case R.id.img_queu:
-//                //TODO TrungTH không thấy chạy thì phải
-//                AllSongsFragment allSongsFragment = new AllSongsFragment();
-//                FrameLayout frameLayout = getActivity().findViewById(R.id.layout_list_song);
-//                if (mIsQueueSelected) {
-//                    frameLayout.setVisibility(View.GONE);
-//                    mIsQueueSelected = false;
-//                    mImgQueue.setImageResource(R.drawable.ic_queue_music_default);
-//                } else {
-//                    frameLayout.setVisibility(View.VISIBLE);
-//                    getFragmentManager().beginTransaction().replace(R.id.layout_list_song, allSongsFragment).commit();
-//                    mIsQueueSelected = true;
-//                    mImgQueue.setImageResource(R.drawable.ic_queue_music_selected);
-//                }
-//                break;
         }
     }
 
     private void updateTimeSong() {
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        mHandler = new Handler();
+        mRunnable =  new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-                MediaPlayer player = mMediaPlaybackService.getPlayer();
-                int mCurrentTime = player.getCurrentPosition();
-                int mDuration = player.getDuration();
+                int mCurrentTime = mMediaPlaybackService.getCurrentTime();
+                int mDuration = mMediaPlaybackService.getDuration();
                 setCurrentTime(format.format(mCurrentTime));
                 setCurrentSeekBar(mCurrentTime, mDuration);
-                handler.postDelayed(this, 1000);
+                mHandler.postDelayed(this, 1000);
             }
-        }, 0);
+        };
     }
 
     public void setService(MediaPlaybackService service) {
