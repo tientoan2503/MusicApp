@@ -1,14 +1,12 @@
 package com.example.music.fragment;
 
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -19,12 +17,12 @@ import androidx.fragment.app.Fragment;
 
 import com.example.music.ActivityMusic;
 import com.example.music.Interface.IMediaControl;
-import com.example.music.Interface.IPassData;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.service.MediaPlaybackService;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -38,7 +36,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private TextView mTvSongTitle, mTvArtist, mTvCurrentTime, mTvTotalTime;
     private SeekBar mSbDuration;
     private IMediaControl mMediaControl;
-    private IPassData mPassData;
     private Bundle mBundle;
     private SharedPreferences mSharedPrf;
 
@@ -49,12 +46,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private MediaPlaybackService mMediaPlaybackService;
     private Handler mHandler;
     private Runnable mRunnable;
-    private MediaPlayer mPlayer;
+    private ArrayList<Song> mArraySongs;
 
-    public MediaPlaybackFragment(IMediaControl mediaControl, IPassData passData) {
-        // TODO TrungTH gọp vào 1 cũng đc
+    public MediaPlaybackFragment(IMediaControl mediaControl) {
         mMediaControl = mediaControl;
-        mPassData = passData;
     }
 
     public MediaPlaybackFragment() {
@@ -218,18 +213,46 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        mArraySongs = mMediaPlaybackService.getArraySongs();
         switch (view.getId()) {
-            case R.id.img_next:
-                mMediaControl.onClickNext(mImgNext);
-                setImgPlay(R.drawable.ic_action_pause);
-                break;
+
             case R.id.img_play:
-                mMediaControl.onClickPlay(mImgPlay);
+                if (mMediaPlaybackService.isPlaying()) {
+                    setImgPlay(R.drawable.ic_action_play);
+                    mMediaPlaybackService.pauseSong();
+                } else {
+                    mMediaPlaybackService.resumeSong();
+                    setImgPlay(R.drawable.ic_action_pause);
+                }
+                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                mMediaControl.onClickPlay(mSong.getId(), mMediaPlaybackService.isPlaying());
                 break;
-            case R.id.img_prev:
-                mMediaControl.onClickPrev(mImgPrev);
+
+            case R.id.img_next:
+                if (mIsShuffle) {
+                    mMediaPlaybackService.playShuffle();
+                } else {
+                    mMediaPlaybackService.playNext();
+                }
+                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                setSongInfo(mSong);
                 setImgPlay(R.drawable.ic_action_pause);
+                mMediaControl.onClickNext(mSong.getId(), mMediaPlaybackService.isPlaying());
                 break;
+
+            case R.id.img_prev:
+                if (mMediaPlaybackService.getCurrentTime() < 3000) {
+                    mMediaPlaybackService.playPrev();
+                } else {
+                    mMediaPlaybackService.playSong();
+                }
+                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                setSongInfo(mSong);
+                setImgPlay(R.drawable.ic_action_pause);
+                mMediaControl.onClickPrev(mSong.getId(), mMediaPlaybackService.isPlaying());
+
+                break;
+
             case R.id.img_shuffle:
                 if (mIsShuffle) {
                     mIsShuffle = false;
@@ -237,9 +260,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     mIsShuffle = true;
                 }
                 checkShuffle();
-                mMediaControl.onClickShuffle(mIsShuffle);
+
                 mMediaPlaybackService.putShuffleToPrf(mIsShuffle);
+                mMediaControl.onClickShuffle(mIsShuffle);
                 break;
+
             case R.id.img_repeat:
                 switch (mRepeat) {
                     case ActivityMusic.FALSE:

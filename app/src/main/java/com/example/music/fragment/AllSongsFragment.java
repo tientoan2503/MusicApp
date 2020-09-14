@@ -48,13 +48,14 @@ public class AllSongsFragment extends Fragment {
         mSongAdapter.getAllSongs(getContext());
     }
 
-    public void setSongId(int id) {
-        mSongAdapter.mSongId = id;
-        mSongAdapter.notifyDataSetChanged();
-    }
-
     public ArrayList<Song> getArraySongs() {
         return mSongAdapter.mArraySongs;
+    }
+
+    public void setAnimation(int id, boolean isPlaying) {
+        mSongAdapter.mSongId = id;
+        mSongAdapter.notifyDataSetChanged();
+        mSongAdapter.mIsPlaying = isPlaying;
     }
 
 }
