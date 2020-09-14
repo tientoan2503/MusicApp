@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,7 +27,6 @@ import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.MediaPlaybackFragment;
-import com.example.music.notification.Notification;
 import com.example.music.service.MediaPlaybackService;
 
 import java.util.ArrayList;
@@ -90,7 +88,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 }
 
                 //set animation of Equalizer view
-                mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
             }
         }
     }
@@ -190,7 +188,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mActionBar.show();
             mInfoLayout.setVisibility(View.VISIBLE);
             setSongInfo(mSong);
-            mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+            mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
             getDataFromStorage();
 
         }
@@ -254,7 +252,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private void startMediaPlaybackService() {
         Intent mIntent = new Intent(this, MediaPlaybackService.class);
         bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
-        startService(mIntent);
+//        startService(mIntent);
+        ContextCompat.startForegroundService(this, mIntent);
     }
 
     private void registerReceiver() {
@@ -281,8 +280,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             //get MediaPlaybackService from iBinder
             mService = binder.getService();
             mArraySongs = mAllSongsFragment.getArraySongs();
-
-            mArraySongs = mAllSongsFragment.getArraySongs();
             mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
 
             //send ArraySongs to MediaPlaybackService
@@ -308,7 +305,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 //update real time of song
                 setMediaPlaybackService();
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
-                mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
 
             }
 
@@ -328,7 +325,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                     //check Media Player is playing or not to set play icon
                     checkPlaying();
-                    mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+                    mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
                 }
             }
 
@@ -355,7 +352,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mService.playSong();
 
         //send song id when click
-        mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+        mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
 
         /*check app in landscape or portrait mode
          ** in portrait mode*/
@@ -378,8 +375,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setSongInfo(Song song) {
-        mTvTitle.setText(song.getTitle());
-        mTvArtist.setText(song.getArtist());
+        mTvTitle.setText(song.getmTitle());
+        mTvArtist.setText(song.getmArtist());
         mSong.setImage(this, mImgArt);
     }
 
@@ -446,7 +443,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     mActionPlay.setImageResource(R.drawable.ic_media_pause);
                 }
                 //set animation of Equalizer view
-                mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
 
 
 

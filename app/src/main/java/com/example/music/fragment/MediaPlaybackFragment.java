@@ -3,7 +3,6 @@ package com.example.music.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -167,9 +166,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     public void setSongInfo(Song song) {
         mSong = song;
-        mTvSongTitle.setText(mSong.getTitle());
-        mTvArtist.setText(mSong.getArtist());
-        mTvTotalTime.setText(mSong.getDuration());
+        mTvSongTitle.setText(mSong.getmTitle());
+        mTvArtist.setText(mSong.getmArtist());
+        mTvTotalTime.setText(mSong.getmDuration());
         mSong.setImage(getContext(), mImgArtTop);
         mSong.setImage(getContext(), mImgSongArt);
         if (mIsPlaying) {
@@ -225,7 +224,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     setImgPlay(R.drawable.ic_action_pause);
                 }
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
-                mMediaControl.onClickPlay(mSong.getId(), mMediaPlaybackService.isPlaying());
+                mMediaControl.onClickPlay(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_next:
@@ -237,7 +236,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 setSongInfo(mSong);
                 setImgPlay(R.drawable.ic_action_pause);
-                mMediaControl.onClickNext(mSong.getId(), mMediaPlaybackService.isPlaying());
+                mMediaControl.onClickNext(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_prev:
@@ -249,7 +248,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 setSongInfo(mSong);
                 setImgPlay(R.drawable.ic_action_pause);
-                mMediaControl.onClickPrev(mSong.getId(), mMediaPlaybackService.isPlaying());
+                mMediaControl.onClickPrev(mSong.getmId(), mMediaPlaybackService.isPlaying());
 
                 break;
 

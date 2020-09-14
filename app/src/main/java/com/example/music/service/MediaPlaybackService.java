@@ -1,5 +1,6 @@
 package com.example.music.service;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,11 +8,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -21,10 +22,8 @@ import androidx.core.app.NotificationCompat;
 import com.example.music.ActivityMusic;
 import com.example.music.R;
 import com.example.music.Song;
-import com.example.music.notification.Notification;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -51,10 +50,12 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
     private int mCurrentTime, mDuration;
+    private Song mSong;
 
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "CHANNEL_ID";
     private NotificationManager mNotifyManager;
+    private Notification mNotification;
     private Context mContext;
 
     @Override
@@ -102,7 +103,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
         if (mPosition != -1) {
             mPlayer.reset();
-            mUri = Uri.parse(mArraySongs.get(mPosition).getResource());
+            mUri = Uri.parse(mArraySongs.get(mPosition).getmResource());
 
             try {
                 mPlayer.setDataSource(getApplicationContext(), mUri);
@@ -132,7 +133,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mSharedPrf = getSharedPreferences(PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
         mContext = getApplicationContext();
-        createChannel();
 
     }
 
@@ -143,8 +143,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        return super.onStartCommand(intent, flags, startId);
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -173,8 +172,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     // TODO TrungTH lặp code với playShuffle cần tách hàm sao để dùng chung
     public void playSong() {
         createUri(mPosition);
+        createChannel();
         createNotification();
-
     }
 
     public void playerSeekTo(int i) {
@@ -205,7 +204,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     private void createUri(int position) {
         mPlayer.reset();
-        mUri = Uri.parse(mArraySongs.get(position).getResource());
+        mUri = Uri.parse(mArraySongs.get(position).getmResource());
         try {
             mPlayer.setDataSource(getApplicationContext(), mUri);
             mPlayer.prepare();
@@ -222,6 +221,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     public void pauseSong() {
         mPlayer.pause();
+        this.stopForeground(false);
     }
 
     public void resumeSong() {
@@ -265,16 +265,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mIntent.putExtra(BROAD_POSITION, mPosition);
     }
 
-//    public void putDataToSharedPrf(int position, String repeat, boolean isShuffle) {
-//        //put data to SharedPreference
-//        mEditor.putInt(PRF_POSITION, position);
-//        mEditor.putString(PRF_REPEAT, repeat);
-//        mEditor.putBoolean(PRF_SHUFFLE, isShuffle);
-////        mEditor.putInt(PRF_CURRENT_TIME, mCurrentTime);
-////        mEditor.putInt(PRF_DURATION, mDuration);
-//        mEditor.commit();
-//    }
-
     public void putRepeatToPrf(String repeat) {
         mEditor.putString(PRF_REPEAT, repeat);
         mEditor.commit();
@@ -300,6 +290,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Music Notification",
                     NotificationManager.IMPORTANCE_HIGH);
 
+            notificationChannel.setSound(null, null);
             mNotifyManager.createNotificationChannel(notificationChannel);
         }
     }
@@ -307,20 +298,24 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public void createNotification() {
         RemoteViews normalLayout = new RemoteViews(mContext.getPackageName(), R.layout.custom_normal_notification);
         RemoteViews expandedLayout = new RemoteViews(mContext.getPackageName(), R.layout.custom_expanded_notification);
+        normalLayout.setTextViewText(R.id.noti_song_title, "Bai gi day");
 
         Intent intent = new Intent(mContext, ActivityMusic.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(mContext, CHANNEL_ID)
+        mNotification = new NotificationCompat.Builder(mContext, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(normalLayout)
+                .setCustomBigContentView(expandedLayout)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCustomContentView(normalLayout)
-                .setCustomBigContentView(expandedLayout)
-                .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("You've been notified!")
-                .setContentText("This is your notification text.");
+                .build();
 
-        mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
-        startForeground(1, notifyBuilder.build());
+
+
+
+        startForeground(NOTIFICATION_ID, mNotification);
+
     }
 }

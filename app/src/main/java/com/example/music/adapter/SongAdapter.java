@@ -3,9 +3,7 @@ package com.example.music.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,10 +44,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull SongAdapter.ViewHolder holder, int position) {
         Song song = mArraySongs.get(position);
         holder.mSongOrder.setText(position + 1 + "");
-        holder.mTvSongName.setText(song.getTitle());
-        holder.mTvDuration.setText(song.getDuration());
+        holder.mTvSongName.setText(song.getmTitle());
+        holder.mTvDuration.setText(song.getmDuration());
 
-        if (song.getId() == mSongId) {
+        if (song.getmId() == mSongId) {
             holder.mTvSongName.setTypeface(Typeface.DEFAULT_BOLD);
             holder.mSongOrder.setVisibility(View.INVISIBLE);
             holder.mEqualizer.setVisibility(View.VISIBLE);
