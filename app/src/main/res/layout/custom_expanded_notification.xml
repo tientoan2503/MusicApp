@@ -27,8 +27,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 
             <TextView
                 android:id="@+id/noti_expanded_artist"
@@ -38,7 +37,7 @@
                 android:layout_marginTop="5dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textSize="12sp" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"

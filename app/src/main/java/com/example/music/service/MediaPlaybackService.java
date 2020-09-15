@@ -82,7 +82,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         }
 
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
-        sendBroadcast(mIntent);
 
         mEditor.putInt(PRF_POSITION, mPosition);
         mEditor.putBoolean(PRF_SHUFFLE, mIsShuffle);
@@ -349,7 +348,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 .setShowWhen(false)
                 .setCustomContentView(mNormalView)
                 .setCustomBigContentView(mExpandedView)
-                .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();

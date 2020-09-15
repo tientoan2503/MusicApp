@@ -81,7 +81,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     } else {
                         setImgPlay(mService.isPlaying());
                     }
-                    Log.d("ToanNTe", "onReceive: " );
                 }
 
                 //if app in landscape mode
