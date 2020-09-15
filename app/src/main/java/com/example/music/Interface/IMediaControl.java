@@ -1,6 +1,5 @@
 package com.example.music.Interface;
 
-import android.widget.ImageView;
 
 public interface IMediaControl {
     void onClickPlay(int id, boolean isPlaying);

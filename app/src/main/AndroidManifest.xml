@@ -18,7 +18,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".ActivityMusic">
+        <activity android:name=".ActivityMusic"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

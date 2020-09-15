@@ -2,21 +2,30 @@ package com.example.music;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
+
+import java.util.concurrent.ExecutionException;
 
 //TrungTH sai convention
 public class Song implements Parcelable {
     private String mTitle, mArtist, mDuration, mResource;
-    private int mOrder, mAlbumID, mId;
-    private ImageView mArt;
+    private int mAlbumID, mId;
 
-    public Song(int order, String title, String artist, int id, int albumID, String duration, String resource) {
-        this.mOrder = order;
+    public Song(String title, String artist, int id, int albumID, String duration, String resource) {
         this.mTitle = title;
         this.mArtist = artist;
         this.mId = id;
@@ -34,7 +43,6 @@ public class Song implements Parcelable {
         mDuration = in.readString();
         mAlbumID = in.readInt();
         mResource = in.readString();
-        mOrder = in.readInt();
         mId = in.readInt();
     }
 
@@ -49,14 +57,6 @@ public class Song implements Parcelable {
             return new Song[size];
         }
     };
-
-    public int getmOrder() {
-        return mOrder;
-    }
-
-    public void setmOrder(int mOrder) {
-        this.mOrder = mOrder;
-    }
 
     public String getmTitle() {
         return mTitle;
@@ -121,18 +121,13 @@ public class Song implements Parcelable {
         return ContentUris.withAppendedId(sArtworkUri, mAlbumID);
     }
 
-    public void setImage(Context context, ImageView imageView) {
-        Glide.with(context)
-                .load(getUri())
-                .placeholder(R.drawable.art_default)
-                .into(imageView);
-    }
-
-    public ImageView getArt(Context context) {
-        Glide.with(context)
-                .load(getUri())
-                .placeholder(R.drawable.art_default)
-                .into(mArt);
-        return mArt;
+    public Bitmap getAlbumArt(Context context, String path) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(path);
+        byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
+        if (data != null) {
+            return BitmapFactory.decodeByteArray(data, 0, data.length);
+        }
+        return BitmapFactory.decodeResource(context.getResources(), R.drawable.art_default);
     }
 }
