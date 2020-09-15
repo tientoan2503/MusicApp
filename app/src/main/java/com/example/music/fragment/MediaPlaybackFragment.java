@@ -97,11 +97,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
 
         if (mMediaPlaybackService != null) {
-            if (mMediaPlaybackService.isPlaying()) {
-                setImgPlay(R.drawable.ic_action_pause);
-            } else {
-                setImgPlay(R.drawable.ic_action_play);
-            }
+            checkPlaying(mMediaPlaybackService.isPlaying());
         }
         return view;
     }
@@ -151,8 +147,20 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    public void setImgPlay(int res) {
-        mImgPlay.setImageResource(res);
+    public void checkPlaying(boolean isPlaying) {
+        if (isPlaying) {
+            mImgPlay.setImageResource(R.drawable.ic_action_pause);
+        } else {
+            mImgPlay.setImageResource(R.drawable.ic_action_play);
+        }
+    }
+
+    public void setImgPlay(boolean isPlaying) {
+        if (isPlaying) {
+            mImgPlay.setImageResource(R.drawable.ic_action_pause);
+        } else {
+            mImgPlay.setImageResource(R.drawable.ic_action_play);
+        }
     }
 
     public void setImgShuffle(int res) {
@@ -220,21 +228,20 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             case R.id.img_play:
                 if (mMediaPlaybackService.isPlaying()) {
-                    setImgPlay(R.drawable.ic_action_play);
                     mMediaPlaybackService.pauseSong();
                 } else {
                     mMediaPlaybackService.resumeSong();
-                    setImgPlay(R.drawable.ic_action_pause);
                 }
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 mMediaControl.onClickPlay(mSong.getmId(), mMediaPlaybackService.isPlaying());
+                setImgPlay(mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_next:
                 mMediaPlaybackService.playNext();
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 setSongInfo(mSong);
-                setImgPlay(R.drawable.ic_action_pause);
+                setImgPlay(mMediaPlaybackService.isPlaying());
                 mMediaControl.onClickNext(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 

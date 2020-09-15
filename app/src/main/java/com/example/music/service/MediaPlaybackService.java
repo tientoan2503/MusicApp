@@ -128,6 +128,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mSharedPrf = getSharedPreferences(PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
         mContext = getApplicationContext();
+        createChannel();
     }
 
     @Override
@@ -139,10 +140,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (mArraySongs != null) {
-            createChannel();
-            createNotification();
-        }
         String action = intent.getAction();
         if (action != null) {
             if (action.equals(ACTION_PLAY)) {
@@ -150,13 +147,13 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                     pauseSong();
                 } else {
                     resumeSong();
-                    mNormalView.setImageViewResource(R.id.noti_normal_play, R.drawable.ic_action_play);
                 }
             } else if (action.equals(ACTION_PLAY_NEXT)) {
                 playNext();
             } else if (action.equals(ACTION_PLAY_PREV)) {
                 playPrev();
             }
+
             setIntent(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
             sendBroadcast(mIntent);
         }
@@ -197,6 +194,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } catch (IOException e) {
             e.printStackTrace();
         }
+        createNotification();
+
     }
 
     public void playerSeekTo(int i) {

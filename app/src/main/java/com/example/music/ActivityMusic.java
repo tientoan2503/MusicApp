@@ -35,9 +35,8 @@ import java.util.ArrayList;
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener {
 
     private static final int REQUEST_PERMISSION_CODE = 1;
-    public static final String MESSAGE_BROADCAST_UPDATE_UI = "ACTION_PLAY_COMPLETE";
+    public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
-    public static final String BUNDLE_IS_PLAYING = "BUNDLE_IS_PLAYING";
     public static final String FALSE = "false";
     public static final String TRUE = "true";
     public static final String REPEAT = "repeat";
@@ -80,6 +79,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     //at MediaPlayback Fragment
                     if (findViewById(R.id.mediaPlayback_layout) != null) {
                         mMediaPlaybackFragment.setSongInfo(mSong);
+                        mMediaPlaybackFragment.setImgPlay(mService.isPlaying());
+                    } else {
+                        setImgPlay(mService.isPlaying());
                     }
                 }
 
@@ -87,6 +89,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 else {
                     updateUIMediaPlayback();
                     setMediaPlaybackService();
+                    mMediaPlaybackFragment.setImgPlay(mService.isPlaying());
+
+                    Log.d("ToanNTe", "onReceive: "+ mService.isPlaying());
                 }
 
                 //set animation of Equalizer view
@@ -424,13 +429,20 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mService.setRepeat(mRepeat);
     }
 
+    private void setImgPlay(boolean isPlaying) {
+        if (isPlaying) {
+            mActionPlay.setImageResource(R.drawable.ic_media_pause);
+        } else {
+            mActionPlay.setImageResource(R.drawable.ic_media_play);
+        }
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.img_action_play:
                 if (mService.isPlaying()) {
                     mService.pauseSong();
-                    mActionPlay.setImageResource(R.drawable.ic_media_play);
                 } else {
 //                    if (mPlayer == null) {
 //                        mService.playSong();
@@ -439,12 +451,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 //                        mService.resumeSong();
 //                    }
                     mService.resumeSong();
-                    mActionPlay.setImageResource(R.drawable.ic_media_pause);
                 }
+                setImgPlay(mService.isPlaying());
                 //set animation of Equalizer view
                 mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
-
-
                 break;
 
             case R.id.song_info:
