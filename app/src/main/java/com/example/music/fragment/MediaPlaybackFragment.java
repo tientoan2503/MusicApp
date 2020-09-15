@@ -96,6 +96,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
         mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
 
+        if (mMediaPlaybackService != null) {
+            if (mMediaPlaybackService.isPlaying()) {
+                setImgPlay(R.drawable.ic_action_pause);
+            } else {
+                setImgPlay(R.drawable.ic_action_play);
+            }
+        }
         return view;
     }
 
@@ -106,7 +113,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mBundle = getArguments();
         if (mBundle != null) {
             mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
-            mIsPlaying = mBundle.getBoolean(ActivityMusic.BUNDLE_IS_PLAYING);
             setSongInfo(mSong);
         }
 
@@ -167,16 +173,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     public void setSongInfo(Song song) {
         mSong = song;
-        mTvSongTitle.setText(mSong.getTitle());
-        mTvArtist.setText(mSong.getArtist());
-        mTvTotalTime.setText(mSong.getDuration());
-        mSong.setImage(getContext(), mImgArtTop);
-        mSong.setImage(getContext(), mImgSongArt);
-        if (mIsPlaying) {
-            setImgPlay(R.drawable.ic_action_pause);
-        } else {
-            setImgPlay(R.drawable.ic_action_play);
-        }
+        mTvSongTitle.setText(mSong.getmTitle());
+        mTvArtist.setText(mSong.getmArtist());
+        mTvTotalTime.setText(mSong.getmDuration());
+        mImgArtTop.setImageBitmap(mSong.getAlbumArt(getContext(), mSong.getmResource()));
+        mImgSongArt.setImageBitmap(mSong.getAlbumArt(getContext(), mSong.getmResource()));
+
     }
 
     @Override
@@ -225,32 +227,19 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     setImgPlay(R.drawable.ic_action_pause);
                 }
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
-                mMediaControl.onClickPlay(mSong.getId(), mMediaPlaybackService.isPlaying());
+                mMediaControl.onClickPlay(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_next:
-                if (mIsShuffle) {
-                    mMediaPlaybackService.playShuffle();
-                } else {
-                    mMediaPlaybackService.playNext();
-                }
+                mMediaPlaybackService.playNext();
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 setSongInfo(mSong);
                 setImgPlay(R.drawable.ic_action_pause);
-                mMediaControl.onClickNext(mSong.getId(), mMediaPlaybackService.isPlaying());
+                mMediaControl.onClickNext(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_prev:
-                if (mMediaPlaybackService.getCurrentTime() < 3000) {
-                    mMediaPlaybackService.playPrev();
-                } else {
-                    mMediaPlaybackService.playSong();
-                }
-                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
-                setSongInfo(mSong);
-                setImgPlay(R.drawable.ic_action_pause);
-                mMediaControl.onClickPrev(mSong.getId(), mMediaPlaybackService.isPlaying());
-
+                mMediaPlaybackService.playPrev();
                 break;
 
             case R.id.img_shuffle:
@@ -286,7 +275,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private void updateTimeSong() {
         mHandler = new Handler();
-        mRunnable =  new Runnable() {
+        mRunnable = new Runnable() {
             @Override
             public void run() {
                 SimpleDateFormat format = new SimpleDateFormat("mm:ss");

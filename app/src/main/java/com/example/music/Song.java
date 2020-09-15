@@ -3,39 +3,47 @@ package com.example.music;
 import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
+
+import java.util.concurrent.ExecutionException;
 
 //TrungTH sai convention
 public class Song implements Parcelable {
-    private String title, artist, duration, resource;
-    private int order, albumID, id;
+    private String mTitle, mArtist, mDuration, mResource;
+    private int mAlbumID, mId;
 
-    public Song(int order, String title, String artist, int id, int albumID, String duration, String resource) {
-        this.order = order;
-        this.title = title;
-        this.artist = artist;
-        this.id = id;
-        this.albumID = albumID;
-        this.duration = duration;
-        this.resource = resource;
+    public Song(String title, String artist, int id, int albumID, String duration, String resource) {
+        this.mTitle = title;
+        this.mArtist = artist;
+        this.mId = id;
+        this.mAlbumID = albumID;
+        this.mDuration = duration;
+        this.mResource = resource;
     }
 
     public Song() {
     }
 
     protected Song(Parcel in) {
-        title = in.readString();
-        artist = in.readString();
-        duration = in.readString();
-        albumID = in.readInt();
-        resource = in.readString();
-        order = in.readInt();
-        id = in.readInt();
+        mTitle = in.readString();
+        mArtist = in.readString();
+        mDuration = in.readString();
+        mAlbumID = in.readInt();
+        mResource = in.readString();
+        mId = in.readInt();
     }
 
     public static final Creator<Song> CREATOR = new Creator<Song>() {
@@ -50,60 +58,52 @@ public class Song implements Parcelable {
         }
     };
 
-    public int getOrder() {
-        return order;
+    public String getmTitle() {
+        return mTitle;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setmTitle(String mTitle) {
+        this.mTitle = mTitle;
     }
 
-    public String getTitle() {
-        return title;
+    public String getmArtist() {
+        return mArtist;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setmArtist(String mArtist) {
+        this.mArtist = mArtist;
     }
 
-    public String getArtist() {
-        return artist;
+    public String getmDuration() {
+        return mDuration;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setmDuration(String mDuration) {
+        this.mDuration = mDuration;
     }
 
-    public String getDuration() {
-        return duration;
+    public int getmId() {
+        return mId;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public void setmId(int mId) {
+        this.mId = mId;
     }
 
-    public int getId() {
-        return id;
+    public int getmAlbumID() {
+        return mAlbumID;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setmAlbumID(int mAlbumID) {
+        this.mAlbumID = mAlbumID;
     }
 
-    public int getAlbumID() {
-        return albumID;
+    public String getmResource() {
+        return mResource;
     }
 
-    public void setAlbumID(int albumID) {
-        this.albumID = albumID;
-    }
-
-    public String getResource() {
-        return resource;
-    }
-
-    public void setResource(String resource) {
-        this.resource = resource;
+    public void setmResource(String mResource) {
+        this.mResource = mResource;
     }
 
     @Override
@@ -118,13 +118,16 @@ public class Song implements Parcelable {
 
     public Uri getUri() {
         Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(sArtworkUri, albumID);
+        return ContentUris.withAppendedId(sArtworkUri, mAlbumID);
     }
 
-    public void setImage(Context context, ImageView imageView) {
-        Glide.with(context)
-                .load(getUri())
-                .placeholder(R.drawable.art_default)
-                .into(imageView);
+    public Bitmap getAlbumArt(Context context, String path) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(path);
+        byte[] data = mediaMetadataRetriever.getEmbeddedPicture();
+        if (data != null) {
+            return BitmapFactory.decodeByteArray(data, 0, data.length);
+        }
+        return BitmapFactory.decodeResource(context.getResources(), R.drawable.art_default);
     }
 }

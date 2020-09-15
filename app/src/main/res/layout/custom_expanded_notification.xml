@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_centerVertical="true"
         android:id="@+id/noti_expanded_art"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_margin="10dp"/>
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerVertical="true" />
 
     <RelativeLayout
-        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/noti_expanded_art">
 
         <RelativeLayout
@@ -22,66 +22,66 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/noti_expanded_song_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:id="@+id/noti_song_title"/>
+                android:textStyle="bold" />
 
             <TextView
-                android:layout_marginTop="5dp"
+                android:id="@+id/noti_expanded_artist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textSize="12sp"
-                android:id="@+id/noti_artist"
-                android:layout_below="@id/noti_song_title"/>
-
-            <View
+                android:layout_below="@id/noti_expanded_song_title"
                 android:layout_marginTop="5dp"
-                android:layout_below="@id/noti_artist"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="12sp" />
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                android:background="#1B232323"/>
+                android:layout_below="@id/noti_expanded_artist"
+                android:layout_marginTop="5dp"
+                android:background="#1B232323" />
 
 
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:layout_below="@id/noti_expanded_content"
-            android:layout_marginRight="20dp"
             android:id="@+id/noti_expanded_media_control"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/noti_expanded_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_marginRight="20dp"
-                android:layout_gravity="center"
                 android:id="@+id/noti_expanded_prev"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="20dp"
                 android:src="@drawable/ic_action_prev" />
 
             <ImageView
-                android:layout_gravity="center"
-                android:layout_marginRight="20dp"
-                android:layout_marginLeft="20dp"
                 android:id="@+id/noti_expanded_play"
                 android:layout_width="50dp"
-                android:layout_height="50dp"/>
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp" />
 
             <ImageView
-                android:layout_marginLeft="20dp"
-                android:layout_gravity="center"
                 android:id="@+id/noti_expanded_next"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
                 android:src="@drawable/ic_action_next" />
 
         </LinearLayout>

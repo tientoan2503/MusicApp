@@ -28,7 +28,6 @@ import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.MediaPlaybackFragment;
-import com.example.music.notification.Notification;
 import com.example.music.service.MediaPlaybackService;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ import java.util.ArrayList;
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener {
 
     private static final int REQUEST_PERMISSION_CODE = 1;
-    public static final String ACTION_PLAY_COMPLETE = "ACTION_PLAY_COMPLETE";
+    public static final String MESSAGE_BROADCAST_UPDATE_UI = "ACTION_PLAY_COMPLETE";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
     public static final String BUNDLE_IS_PLAYING = "BUNDLE_IS_PLAYING";
     public static final String FALSE = "false";
@@ -69,7 +68,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(ACTION_PLAY_COMPLETE)) {
+            if (action.equals(MESSAGE_BROADCAST_UPDATE_UI)) {
+
                 mPosition = intent.getIntExtra(MediaPlaybackService.BROAD_POSITION, 0);
                 mSong = mArraySongs.get(mPosition);
 
@@ -90,7 +90,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 }
 
                 //set animation of Equalizer view
-                mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
             }
         }
     }
@@ -178,22 +178,20 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        // TODO TrungTH : đoạn dưới này xử lý cho trường hợp từ playback sang all all song ? thế từ all song cũng chạy à?
-        // DONE đã kiểm tra nếu ờ màn hình dọc thì sẽ xử lí
+        if(mMediaPlaybackFragment.isAdded()){
+                //check Media Player is play or not to set play icon
+                checkPlaying();
 
-        if (mIsPortrait) {
-            //check Media Player is play or not to set play icon
-            checkPlaying();
-
-            //show Action Bar, InfoLayout
-            mActionBar.show();
-            mInfoLayout.setVisibility(View.VISIBLE);
-            setSongInfo(mSong);
-            mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
-            getDataFromStorage();
-
+                //show Action Bar, InfoLayout
+                mActionBar.show();
+                mInfoLayout.setVisibility(View.VISIBLE);
+                setSongInfo(mSong);
         }
+
+        super.onBackPressed();
+        getDataFromStorage();
+        mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
+
     }
 
     @Override
@@ -254,13 +252,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private void startMediaPlaybackService() {
         Intent mIntent = new Intent(this, MediaPlaybackService.class);
         bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
-        startService(mIntent);
+//        startService(mIntent);
+        ContextCompat.startForegroundService(this, mIntent);
     }
 
     private void registerReceiver() {
         mBroadcast = new BroadcastMusic();
         IntentFilter mFilter = new IntentFilter();
-        mFilter.addAction(ACTION_PLAY_COMPLETE);
+        mFilter.addAction(MESSAGE_BROADCAST_UPDATE_UI);
         this.registerReceiver(mBroadcast, mFilter);
     }
 
@@ -280,8 +279,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
             //get MediaPlaybackService from iBinder
             mService = binder.getService();
-            mArraySongs = mAllSongsFragment.getArraySongs();
-
             mArraySongs = mAllSongsFragment.getArraySongs();
             mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
 
@@ -303,12 +300,12 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 //send position to Adapter
                 // TODO TrungTH đưa hàm vào trong lớp mMediaPlaybackFragment giảm thiểu sự phụ thuộc của lớp mMediaPlaybackFragment vào activity
                 //  => chưa hiểu rõ ý nghĩa của fragment thì phải
-                updateUIMediaPlayback();
 
                 //update real time of song
+                updateUIMediaPlayback();
                 setMediaPlaybackService();
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
-                mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
 
             }
 
@@ -328,7 +325,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                     //check Media Player is playing or not to set play icon
                     checkPlaying();
-                    mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+                    mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
                 }
             }
 
@@ -345,7 +342,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //TODO TrungTH tinh chỉnh lại đoạn này cho gọn lại , ko lặp code
 
 
-
         mPosition = position;
         mService.setPosition(mPosition);
         mService.setArraySongs(mArraySongs);
@@ -355,7 +351,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mService.playSong();
 
         //send song id when click
-        mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
+        mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
 
         /*check app in landscape or portrait mode
          ** in portrait mode*/
@@ -378,9 +374,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setSongInfo(Song song) {
-        mTvTitle.setText(song.getTitle());
-        mTvArtist.setText(song.getArtist());
-        mSong.setImage(this, mImgArt);
+        mTvTitle.setText(song.getmTitle());
+        mTvArtist.setText(song.getmArtist());
+//        mSong.setImage(this, mImgArt);
+        mImgArt.setImageBitmap(mSong.getAlbumArt(getApplicationContext(), mSong.getmResource()));
     }
 
     private void checkPlaying() {
@@ -419,7 +416,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickShuffle(boolean isShuffle) {
         mIsShuffle = isShuffle;
         mService.setShuffle(mIsShuffle);
-
     }
 
     @Override
@@ -446,8 +442,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     mActionPlay.setImageResource(R.drawable.ic_media_pause);
                 }
                 //set animation of Equalizer view
-                mAllSongsFragment.setAnimation(mSong.getId(), mService.isPlaying());
-
+                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
 
 
                 break;
@@ -485,7 +480,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private void sendBundleToMediaPlaybackFragment() {
         mBundle = new Bundle();
         mBundle.putParcelable(BUNDLE_SONG_KEY, mSong);
-        mBundle.putBoolean(BUNDLE_IS_PLAYING, mService.isPlaying());
         mMediaPlaybackFragment.setArguments(mBundle);
     }
 

@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,10 +45,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull SongAdapter.ViewHolder holder, int position) {
         Song song = mArraySongs.get(position);
         holder.mSongOrder.setText(position + 1 + "");
-        holder.mTvSongName.setText(song.getTitle());
-        holder.mTvDuration.setText(song.getDuration());
+        holder.mTvSongName.setText(song.getmTitle());
+        holder.mTvDuration.setText(song.getmDuration());
 
-        if (song.getId() == mSongId) {
+        if (song.getmId() == mSongId) {
             holder.mTvSongName.setTypeface(Typeface.DEFAULT_BOLD);
             holder.mSongOrder.setVisibility(View.INVISIBLE);
             holder.mEqualizer.setVisibility(View.VISIBLE);
@@ -105,13 +104,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     //method read song from storage
     public void getAllSongs(Context context) {
 //        // TODO TrungTH dùng asyncTask đã được dậy chứ
-        int order = 0;
         mArraySongs = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                order++;
+//                order++;
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                 String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -124,7 +122,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 String duration = simpleDateFormat.format(time);
 
                 //add Song to songList
-                Song song = new Song(order, title, artist, id, albumId, duration, resource);
+                Song song = new Song( title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
             }
             cursor.close();
@@ -133,37 +131,37 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     }
 
 //
-//    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
-//
-//        @Override
-//        protected ArrayList<Song> doInBackground(Context... contexts) {
-//            int order = 0;
-//            mArraySongs = new ArrayList<>();
-//            Cursor cursor = contexts[0].getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//                    null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
-//            if (cursor != null) {
-//                while (cursor.moveToNext()) {
-//                    order++;
-//                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-//                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-//                    String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-//                    int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-//                    int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-//                    int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-//
-//                    //format duration to mm:ss
-//                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-//                    String duration = simpleDateFormat.format(time);
-//
-//                    //add Song to songList
-//                    Song song = new Song(order, title, artist, songId, albumId, duration, resource);
-//                    mArraySongs.add(song);
-//                }
-//                cursor.close();
-//            }
-//            return mArraySongs;
-//        }
-//    }
+    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
+
+        @Override
+        protected ArrayList<Song> doInBackground(Context... contexts) {
+            int order = 0;
+            mArraySongs = new ArrayList<>();
+            Cursor cursor = contexts[0].getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    order++;
+                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                    String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                    int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+                    int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                    int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+
+                    //format duration to mm:ss
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+                    String duration = simpleDateFormat.format(time);
+
+                    //add Song to songList
+                    Song song = new Song(title, artist, songId, albumId, duration, resource);
+                    mArraySongs.add(song);
+                }
+                cursor.close();
+            }
+            return mArraySongs;
+        }
+    }
 }
 
 
