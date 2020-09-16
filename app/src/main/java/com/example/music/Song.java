@@ -20,7 +20,6 @@ import com.bumptech.glide.request.transition.Transition;
 
 import java.util.concurrent.ExecutionException;
 
-//TrungTH sai convention
 public class Song implements Parcelable {
     private String mTitle, mArtist, mDuration, mResource;
     private int mAlbumID, mId;

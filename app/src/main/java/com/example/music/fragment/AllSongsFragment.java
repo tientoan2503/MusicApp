@@ -1,6 +1,5 @@
 package com.example.music.fragment;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,8 +54,8 @@ public class AllSongsFragment extends Fragment {
     public void setAnimation(int position, int id, boolean isPlaying) {
         mSongAdapter.mSongId = id;
         mSongAdapter.mIsPlaying = isPlaying;
-        mSongAdapter.notifyDataSetChanged();
         mRecyclerview.smoothScrollToPosition(position);
+        mSongAdapter.notifyDataSetChanged();
     }
 
 }

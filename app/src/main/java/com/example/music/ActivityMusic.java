@@ -173,11 +173,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     protected void onPause() {
+
         super.onPause();
+
     }
 
     @Override
     public void onBackPressed() {
+
         if (mMediaPlaybackFragment.isAdded()) {
             //check Media Player is play or not to set play icon
             checkPlaying();
@@ -186,9 +189,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mActionBar.show();
             mInfoLayout.setVisibility(View.VISIBLE);
             setSongInfo(mSong);
-        }
 
+        }
         super.onBackPressed();
+
         getDataFromStorage();
 
         //set animation of Equalizer view
@@ -306,10 +310,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 updateUIMediaPlayback();
                 setMediaPlaybackService();
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
-
-                //set animation of Equalizer view
-                setAnimation();
-
             }
 
             //if app in portrait mode
@@ -329,10 +329,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     //check Media Player is playing or not to set play icon
                     checkPlaying();
 
-                    //set animation of Equalizer view
-                    setAnimation();
                 }
             }
+
+            //set animation of Equalizer view
+            setAnimation();
 
         }
 
