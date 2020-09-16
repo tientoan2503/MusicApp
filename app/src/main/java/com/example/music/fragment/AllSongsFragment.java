@@ -52,10 +52,11 @@ public class AllSongsFragment extends Fragment {
         return mSongAdapter.mArraySongs;
     }
 
-    public void setAnimation(int id, boolean isPlaying) {
+    public void setAnimation(int position, int id, boolean isPlaying) {
         mSongAdapter.mSongId = id;
-        mSongAdapter.notifyDataSetChanged();
         mSongAdapter.mIsPlaying = isPlaying;
+        mSongAdapter.notifyDataSetChanged();
+        mRecyclerview.smoothScrollToPosition(position);
     }
 
 }

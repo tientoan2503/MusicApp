@@ -75,14 +75,13 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             } else {
                 playNext();
             }
-        } else if (mRepeat.equals(TRUE)){
+        } else if (mRepeat.equals(TRUE)) {
             playNext();
         } else if (mRepeat.equals(REPEAT)) {
             playSong();
         }
 
-        setIntent(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
-        sendBroadcast(mIntent);
+        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
 
         mEditor.putInt(PRF_POSITION, mPosition);
         mEditor.putBoolean(PRF_SHUFFLE, mIsShuffle);
@@ -145,6 +144,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             if (action.equals(ACTION_PLAY)) {
                 if (isPlaying()) {
                     pauseSong();
+                    stopForeground(false);
                 } else {
                     resumeSong();
                 }
@@ -153,9 +153,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             } else if (action.equals(ACTION_PLAY_PREV)) {
                 playPrev();
             }
-
-            setIntent(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
-            sendBroadcast(mIntent);
         }
 
         return START_NOT_STICKY;
@@ -194,8 +191,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } catch (IOException e) {
             e.printStackTrace();
         }
-        createNotification();
 
+        startForeground(NOTIFICATION_ID, createNotification(isPlaying()));
+        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
     public void playerSeekTo(int i) {
@@ -227,11 +225,16 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     public void pauseSong() {
         mPlayer.pause();
-        this.stopForeground(false);
+
+        startForeground(NOTIFICATION_ID, createNotification(isPlaying()));
+        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
     public void resumeSong() {
         mPlayer.start();
+
+        startForeground(NOTIFICATION_ID, createNotification(isPlaying()));
+        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
     public boolean isPlaying() {
@@ -248,6 +251,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
+
+        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
     public void playPrev() {
@@ -258,6 +263,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
+
+        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
     public void setShuffle(boolean shuffle) {
@@ -268,9 +275,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mRepeat = repeat;
     }
 
-    private void setIntent(String action) {
+    private void sendBroadcastMessage(String action) {
         mIntent.setAction(action);
         mIntent.putExtra(BROAD_POSITION, mPosition);
+        sendBroadcast(mIntent);
     }
 
     public void putRepeatToPrf(String repeat) {
@@ -298,8 +306,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         }
     }
 
-    public void createNotification() {
-
+    public Notification createNotification(boolean isPlaying) {
         mNormalView = new RemoteViews(mContext.getPackageName(), R.layout.custom_normal_notification);
         mExpandedView = new RemoteViews(mContext.getPackageName(), R.layout.custom_expanded_notification);
 
@@ -310,7 +317,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mExpandedView.setTextViewText(R.id.noti_expanded_song_title, mSong.getmTitle());
         mExpandedView.setTextViewText(R.id.noti_expanded_artist, mSong.getmArtist());
 
-        if (isPlaying()) {
+        if (isPlaying) {
             mNormalView.setImageViewResource(R.id.noti_normal_play, R.drawable.ic_action_pause);
             mExpandedView.setImageViewResource(R.id.noti_expanded_play, R.drawable.ic_action_pause);
         } else {
@@ -341,15 +348,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 .setShowWhen(false)
                 .setCustomContentView(mNormalView)
                 .setCustomBigContentView(mExpandedView)
-                .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
-
-        startForeground(NOTIFICATION_ID, mNotification);
-    }
-
-    private void updateNotification() {
-
+        return mNotification;
     }
 }

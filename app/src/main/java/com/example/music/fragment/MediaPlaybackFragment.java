@@ -234,19 +234,18 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 }
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 mMediaControl.onClickPlay(mSong.getmId(), mMediaPlaybackService.isPlaying());
-                setImgPlay(mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_next:
                 mMediaPlaybackService.playNext();
                 mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
-                setSongInfo(mSong);
-                setImgPlay(mMediaPlaybackService.isPlaying());
                 mMediaControl.onClickNext(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_prev:
                 mMediaPlaybackService.playPrev();
+                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                mMediaControl.onClickPrev(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_shuffle:

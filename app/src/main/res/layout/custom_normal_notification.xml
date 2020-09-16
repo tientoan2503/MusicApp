@@ -7,6 +7,7 @@
         android:id="@+id/noti_normal_art"
         android:layout_width="50dp"
         android:layout_height="50dp"
+
         android:layout_alignParentLeft="true"/>
 
     <LinearLayout

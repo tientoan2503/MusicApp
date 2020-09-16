@@ -57,8 +57,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private SharedPreferences mSharedPrf;
     private SharedPreferences.Editor mEditor;
     private boolean mIsPortrait;
-    private int mCurrentTime;
-    private int mDuration;
     private BroadcastReceiver mBroadcast;
     private boolean mBound;
     private Bundle mBundle;
@@ -89,13 +87,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 else {
                     updateUIMediaPlayback();
                     setMediaPlaybackService();
-                    mMediaPlaybackFragment.setImgPlay(mService.isPlaying());
-
-                    Log.d("ToanNTe", "onReceive: "+ mService.isPlaying());
                 }
 
                 //set animation of Equalizer view
-                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
+                setAnimation();
             }
         }
     }
@@ -183,19 +178,21 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void onBackPressed() {
-        if(mMediaPlaybackFragment.isAdded()){
-                //check Media Player is play or not to set play icon
-                checkPlaying();
+        if (mMediaPlaybackFragment.isAdded()) {
+            //check Media Player is play or not to set play icon
+            checkPlaying();
 
-                //show Action Bar, InfoLayout
-                mActionBar.show();
-                mInfoLayout.setVisibility(View.VISIBLE);
-                setSongInfo(mSong);
+            //show Action Bar, InfoLayout
+            mActionBar.show();
+            mInfoLayout.setVisibility(View.VISIBLE);
+            setSongInfo(mSong);
         }
 
         super.onBackPressed();
         getDataFromStorage();
-        mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
+
+        //set animation of Equalizer view
+        setAnimation();
 
     }
 
@@ -257,8 +254,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private void startMediaPlaybackService() {
         Intent mIntent = new Intent(this, MediaPlaybackService.class);
         bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
-//        startService(mIntent);
-        ContextCompat.startForegroundService(this, mIntent);
+        startService(mIntent);
     }
 
     private void registerReceiver() {
@@ -310,7 +306,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 updateUIMediaPlayback();
                 setMediaPlaybackService();
                 setShuffleAndRepeat(mIsShuffle, mRepeat);
-                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
+
+                //set animation of Equalizer view
+                setAnimation();
 
             }
 
@@ -330,7 +328,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                     //check Media Player is playing or not to set play icon
                     checkPlaying();
-                    mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
+
+                    //set animation of Equalizer view
+                    setAnimation();
                 }
             }
 
@@ -355,8 +355,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //play song
         mService.playSong();
 
-        //send song id when click
-        mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
+        //set animation of Equalizer view
+        setAnimation();
 
         /*check app in landscape or portrait mode
          ** in portrait mode*/
@@ -398,14 +398,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickPlay(int id, boolean isPlaying) {
 
         //set animation of Equalizer view
-        mAllSongsFragment.setAnimation(id, isPlaying);
+        setAnimation();
     }
 
     @Override
     public void onClickNext(int id, boolean isPlaying) {
 
         //set animation of Equalizer view
-        mAllSongsFragment.setAnimation(id, isPlaying);
+        setAnimation();
 
     }
 
@@ -413,7 +413,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickPrev(int id, boolean isPlaying) {
 
         //set animation of Equalizer view
-        mAllSongsFragment.setAnimation(id, isPlaying);
+        setAnimation();
 
     }
 
@@ -444,17 +444,16 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 if (mService.isPlaying()) {
                     mService.pauseSong();
                 } else {
-//                    if (mPlayer == null) {
-//                        mService.playSong();
-//                        mPlayer = mService.getPlayer();
-//                    } else {
-//                        mService.resumeSong();
-//                    }
-                    mService.resumeSong();
+                    if (mService.getCurrentTime() == 0) {
+                        mService.playSong();
+                    } else {
+                        mService.resumeSong();
+                    }
                 }
                 setImgPlay(mService.isPlaying());
+
                 //set animation of Equalizer view
-                mAllSongsFragment.setAnimation(mSong.getmId(), mService.isPlaying());
+                setAnimation();
                 break;
 
             case R.id.song_info:
@@ -497,6 +496,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mMediaPlaybackFragment = new MediaPlaybackFragment(this);
         sendBundleToMediaPlaybackFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
+    }
+
+    private void setAnimation() {
+        if (mPosition == 0) {
+            mAllSongsFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
+        } else {
+            mAllSongsFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
+        }
     }
 
 }
