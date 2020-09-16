@@ -500,10 +500,12 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setAnimation() {
-        if (mPosition == 0) {
-            mAllSongsFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
-        } else {
-            mAllSongsFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
+        if (mPosition != -1) {
+            if (mPosition == 0) {
+                mAllSongsFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
+            } else {
+                mAllSongsFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
+            }
         }
     }
 
