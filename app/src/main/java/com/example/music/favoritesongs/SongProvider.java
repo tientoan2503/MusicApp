@@ -10,11 +10,11 @@ import androidx.annotation.Nullable;
 
 public class SongProvider extends ContentProvider {
 
-    private SongsHelper mSongsHelper;
+    private FavoriteSongs mFavoriteSongs;
 
     @Override
     public boolean onCreate() {
-        mSongsHelper = new SongsHelper(getContext());
+        mFavoriteSongs = new FavoriteSongs(getContext());
         return true;
     }
 
