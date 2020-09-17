@@ -3,12 +3,14 @@ package com.example.music;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -26,6 +28,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IMediaControl;
+import com.example.music.database.SongProvider;
 import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.MediaPlaybackFragment;
 import com.example.music.service.MediaPlaybackService;
@@ -345,8 +348,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void onClickItem(int position) {
-        //TODO TrungTH tinh chỉnh lại đoạn này cho gọn lại , ko lặp code
-
 
         mPosition = position;
         mService.setPosition(mPosition);
@@ -377,6 +378,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             updateUIMediaPlayback();
             setMediaPlaybackService();
         }
+
     }
 
     private void setSongInfo(Song song) {
@@ -500,10 +502,12 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setAnimation() {
-        if (mPosition == 0) {
-            mAllSongsFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
-        } else {
-            mAllSongsFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
+        if (mPosition != -1) {
+            if (mPosition == 0) {
+                mAllSongsFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
+            } else {
+                mAllSongsFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
+            }
         }
     }
 
