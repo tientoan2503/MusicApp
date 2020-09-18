@@ -16,8 +16,8 @@ import androidx.annotation.Nullable;
 
 public class SongProvider extends ContentProvider {
 
-    public static final String AUTHORITY = "com.example.music.database.SongProvider";
-    public static final String PATH = "id";
+    public static final String AUTHORITY = "com.example.music.databases";
+    public static final String PATH = "favoritesongs";
     public static final String URL = "content://" + AUTHORITY + "/" + PATH;
     public static final Uri CONTENT_URI = Uri.parse(URL);
 
@@ -25,9 +25,9 @@ public class SongProvider extends ContentProvider {
     public static final int SONG_ID = 2;
 
     static final String SINGLE_SONG_MIME_TYPE =
-            "vnd.android.cursor.item/vnd.com.bkav.note.databases.notes";
+            "vnd.android.cursor.item/vnd.com.example.music.databases.favoritesongs";
     static final String MULTIPLE_SONGS_MIME_TYPE =
-            "vnd.android.cursor.dir/vnd.com.bkav.note.databases.notes";
+            "vnd.android.cursor.dir/vnd.com.example.music.databases.favoritesongs";
 
     private static final UriMatcher sUriMatcher;
     static {
@@ -55,7 +55,7 @@ public class SongProvider extends ContentProvider {
             case SONGS:
                 break;
             case SONG_ID:
-                sqLiteQueryBuilder.appendWhere(SongHelper.ID + "=" + uri.getPathSegments().get(1));
+                sqLiteQueryBuilder.appendWhere(SongHelper.ID_PROVIDER + "=" + uri.getPathSegments().get(1));
                 break;
             default:
                 try {
@@ -87,9 +87,9 @@ public class SongProvider extends ContentProvider {
         long rowId = mDatabase.insert(SongHelper.TABLE_NAME, null, contentValues);
 
         if (rowId > 0) {
-            Uri newNoteUri = ContentUris.withAppendedId(CONTENT_URI, rowId);
-            getContext().getContentResolver().notifyChange(newNoteUri, null);
-            return newNoteUri;
+            Uri newSongUri = ContentUris.withAppendedId(CONTENT_URI, rowId);
+            getContext().getContentResolver().notifyChange(newSongUri, null);
+            return newSongUri;
         }
         throw new SQLException("Failed to add a record into " + uri);
     }
@@ -99,12 +99,11 @@ public class SongProvider extends ContentProvider {
         int count = 0;
         switch (sUriMatcher.match(uri)){
             case SONGS:
-                // Truong hop xoa toan bo notes
                 count = mDatabase.delete(SongHelper.TABLE_NAME, selection, selectionArgs);
                 break;
             case SONG_ID:
                 String id = uri.getPathSegments().get(1);
-                count = mDatabase.delete(SongHelper.TABLE_NAME, SongHelper.ID +  " = " + id +
+                count = mDatabase.delete(SongHelper.TABLE_NAME, SongHelper.ID_PROVIDER +  " = " + id +
                         (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
 
@@ -125,7 +124,7 @@ public class SongProvider extends ContentProvider {
 
             case SONG_ID:
                 String id = uri.getPathSegments().get(1);
-                count = mDatabase.update(SongHelper.TABLE_NAME, contentValues, SongHelper.ID + " = " + id +
+                count = mDatabase.update(SongHelper.TABLE_NAME, contentValues, SongHelper.ID_PROVIDER + " = " + id +
                         (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""), selectionArgs);
                 break;
 

@@ -1,16 +1,15 @@
 package com.example.music.database;
 
 import android.content.Context;
-import android.content.UriMatcher;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 
 public class SongHelper extends SQLiteOpenHelper {
 
-    public static final String DB_NAME = "DB_NAME";
+    public static final String DB_NAME = "FavoriteSongs";
     public static final int DB_VERSION = 1;
-    public static final String TABLE_NAME = "FAVORITE_SONGS";
+    public static final String TABLE_NAME = "FavoriteSongs";
     public static final String ID = "ID";
     public static final String ID_PROVIDER = "ID_PROVIDER";
     public static final String IS_FAVORITE = "IS_FAVORITE";
@@ -33,6 +32,16 @@ public class SongHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+    }
+
+    public void querySql(String sql) {
+        SQLiteDatabase database = getWritableDatabase();
+        database.execSQL(sql);
+    }
+
+    public Cursor getData(String sql) {
+        SQLiteDatabase database = getReadableDatabase();
+        return database.rawQuery(sql, null);
     }
 
 }

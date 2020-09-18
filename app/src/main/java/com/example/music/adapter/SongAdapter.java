@@ -1,10 +1,13 @@
 package com.example.music.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.music.Interface.IClickItem;
 import com.example.music.R;
 import com.example.music.Song;
+import com.example.music.database.SongHelper;
+import com.example.music.database.SongProvider;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -109,7 +114,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
         if (cursor != null) {
             while (cursor.moveToNext()) {
-//                order++;
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                 String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -122,12 +126,25 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 String duration = simpleDateFormat.format(time);
 
                 //add Song to songList
-                Song song = new Song( title, artist, id, albumId, duration, resource);
+                Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
+
+                putSongToDatabase(SongProvider.CONTENT_URI, context, id);
             }
             cursor.close();
         }
 //        new GetAllSongs().execute(context);
+    }
+
+    private void putSongToDatabase(Uri uri, Context context, int id) {
+        Cursor cursor = context.getContentResolver().query(uri, null, SongHelper.ID_PROVIDER, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            if (cursor.getInt(cursor.getColumnIndex(SongHelper.ID_PROVIDER)) != id) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(SongHelper.ID_PROVIDER, id);
+                context.getContentResolver().insert(uri, contentValues);
+            }
+        }
     }
 
 //
