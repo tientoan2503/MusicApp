@@ -1,10 +1,13 @@
 package com.example.music.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.music.Interface.IClickItem;
 import com.example.music.R;
 import com.example.music.Song;
+import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongProvider;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -31,6 +36,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public int mPosition;
     public int mSongId;
     public boolean mIsPlaying;
+    private SongProvider mSongProvider;
 
     @NonNull
     @Override
@@ -106,10 +112,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 //        // TODO TrungTH dùng asyncTask đã được dậy chứ
         mArraySongs = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
+                null, MediaStore.Audio.Media.IS_MUSIC + "=1",
+                null, MediaStore.Audio.Media.TITLE + " ASC");
         if (cursor != null) {
             while (cursor.moveToNext()) {
-//                order++;
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                 String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -122,26 +128,27 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 String duration = simpleDateFormat.format(time);
 
                 //add Song to songList
-                Song song = new Song( title, artist, id, albumId, duration, resource);
+                Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
+
+                mSongProvider = new SongProvider();
+                mSongProvider.putSongToFavoriteDB(context, id);
+
             }
             cursor.close();
         }
-//        new GetAllSongs().execute(context);
     }
 
-//
+
     public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
 
         @Override
         protected ArrayList<Song> doInBackground(Context... contexts) {
-            int order = 0;
             mArraySongs = new ArrayList<>();
             Cursor cursor = contexts[0].getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    order++;
                     String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                     String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));

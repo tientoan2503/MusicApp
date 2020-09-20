@@ -17,6 +17,13 @@
             android:name="com.example.music.service.MediaPlaybackService"
             android:enabled="true"
             android:exported="true" />
+        
+        <provider
+            android:authorities="com.example.music.databases"
+            android:name=".database.SongProvider"
+            android:exported="true"
+            android:readPermission="com.example.music.READ_DATABASE"
+            android:writePermission="com.example.music.WRITE_DATABASE"/>
 
         <activity android:name=".ActivityMusic"
             android:launchMode="singleTop">

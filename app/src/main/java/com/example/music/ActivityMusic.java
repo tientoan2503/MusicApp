@@ -3,12 +3,15 @@ package com.example.music;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -26,6 +29,8 @@ import androidx.core.content.ContextCompat;
 
 import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IMediaControl;
+import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongProvider;
 import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.MediaPlaybackFragment;
 import com.example.music.service.MediaPlaybackService;
@@ -60,6 +65,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private BroadcastReceiver mBroadcast;
     private boolean mBound;
     private Bundle mBundle;
+    private FavoriteSongsDB mFavoriteSongsDB;
 
     public class BroadcastMusic extends BroadcastReceiver {
         @Override
@@ -135,6 +141,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
         //request permission to get data from storage
         requestPermission();
+        //register BroadcastMusic
+        registerReceiver();
 
         //start MediaPlayback Service
         //TODO TrungTH có quyền rồi thì mới nên bind services ? -> DONE
@@ -156,8 +164,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     protected void onResume() {
         super.onResume();
 
-        //register BroadcastMusic
-        registerReceiver();
 
         //get adapter from AllSongsFragment
 //        //TODO TrungTH lấy đối tượng mAdapter này ra đây làm gì ? ko cần thiết => xem lại
@@ -173,7 +179,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     protected void onPause() {
-
         super.onPause();
 
     }
@@ -190,13 +195,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mInfoLayout.setVisibility(View.VISIBLE);
             setSongInfo(mSong);
 
+
         }
         super.onBackPressed();
 
         getDataFromStorage();
-
         //set animation of Equalizer view
         setAnimation();
+
 
     }
 
@@ -204,8 +210,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     protected void onDestroy() {
         super.onDestroy();
 
-        //unregister Receiver
-        this.unregisterReceiver(mBroadcast);
 
         //unbound Service
         if (mBound) {
@@ -216,6 +220,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mEditor.putInt(MediaPlaybackService.PRF_POSITION, mPosition);
         mEditor.commit();
 
+        //unregister Receiver
+        this.unregisterReceiver(mBroadcast);
     }
 
     private void getDataFromStorage() {
@@ -345,8 +351,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void onClickItem(int position) {
-        //TODO TrungTH tinh chỉnh lại đoạn này cho gọn lại , ko lặp code
-
 
         mPosition = position;
         mService.setPosition(mPosition);
@@ -377,12 +381,42 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             updateUIMediaPlayback();
             setMediaPlaybackService();
         }
+        insertToDatabase(mSong.getmId());
+        String uri = SongProvider.CONTENT_URI + "/" + mSong.getmId();
+        Cursor cursor = getContentResolver().query(Uri.parse(uri),null,
+                null, null,null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+            Log.d("ToanNTe", "onClickItem: "+cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID)));
+//            if (cursor.getInt(cursor.getColumnIndex(SongHelper.ID_PROVIDER)) == mSong.getmId()) {
+//                updateDatabase(mSong.getmId());
+//            }
+        } else {
+            Log.d("ToanNTe", "onClickItem: ");
+//            insertToDatabase(mSong.getmId());
+        }
+
+    }
+
+    private void updateDatabase(int id) {
+        Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.COUNT_OF_PLAY},
+                FavoriteSongsDB.ID_PROVIDER + " = " + id, null,null);
+        int count = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.COUNT_OF_PLAY));
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FavoriteSongsDB.COUNT_OF_PLAY, ++count);
+        getContentResolver().update(SongProvider.CONTENT_URI, contentValues, null);
+    }
+
+    private void insertToDatabase(int id) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FavoriteSongsDB.ID_PROVIDER, id);
+        getContentResolver().insert(SongProvider.CONTENT_URI, contentValues);
     }
 
     private void setSongInfo(Song song) {
         mTvTitle.setText(song.getmTitle());
         mTvArtist.setText(song.getmArtist());
-//        mSong.setImage(this, mImgArt);
         mImgArt.setImageBitmap(mSong.getAlbumArt(getApplicationContext(), mSong.getmResource()));
     }
 
