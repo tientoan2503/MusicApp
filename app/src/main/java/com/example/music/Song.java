@@ -92,7 +92,7 @@ public class Song implements Parcelable {
         this.mResource = mResource;
     }
 
-    public boolean ismIsFavorite() {
+    public boolean getIsIsFavorite() {
         return mIsFavorite;
     }
 
