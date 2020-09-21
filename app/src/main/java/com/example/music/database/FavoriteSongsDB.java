@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.Nullable;
-
 public class FavoriteSongsDB {
 
     public static final String DB_NAME = "FavoriteSongs";
@@ -17,6 +15,7 @@ public class FavoriteSongsDB {
     public static final String ID_PROVIDER = "ID_PROVIDER";
     public static final String IS_FAVORITE = "IS_FAVORITE";
     public static final String COUNT_OF_PLAY = "COUNT_OF_PLAY";
+    private ContentValues mContentValues;
 
     private Context mContext;
 
@@ -37,15 +36,28 @@ public class FavoriteSongsDB {
                     + TABLE_NAME + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + ID_PROVIDER + " INTEGER, " + IS_FAVORITE + " INTEGER DEFAULT 0, "
                     + COUNT_OF_PLAY + " INTEGER DEFAULT 0)";
-
             sqLiteDatabase.execSQL(sql);
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-                sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-                onCreate(sqLiteDatabase);
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+            onCreate(db);
         }
+
     }
 
+    public void insertDB(int id, int count) {
+        mContentValues = new ContentValues();
+        mContentValues.put(ID_PROVIDER, id);
+        mContentValues.put(COUNT_OF_PLAY, count);
+        mContext.getContentResolver().insert(SongProvider.CONTENT_URI, mContentValues);
+    }
+
+    public void updateDatabase(int id, int count) {
+        mContentValues = new ContentValues();
+        mContentValues.put(FavoriteSongsDB.COUNT_OF_PLAY, count);
+        mContext.getContentResolver().update(SongProvider.CONTENT_URI, mContentValues,
+                FavoriteSongsDB.ID_PROVIDER + " = " + id, null);
+    }
 }

@@ -35,7 +35,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public static final String PRF_REPEAT = "PRF_REPEAT";
     public static final String PRF_SHUFFLE = "PRF_SHUFFLE";
     private static final String ACTION_PLAY = "ACTION_PLAY";
-    public static final String ACTION_PAUSE = "ACTION_PAUSE";
     public static final String ACTION_PLAY_PREV = "ACTION_PLAY_PREV";
     public static final String ACTION_PLAY_NEXT = "ACTION_PLAY_NEXT";
 
@@ -84,8 +83,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
 
         mEditor.putInt(PRF_POSITION, mPosition);
-        mEditor.putBoolean(PRF_SHUFFLE, mIsShuffle);
-        mEditor.putString(PRF_REPEAT, mRepeat);
     }
 
     @Override

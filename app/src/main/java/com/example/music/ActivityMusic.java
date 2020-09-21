@@ -11,7 +11,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -59,6 +58,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private MediaPlaybackService mService;
     private boolean mIsShuffle;
     private String mRepeat;
+    private boolean mIsFavorite;
     private SharedPreferences mSharedPrf;
     private SharedPreferences.Editor mEditor;
     private boolean mIsPortrait;
@@ -66,6 +66,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private boolean mBound;
     private Bundle mBundle;
     private FavoriteSongsDB mFavoriteSongsDB;
+    private int mIdSong;
 
     public class BroadcastMusic extends BroadcastReceiver {
         @Override
@@ -75,6 +76,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                 mPosition = intent.getIntExtra(MediaPlaybackService.BROAD_POSITION, 0);
                 mSong = mArraySongs.get(mPosition);
+                mIdSong = mSong.getmId();
 
                 //if app in portrait mode
                 if (mIsPortrait) {
@@ -84,6 +86,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     if (findViewById(R.id.mediaPlayback_layout) != null) {
                         mMediaPlaybackFragment.setSongInfo(mSong);
                         mMediaPlaybackFragment.setImgPlay(mService.isPlaying());
+                        getFavoriteSong(mIdSong);
                     } else {
                         setImgPlay(mService.isPlaying());
                     }
@@ -93,6 +96,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 else {
                     updateUIMediaPlayback();
                     setMediaPlaybackService();
+                    getFavoriteSong(mIdSong);
                 }
 
                 //set animation of Equalizer view
@@ -141,40 +145,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
         //request permission to get data from storage
         requestPermission();
+
         //register BroadcastMusic
         registerReceiver();
-
-        //start MediaPlayback Service
-        //TODO TrungTH có quyền rồi thì mới nên bind services ? -> DONE
-//        if (mIntent == null) {
-//            mIntent = new Intent(this, MediaPlaybackService.class);
-//            bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
-//            startService(mIntent);
-//        }
-
-        //TODO TrungTH đặt tên cho rõ ràng hơn, ngoài ra registerReceiver với unregisterReceiver code sai chỗ
-        // Thường khi nào app hiển thị mới cần lắng nghe => em xem lại vòng đời như nào và đặt cho chuẩn
-        //register BroadcastMusic
-//        mBroadcast = new BroadcastMusic();
-//        mFilter = new IntentFilter();
-//        mFilter.addAction(ACTION_PLAY_COMPLETE);
-//        this.registerReceiver(mBroadcast, mFilter);
     }
 
     protected void onResume() {
         super.onResume();
-
-
-        //get adapter from AllSongsFragment
-//        //TODO TrungTH lấy đối tượng mAdapter này ra đây làm gì ? ko cần thiết => xem lại
-//        mAdapter = mAllSongsFragment.getAdapter();
-//        mArraySongs = mAdapter.getArraySongs();
-
-        //TODO TrungTH trường hợp dọc có cần thiết gọi cái này không ? -> DONE Đã check trường hợp dọc thì không set nữa
-//        if (!mIsPortrait) {
-//            setShuffleAndRepeat(mIsShuffle, mRepeat);
-//        }
-
     }
 
     @Override
@@ -194,22 +171,17 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mActionBar.show();
             mInfoLayout.setVisibility(View.VISIBLE);
             setSongInfo(mSong);
-
-
         }
         super.onBackPressed();
 
         getDataFromStorage();
         //set animation of Equalizer view
         setAnimation();
-
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
 
         //unbound Service
         if (mBound) {
@@ -308,9 +280,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     mPosition = 0;
                 }
                 mSong = mArraySongs.get(mPosition);
-                //send position to Adapter
-                // TODO TrungTH đưa hàm vào trong lớp mMediaPlaybackFragment giảm thiểu sự phụ thuộc của lớp mMediaPlaybackFragment vào activity
-                //  => chưa hiểu rõ ý nghĩa của fragment thì phải
 
                 //update real time of song
                 updateUIMediaPlayback();
@@ -334,13 +303,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                     //check Media Player is playing or not to set play icon
                     checkPlaying();
-
                 }
             }
 
             //set animation of Equalizer view
             setAnimation();
-
         }
 
         @Override
@@ -381,37 +348,24 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             updateUIMediaPlayback();
             setMediaPlaybackService();
         }
-        insertToDatabase(mSong.getmId());
-        String uri = SongProvider.CONTENT_URI + "/" + mSong.getmId();
-        Cursor cursor = getContentResolver().query(Uri.parse(uri),null,
-                null, null,null);
 
+        // add songs to Favorite Songs database
+        mFavoriteSongsDB = new FavoriteSongsDB(getApplicationContext());
+        addToFavoriteDB(mSong.getmId());
+    }
+
+    private void addToFavoriteDB(int id) {
+        Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.COUNT_OF_PLAY,
+                FavoriteSongsDB.ID_PROVIDER}, FavoriteSongsDB.ID_PROVIDER + " = " + id, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
-            Log.d("ToanNTe", "onClickItem: "+cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID)));
-//            if (cursor.getInt(cursor.getColumnIndex(SongHelper.ID_PROVIDER)) == mSong.getmId()) {
-//                updateDatabase(mSong.getmId());
-//            }
-        } else {
-            Log.d("ToanNTe", "onClickItem: ");
-//            insertToDatabase(mSong.getmId());
+            if (cursor.getCount() > 0) {
+                int count = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.COUNT_OF_PLAY));
+                mFavoriteSongsDB.updateDatabase(id, ++count);
+            } else {
+                mFavoriteSongsDB.insertDB(id, 1);
+            }
         }
-
-    }
-
-    private void updateDatabase(int id) {
-        Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.COUNT_OF_PLAY},
-                FavoriteSongsDB.ID_PROVIDER + " = " + id, null,null);
-        int count = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.COUNT_OF_PLAY));
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(FavoriteSongsDB.COUNT_OF_PLAY, ++count);
-        getContentResolver().update(SongProvider.CONTENT_URI, contentValues, null);
-    }
-
-    private void insertToDatabase(int id) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(FavoriteSongsDB.ID_PROVIDER, id);
-        getContentResolver().insert(SongProvider.CONTENT_URI, contentValues);
     }
 
     private void setSongInfo(Song song) {
@@ -441,7 +395,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
         //set animation of Equalizer view
         setAnimation();
-
     }
 
     @Override
@@ -449,7 +402,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
         //set animation of Equalizer view
         setAnimation();
-
     }
 
     @Override
@@ -462,6 +414,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickRepeat(String repeat) {
         mRepeat = repeat;
         mService.setRepeat(mRepeat);
+    }
+
+    @Override
+    public void onClickFavorite(boolean isFavorite) {
+        mIsFavorite = isFavorite;
     }
 
     private void setImgPlay(boolean isPlaying) {
@@ -541,6 +498,19 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 mAllSongsFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
             }
         }
+    }
+
+    public void getFavoriteSong(int id) {
+        Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.ID_PROVIDER, FavoriteSongsDB.COUNT_OF_PLAY},
+                FavoriteSongsDB.ID_PROVIDER + "=" + id + " AND " + FavoriteSongsDB.COUNT_OF_PLAY + "=" + 3 ,
+                null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            if (cursor.getCount() > 0) {
+                Log.d("ToanNTe", "getFavoriteSong: co nha");
+            }
+        }
+
     }
 
 }

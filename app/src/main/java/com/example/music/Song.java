@@ -12,6 +12,7 @@ import android.os.Parcelable;
 public class Song implements Parcelable {
     private String mTitle, mArtist, mDuration, mResource;
     private int mAlbumID, mId;
+    private boolean mIsFavorite = false;
 
     public Song(String title, String artist, int id, int albumID, String duration, String resource) {
         this.mTitle = title;
@@ -20,9 +21,6 @@ public class Song implements Parcelable {
         this.mAlbumID = albumID;
         this.mDuration = duration;
         this.mResource = resource;
-    }
-
-    public Song() {
     }
 
     protected Song(Parcel in) {
@@ -94,6 +92,14 @@ public class Song implements Parcelable {
         this.mResource = mResource;
     }
 
+    public boolean ismIsFavorite() {
+        return mIsFavorite;
+    }
+
+    public void setmIsFavorite(boolean mIsFavorite) {
+        this.mIsFavorite = mIsFavorite;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -102,11 +108,6 @@ public class Song implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
 
-    }
-
-    public Uri getUri() {
-        Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(sArtworkUri, mAlbumID);
     }
 
     public Bitmap getAlbumArt(Context context, String path) {
