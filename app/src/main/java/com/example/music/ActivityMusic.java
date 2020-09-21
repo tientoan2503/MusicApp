@@ -352,7 +352,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         // add songs to Favorite Songs database
         mFavoriteSongsDB = new FavoriteSongsDB(getApplicationContext());
         addToFavoriteDB(mSong.getmId());
-
     }
 
     private void addToFavoriteDB(int id) {

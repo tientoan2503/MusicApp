@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 
 public class FavoriteSongsDB {
 
@@ -17,12 +16,12 @@ public class FavoriteSongsDB {
     public static final String IS_FAVORITE = "IS_FAVORITE";
     public static final String COUNT_OF_PLAY = "COUNT_OF_PLAY";
     private ContentValues mContentValues;
+
     private Context mContext;
 
     public FavoriteSongsDB(Context context) {
         mContext = context;
     }
-
 
     public static class SongHelper extends SQLiteOpenHelper {
 
@@ -31,13 +30,13 @@ public class FavoriteSongsDB {
         }
 
         @Override
-        public void onCreate(SQLiteDatabase db) {
+        public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
             String sql = "CREATE TABLE IF NOT EXISTS "
                     + TABLE_NAME + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + ID_PROVIDER + " INTEGER, " + IS_FAVORITE + " INTEGER DEFAULT 0, "
                     + COUNT_OF_PLAY + " INTEGER DEFAULT 0)";
-            db.execSQL(sql);
+            sqLiteDatabase.execSQL(sql);
         }
 
         @Override

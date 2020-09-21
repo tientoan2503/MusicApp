@@ -3,6 +3,7 @@ package com.example.music.database;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -10,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -133,5 +135,21 @@ public class SongProvider extends ContentProvider {
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
+    }
+
+
+    public void putSongToFavoriteDB(Context context, int id) {
+//        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI,
+//                null, FavoriteSongsDB.ID_PROVIDER, null, null);
+//
+//        if (cursor != null && cursor.moveToFirst()) {
+//            while (cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER)) != id) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(FavoriteSongsDB.ID_PROVIDER, id);
+                insert(SongProvider.CONTENT_URI, contentValues);
+//                cursor.moveToNext();
+//            }
+//            Log.d("ToanNTe", "putSongToFavoriteDB: " + cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER)));
+//        }
     }
 }

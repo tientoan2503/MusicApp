@@ -110,7 +110,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 //        // TODO TrungTH dùng asyncTask đã được dậy chứ
         mArraySongs = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
+                null, MediaStore.Audio.Media.IS_MUSIC + "=1",
+                null, MediaStore.Audio.Media.TITLE + " ASC");
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
@@ -127,12 +128,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 //add Song to songList
                 Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
-//
-
             }
             cursor.close();
         }
-//        new GetAllSongs().execute(context);
     }
 
 //    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
