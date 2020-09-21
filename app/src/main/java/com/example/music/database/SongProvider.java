@@ -40,7 +40,7 @@ public class SongProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        SongHelper songHelper = new SongHelper(getContext());
+        FavoriteSongsDB.SongHelper songHelper = new FavoriteSongsDB.SongHelper(getContext());
         mDatabase = songHelper.getWritableDatabase();
         return mDatabase == null ? false : true;
     }
@@ -49,13 +49,13 @@ public class SongProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
-        sqLiteQueryBuilder.setTables(SongHelper.TABLE_NAME);
+        sqLiteQueryBuilder.setTables(FavoriteSongsDB.TABLE_NAME);
 
         switch (sUriMatcher.match(uri)) {
             case SONGS:
                 break;
             case SONG_ID:
-                sqLiteQueryBuilder.appendWhere(SongHelper.ID_PROVIDER + "=" + uri.getPathSegments().get(1));
+                sqLiteQueryBuilder.appendWhere(FavoriteSongsDB.ID_PROVIDER + "=" + uri.getPathSegments().get(1));
                 break;
             default:
                 try {
@@ -84,7 +84,7 @@ public class SongProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        long rowId = mDatabase.insert(SongHelper.TABLE_NAME, null, contentValues);
+        long rowId = mDatabase.insert(FavoriteSongsDB.TABLE_NAME, null, contentValues);
 
         if (rowId > 0) {
             Uri newSongUri = ContentUris.withAppendedId(CONTENT_URI, rowId);
@@ -99,11 +99,11 @@ public class SongProvider extends ContentProvider {
         int count = 0;
         switch (sUriMatcher.match(uri)){
             case SONGS:
-                count = mDatabase.delete(SongHelper.TABLE_NAME, selection, selectionArgs);
+                count = mDatabase.delete(FavoriteSongsDB.TABLE_NAME, selection, selectionArgs);
                 break;
             case SONG_ID:
                 String id = uri.getPathSegments().get(1);
-                count = mDatabase.delete(SongHelper.TABLE_NAME, SongHelper.ID_PROVIDER +  " = " + id +
+                count = mDatabase.delete(FavoriteSongsDB.TABLE_NAME, FavoriteSongsDB.ID_PROVIDER +  " = " + id +
                         (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
 
@@ -119,12 +119,12 @@ public class SongProvider extends ContentProvider {
         int count = 0;
         switch (sUriMatcher.match(uri)){
             case SONGS:
-                count = mDatabase.update(SongHelper.TABLE_NAME, contentValues, selection, selectionArgs);
+                count = mDatabase.update(FavoriteSongsDB.TABLE_NAME, contentValues, selection, selectionArgs);
                 break;
 
             case SONG_ID:
                 String id = uri.getPathSegments().get(1);
-                count = mDatabase.update(SongHelper.TABLE_NAME, contentValues, SongHelper.ID_PROVIDER + " = " + id +
+                count = mDatabase.update(FavoriteSongsDB.TABLE_NAME, contentValues, FavoriteSongsDB.ID_PROVIDER + " = " + id +
                         (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""), selectionArgs);
                 break;
 

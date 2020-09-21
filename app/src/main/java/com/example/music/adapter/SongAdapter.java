@@ -7,7 +7,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.music.Interface.IClickItem;
 import com.example.music.R;
 import com.example.music.Song;
-import com.example.music.database.SongHelper;
+import com.example.music.database.FavoriteSongsDB;
 import com.example.music.database.SongProvider;
 
 import java.lang.ref.WeakReference;
@@ -128,57 +127,43 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 //add Song to songList
                 Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
+//
 
-                putSongToDatabase(SongProvider.CONTENT_URI, context, id);
             }
             cursor.close();
         }
 //        new GetAllSongs().execute(context);
     }
 
-    private void putSongToDatabase(Uri uri, Context context, int id) {
-        Cursor cursor = context.getContentResolver().query(uri, null, SongHelper.ID_PROVIDER, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            if (cursor.getInt(cursor.getColumnIndex(SongHelper.ID_PROVIDER)) != id) {
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(SongHelper.ID_PROVIDER, id);
-                context.getContentResolver().insert(uri, contentValues);
-            }
-        }
-    }
-
+//    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
 //
-    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
-
-        @Override
-        protected ArrayList<Song> doInBackground(Context... contexts) {
-            int order = 0;
-            mArraySongs = new ArrayList<>();
-            Cursor cursor = contexts[0].getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    order++;
-                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                    String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                    int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                    int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-
-                    //format duration to mm:ss
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-                    String duration = simpleDateFormat.format(time);
-
-                    //add Song to songList
-                    Song song = new Song(title, artist, songId, albumId, duration, resource);
-                    mArraySongs.add(song);
-                }
-                cursor.close();
-            }
-            return mArraySongs;
-        }
-    }
+//        @Override
+//        protected ArrayList<Song> doInBackground(Context... contexts) {
+//            mArraySongs = new ArrayList<>();
+//            Cursor cursor = contexts[0].getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                    null, MediaStore.Audio.Media.IS_MUSIC + "=1", null, MediaStore.Audio.Media.TITLE + " ASC");
+//            if (cursor != null) {
+//                while (cursor.moveToNext()) {
+//                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+//                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+//                    String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+//                    int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+//                    int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+//                    int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+//
+//                    //format duration to mm:ss
+//                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+//                    String duration = simpleDateFormat.format(time);
+//
+//                    //add Song to songList
+//                    Song song = new Song(title, artist, songId, albumId, duration, resource);
+//                    mArraySongs.add(song);
+//                }
+//                cursor.close();
+//            }
+//            return mArraySongs;
+//        }
+//    }
 }
 
 
