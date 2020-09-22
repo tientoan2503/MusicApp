@@ -141,7 +141,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             if (action.equals(ACTION_PLAY)) {
                 if (isPlaying()) {
                     pauseSong();
-                    stopForeground(false);
+//                    stopForeground(false);
                 } else {
                     resumeSong();
                 }
@@ -224,6 +224,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mPlayer.pause();
 
         startForeground(NOTIFICATION_ID, createNotification(isPlaying()));
+        stopForeground(false);
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 

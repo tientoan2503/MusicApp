@@ -4,14 +4,20 @@
     android:id="@+id/activity_music_portrait"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- TrungTH các mã màu, các kích thước, cần được dưa vào các file res tương ứng  -->
+
+
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:id="@+id/toolbar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="?attr/actionBarSize"-->
+<!--        android:background="@color/colorPrimary" />-->
+
     <FrameLayout
         android:id="@+id/all_song"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_above="@+id/song_info"
-        android:layout_alignParentTop="true" />
+        android:layout_above="@+id/song_info" />
 
     <RelativeLayout
         android:visibility="gone"

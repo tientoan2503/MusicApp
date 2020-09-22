@@ -1,11 +1,8 @@
 package com.example.music.adapter;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.music.Interface.IClickItem;
 import com.example.music.R;
 import com.example.music.Song;
-import com.example.music.database.FavoriteSongsDB;
 import com.example.music.database.SongProvider;
 
 import java.lang.ref.WeakReference;
@@ -131,6 +127,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
             cursor.close();
         }
+    }
+
+    public void getFavoriteList(Context context) {
+        mArraySongs = new ArrayList<>();
+//        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, )
     }
 
 //    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {

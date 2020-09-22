@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -100,11 +101,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         if (mMediaPlaybackService != null) {
             checkPlaying(mMediaPlaybackService.isPlaying());
         }
+
         mBundle = getArguments();
         if (mBundle != null) {
             mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
             setSongInfo(mSong);
         }
+
         mIsFavorite = mSong.getIsIsFavorite();
 
         checkShuffle();
@@ -304,8 +307,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 if (mIsFavorite) {
                     mIsFavorite = false;
                     favoriteSongsDB.setFavorite(mSong.getmId(), 0);
+                    favoriteSongsDB.updateCount(mSong.getmId(), 0);
+                    Toast.makeText(mMediaPlaybackService, R.string.remove_favorite, Toast.LENGTH_SHORT).show();
                 } else {
                     mIsFavorite = true;
+                    Toast.makeText(mMediaPlaybackService, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
                     favoriteSongsDB.setFavorite(mSong.getmId(), 2);
                 }
                 mSong.setmIsFavorite(mIsFavorite);
