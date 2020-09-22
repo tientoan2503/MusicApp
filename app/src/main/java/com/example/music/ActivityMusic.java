@@ -3,7 +3,6 @@ package com.example.music;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -86,7 +85,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     if (findViewById(R.id.mediaPlayback_layout) != null) {
                         mMediaPlaybackFragment.setSongInfo(mSong);
                         mMediaPlaybackFragment.setImgPlay(mService.isPlaying());
-                        getFavoriteSong(mIdSong);
+//                        getFavoriteSong(mIdSong);
                     } else {
                         setImgPlay(mService.isPlaying());
                     }
@@ -96,7 +95,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 else {
                     updateUIMediaPlayback();
                     setMediaPlaybackService();
-                    getFavoriteSong(mIdSong);
+//                    getFavoriteSong(mIdSong);
                 }
 
                 //set animation of Equalizer view
@@ -361,7 +360,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {
                 int count = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.COUNT_OF_PLAY));
-                mFavoriteSongsDB.updateDatabase(id, ++count);
+                mFavoriteSongsDB.updateCount(id, ++count);
+                mFavoriteSongsDB.updateFavorite(1);
             } else {
                 mFavoriteSongsDB.insertDB(id, 1);
             }
@@ -500,10 +500,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         }
     }
 
-    public void getFavoriteSong(int id) {
-        Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.ID_PROVIDER, FavoriteSongsDB.COUNT_OF_PLAY},
-                FavoriteSongsDB.ID_PROVIDER + "=" + id + " AND " + FavoriteSongsDB.COUNT_OF_PLAY + "=" + 3 ,
-                null, null);
+    public void getSongFromDB(int id) {
+        Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.ID_PROVIDER,
+                        FavoriteSongsDB.IS_FAVORITE}, FavoriteSongsDB.ID_PROVIDER + "=" + id + " AND " +
+                        FavoriteSongsDB.IS_FAVORITE + "=" + 2, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
             if (cursor.getCount() > 0) {

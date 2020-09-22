@@ -18,6 +18,7 @@ import com.example.music.ActivityMusic;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.R;
 import com.example.music.Song;
+import com.example.music.database.FavoriteSongsDB;
 import com.example.music.service.MediaPlaybackService;
 
 import java.text.SimpleDateFormat;
@@ -99,10 +100,16 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         if (mMediaPlaybackService != null) {
             checkPlaying(mMediaPlaybackService.isPlaying());
         }
+        mBundle = getArguments();
+        if (mBundle != null) {
+            mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
+            setSongInfo(mSong);
+        }
+        mIsFavorite = mSong.getIsIsFavorite();
 
         checkShuffle();
         checkRepeat();
-        checkFavorite();
+        checkFavorite(mIsFavorite);
 
         return view;
     }
@@ -111,11 +118,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void onResume() {
         super.onResume();
 
-        mBundle = getArguments();
-        if (mBundle != null) {
-            mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
-            setSongInfo(mSong);
-        }
 
     }
 
@@ -158,8 +160,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
-    public void checkFavorite() {
-        if (mIsFavorite) {
+    public void checkFavorite(boolean isFavorite) {
+        if (isFavorite) {
             setImgFavorite(R.drawable.ic_favorite_selected);
         } else {
             setImgFavorite(R.drawable.ic_favorite_default);
@@ -200,12 +202,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     public void setSongInfo(Song song) {
         mSong = song;
+        mIsFavorite = mSong.getIsIsFavorite();
         mTvSongTitle.setText(mSong.getmTitle());
         mTvArtist.setText(mSong.getmArtist());
         mTvTotalTime.setText(mSong.getmDuration());
         mImgArtTop.setImageBitmap(mSong.getAlbumArt(getContext(), mSong.getmResource()));
         mImgSongArt.setImageBitmap(mSong.getAlbumArt(getContext(), mSong.getmResource()));
-        checkFavorite();
+        checkFavorite(mIsFavorite);
     }
 
     @Override
@@ -297,12 +300,16 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
 
             case R.id.img_favorite:
+                FavoriteSongsDB favoriteSongsDB = new FavoriteSongsDB(getContext());
                 if (mIsFavorite) {
                     mIsFavorite = false;
+                    favoriteSongsDB.setFavorite(mSong.getmId(), 0);
                 } else {
                     mIsFavorite = true;
+                    favoriteSongsDB.setFavorite(mSong.getmId(), 2);
                 }
-                checkFavorite();
+                mSong.setmIsFavorite(mIsFavorite);
+                checkFavorite(mIsFavorite);
                 break;
         }
     }
@@ -325,4 +332,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void setService(MediaPlaybackService service) {
         mMediaPlaybackService = service;
     }
+
+
 }
