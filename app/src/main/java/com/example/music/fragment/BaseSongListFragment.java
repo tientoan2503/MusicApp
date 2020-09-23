@@ -13,60 +13,44 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.music.R;
-import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
 
-import java.util.ArrayList;
-
-public class BaseSongListFragment extends Fragment {
+public abstract class BaseSongListFragment extends Fragment {
 
     private RecyclerView mRecyclerview;
-    private SongAdapter mSongAdapter;
+    private SongAdapter mAdapter;
 
 
-    @Nullable
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all_songs, container, false);
-        mSongAdapter = new SongAdapter();
-
+        Log.d("ToanNTe", "onCreateView: ");
+        mAdapter = new SongAdapter();
         mRecyclerview = view.findViewById(R.id.recyclerview);
-        Log.d("ToanNTe", "onCreateView: " + mSongAdapter);
+
+        setAdapter(getAdapter());
+
         return view;
     }
 
     public void initRecyclerView() {
-        Log.d("ToanNTe", "initRecyclerView: " + mSongAdapter);
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
 
-        mRecyclerview.setAdapter(mSongAdapter);
+        mRecyclerview.setAdapter(mAdapter);
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
-    public void getAllSongs() {
-        mSongAdapter.getAllSongs(getContext());
-        Log.d("ToanNTe", "getAllSongs: " + mSongAdapter);
+    public void setAdapter(SongAdapter adapter) {
+        mAdapter = adapter;
     }
 
-    public void getFavoriteList() {
-        mSongAdapter = new SongAdapter();
-        Log.d("ToanNTe", "getFavoriteList: " + mSongAdapter);
-        mSongAdapter.getFavoriteList(getContext());
-    }
-
-    public ArrayList<Song> getArraySongs() {
-        return mSongAdapter.mArraySongs;
-    }
+    public abstract SongAdapter getAdapter();
 
     public void setAnimation(int position, int id, boolean isPlaying) {
-        mSongAdapter.mSongId = id;
-        mSongAdapter.mIsPlaying = isPlaying;
+        mAdapter.mSongId = id;
+        mAdapter.mIsPlaying = isPlaying;
         mRecyclerview.smoothScrollToPosition(position);
-        mSongAdapter.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
     }
 
-    public SongAdapter getAdapter() {
-        return mSongAdapter;
-    }
 }

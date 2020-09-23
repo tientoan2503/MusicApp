@@ -162,8 +162,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         switch (item.getItemId()) {
             case R.id.nav_listen_now:
                 mFavoriteSongsFragment = new FavoriteSongsFragment();
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.all_song, mFavoriteSongsFragment).addToBackStack(null).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mFavoriteSongsFragment).addToBackStack(null).commit();
                 mFavoriteSongsFragment.initRecyclerView();
                 mFavoriteSongsFragment.getFavoriteList();
                 break;

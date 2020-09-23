@@ -165,29 +165,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         }
     }
 
-    private void getSongFromExternalStorage(Context context, Cursor cursor) {
-        mArraySongs = new ArrayList<>();
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-
-                //format duration to mm:ss
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-                String duration = simpleDateFormat.format(time);
-
-                //add Song to songList
-                Song song = new Song(title, artist, id, albumId, duration, resource);
-                mArraySongs.add(song);
-            }
-            cursor.close();
-        }
-    }
-
 //    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
 //
 //        @Override
