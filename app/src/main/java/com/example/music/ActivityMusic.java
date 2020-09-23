@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -38,6 +39,7 @@ import com.example.music.Interface.IMediaControl;
 import com.example.music.database.FavoriteSongsDB;
 import com.example.music.database.SongProvider;
 import com.example.music.fragment.AllSongsFragment;
+import com.example.music.fragment.FavoriteSongsFragment;
 import com.example.music.fragment.MediaPlaybackFragment;
 import com.example.music.service.MediaPlaybackService;
 import com.google.android.material.navigation.NavigationView;
@@ -59,6 +61,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private ImageView mImgArt, mActionPlay;
     private AllSongsFragment mAllSongsFragment;
     private MediaPlaybackFragment mMediaPlaybackFragment;
+    private FavoriteSongsFragment mFavoriteSongsFragment;
     private Song mSong;
     private ArrayList<Song> mArraySongs;
     private int mPosition;
@@ -158,7 +161,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_listen_now:
-
+                mFavoriteSongsFragment = new FavoriteSongsFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.all_song, mFavoriteSongsFragment).addToBackStack(null).commit();
+                mFavoriteSongsFragment.initRecyclerView();
+                mFavoriteSongsFragment.getFavoriteList();
                 break;
             case R.id.nav_recent:
 

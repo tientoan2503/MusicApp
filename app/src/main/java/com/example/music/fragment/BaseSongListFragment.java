@@ -1,6 +1,7 @@
 package com.example.music.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +28,15 @@ public class BaseSongListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all_songs, container, false);
-
         mSongAdapter = new SongAdapter();
-        mRecyclerview = view.findViewById(R.id.recyclerview);
 
+        mRecyclerview = view.findViewById(R.id.recyclerview);
+        Log.d("ToanNTe", "onCreateView: " + mSongAdapter);
         return view;
     }
 
     public void initRecyclerView() {
+        Log.d("ToanNTe", "initRecyclerView: " + mSongAdapter);
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
 
@@ -44,6 +46,13 @@ public class BaseSongListFragment extends Fragment {
 
     public void getAllSongs() {
         mSongAdapter.getAllSongs(getContext());
+        Log.d("ToanNTe", "getAllSongs: " + mSongAdapter);
+    }
+
+    public void getFavoriteList() {
+        mSongAdapter = new SongAdapter();
+        Log.d("ToanNTe", "getFavoriteList: " + mSongAdapter);
+        mSongAdapter.getFavoriteList(getContext());
     }
 
     public ArrayList<Song> getArraySongs() {
@@ -55,5 +64,9 @@ public class BaseSongListFragment extends Fragment {
         mSongAdapter.mIsPlaying = isPlaying;
         mRecyclerview.smoothScrollToPosition(position);
         mSongAdapter.notifyDataSetChanged();
+    }
+
+    public SongAdapter getAdapter() {
+        return mSongAdapter;
     }
 }
