@@ -13,5 +13,6 @@ import com.example.music.R;
 import com.example.music.adapter.SongAdapter;
 
 public class AllSongsFragment extends BaseSongListFragment {
-    
+
+
 }

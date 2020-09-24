@@ -22,7 +22,6 @@ public class BaseSongListFragment extends Fragment {
     private RecyclerView mRecyclerview;
     private SongAdapter mSongAdapter;
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {

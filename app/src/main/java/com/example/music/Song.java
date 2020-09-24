@@ -13,14 +13,16 @@ public class Song implements Parcelable {
     private String mTitle, mArtist, mDuration, mResource;
     private int mAlbumID, mId;
     private boolean mIsFavorite = false;
+    private int mFavorite;
 
-    public Song(String title, String artist, int id, int albumID, String duration, String resource) {
+    public Song(String title, String artist, int id, int albumID, String duration, String resource, int mFavorite) {
         this.mTitle = title;
         this.mArtist = artist;
         this.mId = id;
         this.mAlbumID = albumID;
         this.mDuration = duration;
         this.mResource = resource;
+        this.mFavorite = mFavorite;
     }
 
     protected Song(Parcel in) {

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.music.Interface.IClickItem;
 import com.example.music.R;
 import com.example.music.Song;
+import com.example.music.database.FavoriteSongsDB;
 import com.example.music.database.SongProvider;
 
 import java.lang.ref.WeakReference;
@@ -121,6 +123,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
                 String duration = simpleDateFormat.format(time);
 
+                Cursor cursor1 = context.getContentResolver().query(SongProvider.CONTENT_URI,
+                        null, )
+
                 //add Song to songList
                 Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
@@ -131,7 +136,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     public void getFavoriteList(Context context) {
         mArraySongs = new ArrayList<>();
-//        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, )
+        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
+                FavoriteSongsDB.IS_FAVORITE + "=2", null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            if (cursor.getCount() > 0) {
+
+            }
+        }
     }
 
 //    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {
