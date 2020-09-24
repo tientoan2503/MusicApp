@@ -42,7 +42,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private boolean mIsShuffle;
     private String mRepeat;
-    private boolean mIsQueueSelected = false;
     private boolean mIsFavorite = false;
     private MediaPlaybackService mMediaPlaybackService;
     private Handler mHandler;

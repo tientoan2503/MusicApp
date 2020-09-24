@@ -1,30 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_listen_now"
-            android:icon="@drawable/ic_listen_now"
-            android:title="@string/listen_now" />
+            android:icon="@drawable/ic_all_songs"
+            android:id="@+id/nav_all_songs"
+            android:title="@string/all_song" />
         <item
-            android:id="@+id/nav_recent"
-            android:icon="@drawable/ic_recent"
-            android:title="@string/recent" />
-        <item
-            android:id="@+id/nav_library"
-            android:icon="@drawable/ic_library_music"
-            android:title="@string/music_library" />
+            android:icon="@drawable/ic_nav_favorite"
+            android:id="@+id/nav_favorite"
+            android:title="@string/favorite" />
     </group>
-
-    <item
-        android:id="@+id/nav_settings"
-        android:icon="@drawable/ic_nav_settings"
-        android:title="@string/settings" />
-    <item
-        android:id="@+id/nav_help"
-        android:icon="@drawable/ic_nav_help"
-        android:title="@string/helps_feedback" />
 
 </menu>

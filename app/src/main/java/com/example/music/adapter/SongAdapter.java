@@ -43,6 +43,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return new ViewHolder(view, this);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull SongAdapter.ViewHolder holder, int position) {
         Song song = mArraySongs.get(position);
@@ -106,10 +107,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     //method read song from storage
     public void getAllSongs(Context context) {
 //        // TODO TrungTH dùng asyncTask đã được dậy chứ
-        mArraySongs = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, MediaStore.Audio.Media.IS_MUSIC + "=1",
                 null, MediaStore.Audio.Media.TITLE + " ASC");
+        mArraySongs = new ArrayList<>();
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
@@ -123,9 +124,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
                 String duration = simpleDateFormat.format(time);
 
-                Cursor cursor1 = context.getContentResolver().query(SongProvider.CONTENT_URI,
-                        null, )
-
                 //add Song to songList
                 Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
@@ -135,13 +133,36 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     }
 
     public void getFavoriteList(Context context) {
-        mArraySongs = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
                 FavoriteSongsDB.IS_FAVORITE + "=2", null, null);
+        mArraySongs = new ArrayList<>();
         if (cursor != null) {
-            cursor.moveToFirst();
-            if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int idOfFavoriteSong = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER));
+                Cursor cursor1 = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null, MediaStore.Audio.Media.IS_MUSIC + "=1",
+                        null, MediaStore.Audio.Media.TITLE + " ASC");
+                if (cursor1 != null) {
+                    while (cursor1.moveToNext()) {
+                        String title = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                        String artist = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                        String resource = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.DATA));
+                        int time = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.DURATION));
+                        int albumId = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                        int id = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media._ID));
 
+                        //format duration to mm:ss
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+                        String duration = simpleDateFormat.format(time);
+
+                        //add Song to songList
+                        if (idOfFavoriteSong == id) {
+                            Song song = new Song(title, artist, id, albumId, duration, resource);
+                            mArraySongs.add(song);
+                        }
+                    }
+                    cursor1.close();
+                }
             }
         }
     }

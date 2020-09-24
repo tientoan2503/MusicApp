@@ -1,6 +1,7 @@
 package com.example.music.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,19 +18,22 @@ import com.example.music.adapter.SongAdapter;
 
 import java.util.ArrayList;
 
-public class BaseSongListFragment extends Fragment {
+public abstract class BaseSongListFragment extends Fragment {
 
     private RecyclerView mRecyclerview;
-    private SongAdapter mSongAdapter;
+    protected SongAdapter mSongAdapter;
+
+    public abstract void updateAdapter();
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all_songs, container, false);
-
         mSongAdapter = new SongAdapter();
+        updateAdapter();
         mRecyclerview = view.findViewById(R.id.recyclerview);
-
+        initRecyclerView();
         return view;
     }
 
