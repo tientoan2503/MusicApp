@@ -45,10 +45,6 @@ public abstract class BaseSongListFragment extends Fragment {
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
-    public void getAllSongs() {
-        mSongAdapter.getAllSongs(getContext());
-    }
-
     public ArrayList<Song> getArraySongs() {
         return mSongAdapter.mArraySongs;
     }
