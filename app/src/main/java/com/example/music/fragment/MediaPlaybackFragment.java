@@ -42,12 +42,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private boolean mIsShuffle;
     private String mRepeat;
-    private boolean mIsQueueSelected = false;
     private boolean mIsFavorite = false;
     private MediaPlaybackService mMediaPlaybackService;
     private Handler mHandler;
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
+
 
     public MediaPlaybackFragment(IMediaControl mediaControl) {
         mMediaControl = mediaControl;
@@ -318,6 +318,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 checkFavorite(mIsFavorite);
                 break;
         }
+    }
+
+    private void updateFavoriteList() {
+        getFragmentManager().beginTransaction().replace(R.id.all_song, new FavoriteSongsFragment()).commit();
     }
 
     private void updateTimeSong() {

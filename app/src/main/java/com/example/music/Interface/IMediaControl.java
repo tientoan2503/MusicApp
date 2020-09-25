@@ -7,5 +7,4 @@ public interface IMediaControl {
     void onClickPrev(int id, boolean isPlaying);
     void onClickShuffle(boolean isShuffle);
     void onClickRepeat(String repeat);
-    void onClickFavorite(boolean isFavorite);
 }

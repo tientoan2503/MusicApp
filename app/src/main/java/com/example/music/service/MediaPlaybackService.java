@@ -141,7 +141,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             if (action.equals(ACTION_PLAY)) {
                 if (isPlaying()) {
                     pauseSong();
-//                    stopForeground(false);
                 } else {
                     resumeSong();
                 }
@@ -249,7 +248,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
-
+        mEditor.putInt(PRF_POSITION, mPosition);
+        mEditor.commit();
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
@@ -261,6 +261,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
+        mEditor.putInt(PRF_POSITION, mPosition);
+        mEditor.commit();
 
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }

@@ -13,22 +13,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.music.R;
+import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
+
+import java.util.ArrayList;
 
 public abstract class BaseSongListFragment extends Fragment {
 
     private RecyclerView mRecyclerview;
-    private SongAdapter mAdapter;
+    protected SongAdapter mSongAdapter;
 
+    public abstract void updateAdapter();
 
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all_songs, container, false);
-        Log.d("ToanNTe", "onCreateView: ");
-        mAdapter = new SongAdapter();
+        mSongAdapter = new SongAdapter();
+        updateAdapter();
         mRecyclerview = view.findViewById(R.id.recyclerview);
-
-        setAdapter(getAdapter());
-
+        initRecyclerView();
         return view;
     }
 
@@ -36,21 +40,18 @@ public abstract class BaseSongListFragment extends Fragment {
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
 
-        mRecyclerview.setAdapter(mAdapter);
+        mRecyclerview.setAdapter(mSongAdapter);
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
-    public void setAdapter(SongAdapter adapter) {
-        mAdapter = adapter;
+    public ArrayList<Song> getArraySongs() {
+        return mSongAdapter.mArraySongs;
     }
-
-    public abstract SongAdapter getAdapter();
 
     public void setAnimation(int position, int id, boolean isPlaying) {
-        mAdapter.mSongId = id;
-        mAdapter.mIsPlaying = isPlaying;
+        mSongAdapter.mSongId = id;
+        mSongAdapter.mIsPlaying = isPlaying;
         mRecyclerview.smoothScrollToPosition(position);
-        mAdapter.notifyDataSetChanged();
+        mSongAdapter.notifyDataSetChanged();
     }
-
 }
