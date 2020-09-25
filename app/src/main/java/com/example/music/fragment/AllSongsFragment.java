@@ -1,7 +1,5 @@
 package com.example.music.fragment;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
 
