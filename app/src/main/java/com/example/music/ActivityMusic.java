@@ -242,10 +242,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             checkPlaying();
 
 
-            if (mSong != null) {
                 mInfoLayout.setVisibility(View.VISIBLE);
                 setSongInfo(mSong);
-            }
 
             //show Action Bar, InfoLayout
             getSupportActionBar().show();
