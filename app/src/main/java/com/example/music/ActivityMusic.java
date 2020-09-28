@@ -132,7 +132,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //add AllSongsFragment to Activity
         mSharedPrf = getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
+        mIndexNavigation = mSharedPrf.getInt(PRF_INDEX_KEY, 0);
 
+        //save state when change configuration
+        if (mIndexNavigation == 0) {
+            mBaseFragment = new AllSongsFragment();
+        } else {
+            mBaseFragment = new FavoriteSongsFragment();
+        }
         mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
         mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
 
@@ -144,21 +151,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             //event click song info
             mInfoLayout.setOnClickListener(ActivityMusic.this);
         }
-
-//        if (savedInstanceState != null) {
-//            mIndexNavigation = savedInstanceState.getInt(PRF_INDEX_KEY);
-//
-//            //save state when change configuration
-//            if (mIndexNavigation == 0) {
-//                mBaseFragment = new AllSongsFragment();
-//            } else {
-//                mBaseFragment = new FavoriteSongsFragment();
-//            }
-//            Log.d("ToanNTe", "onCreate: " + mIndexNavigation);
-//            getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
-//        }
-        mNavigationView.getMenu().getItem(0).setChecked(true);
-
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -188,13 +180,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(PRF_INDEX_KEY, mIndexNavigation);
-        Log.d("ToanNTe", "onSaveInstanceState: " +mIndexNavigation);
     }
 
     @Override
@@ -236,6 +221,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     protected void onPause() {
         super.onPause();
+        mEditor.putInt(PRF_INDEX_KEY, mIndexNavigation);
     }
 
     @Override
@@ -291,7 +277,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
         if (grantResults.length > 0 && requestCode == REQUEST_PERMISSION_CODE && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mBaseFragment = new AllSongsFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
 
                 //start MediaPlaybackService
@@ -310,7 +295,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     REQUEST_PERMISSION_CODE);
         } else {
-            mBaseFragment = new AllSongsFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
 
             //start MediaPlaybackService
