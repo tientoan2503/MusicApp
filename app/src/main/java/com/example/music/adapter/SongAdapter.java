@@ -132,6 +132,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         }
     }
 
+    public ArrayList getArr() {
+        return mArraySongs;
+    }
+
     public void getFavoriteList(Context context) {
         Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
                 FavoriteSongsDB.IS_FAVORITE + "=2", null, null);

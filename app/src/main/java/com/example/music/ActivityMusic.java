@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,7 +65,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private MediaPlaybackService mService;
     private boolean mIsShuffle;
     private String mRepeat;
-    private boolean mIsFavorite;
     private SharedPreferences mSharedPrf;
     private SharedPreferences.Editor mEditor;
     private boolean mIsPortrait;
@@ -77,13 +77,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private ActionBarDrawerToggle mToggle;
     private BaseSongListFragment mBaseFragment;
     private int mIndexNavigation = 0;
+    private SongAdapter mAdapter;
 
     public class BroadcastMusic extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(MESSAGE_BROADCAST_UPDATE_UI)) {
-
+                mArraySongs = mService.getArraySongs();
                 mPosition = intent.getIntExtra(MediaPlaybackService.BROAD_POSITION, 0);
                 mSong = mArraySongs.get(mPosition);
                 getSongFromDB(mSong.getmId());
@@ -142,6 +143,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
         }
         mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
+        mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
 
 //      if app in portrait mode
         if (mIsPortrait) {
@@ -161,21 +163,25 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        mAdapter = mBaseFragment.getAdapter();
 
         switch (item.getItemId()) {
             case R.id.nav_all_songs:
                 mBaseFragment = new AllSongsFragment();
                 getSupportActionBar().setTitle(R.string.music_actionbar_title);
                 mIndexNavigation = 0;
+
                 break;
 
             case R.id.nav_favorite:
                 mBaseFragment = new FavoriteSongsFragment();
                 getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
                 mIndexNavigation = 1;
-
                 break;
         }
+
+        mArraySongs = mAdapter.getArr();
+
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -244,6 +250,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
             //show Action Bar, InfoLayout
             getSupportActionBar().show();
+
             getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
 
             //set animation of Equalizer view
@@ -331,16 +338,15 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mService = binder.getService();
             mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
             mArraySongs = mService.getArraySongs();
+            mAdapter = mBaseFragment.getAdapter();
 
             if (mArraySongs == null) {
                 mBaseFragment.updateAdapter();
-                mArraySongs = mBaseFragment.getArraySongs();
-                Log.d("ToanNTe", "onServiceConnected: " + mArraySongs.size());
+                mArraySongs = mAdapter.getArr();
             }
 
             //send ArraySongs to MediaPlaybackService
             mService.setArraySongs(mArraySongs);
-            mService.setPosition(mPosition);
 
             //set shuffle, repeat variable
             mService.setShuffle(mIsShuffle);
@@ -380,6 +386,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     checkPlaying();
                 }
             }
+            mService.setPosition(mPosition);
 
             //set animation of Equalizer view
             setAnimation();

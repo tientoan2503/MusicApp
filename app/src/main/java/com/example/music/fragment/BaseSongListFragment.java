@@ -29,17 +29,14 @@ public abstract class BaseSongListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all_songs, container, false);
-
+        mSongAdapter = new SongAdapter();
+        updateAdapter();
         mRecyclerview = view.findViewById(R.id.recyclerview);
         initRecyclerView();
-        Log.d("ToanNTe", "onCreateView: " + mSongAdapter);
         return view;
     }
 
     public void initRecyclerView() {
-        mSongAdapter = new SongAdapter();
-
-        updateAdapter();
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
