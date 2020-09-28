@@ -31,6 +31,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IMediaControl;
+import com.example.music.adapter.SongAdapter;
 import com.example.music.database.FavoriteSongsDB;
 import com.example.music.database.SongProvider;
 import com.example.music.fragment.AllSongsFragment;
@@ -135,8 +136,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //save state when change configuration
         if (mIndexNavigation == 0) {
             mBaseFragment = new AllSongsFragment();
+            getSupportActionBar().setTitle(R.string.music_actionbar_title);
         } else {
             mBaseFragment = new FavoriteSongsFragment();
+            getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
         }
         mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
 
@@ -162,11 +165,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         switch (item.getItemId()) {
             case R.id.nav_all_songs:
                 mBaseFragment = new AllSongsFragment();
+                getSupportActionBar().setTitle(R.string.music_actionbar_title);
                 mIndexNavigation = 0;
                 break;
 
             case R.id.nav_favorite:
                 mBaseFragment = new FavoriteSongsFragment();
+                getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
                 mIndexNavigation = 1;
 
                 break;
@@ -325,7 +330,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             //get MediaPlaybackService from iBinder
             mService = binder.getService();
             mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
-            mArraySongs = mBaseFragment.getArraySongs();
+            mArraySongs = mService.getArraySongs();
+
+            if (mArraySongs == null) {
+                mBaseFragment.updateAdapter();
+                mArraySongs = mBaseFragment.getArraySongs();
+                Log.d("ToanNTe", "onServiceConnected: " + mArraySongs.size());
+            }
 
             //send ArraySongs to MediaPlaybackService
             mService.setArraySongs(mArraySongs);
@@ -390,6 +401,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
         //play song
         mService.playSong();
+
         //set animation of Equalizer view
         setAnimation();
 
@@ -426,7 +438,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 int count = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.COUNT_OF_PLAY));
                 mFavoriteSongsDB.updateCount(id, ++count);
                 if (count >= 3) {
-                    mFavoriteSongsDB.updateFavorite(2);
+                    mFavoriteSongsDB.setFavorite(id, 2);
                 }
             } else {
                 mFavoriteSongsDB.insertDB(id, 1);

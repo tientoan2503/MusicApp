@@ -61,13 +61,6 @@ public class FavoriteSongsDB {
                 FavoriteSongsDB.ID_PROVIDER + "=" + id, null);
     }
 
-    public void updateFavorite(int favorite) {
-        mContentValues = new ContentValues();
-        mContentValues.put(FavoriteSongsDB.IS_FAVORITE, favorite);
-        mContext.getContentResolver().update(SongProvider.CONTENT_URI, mContentValues,
-                FavoriteSongsDB.COUNT_OF_PLAY + ">=" + 3, null);
-    }
-
     public void setFavorite(int id, int favorite) {
         mContentValues = new ContentValues();
         mContentValues.put(FavoriteSongsDB.IS_FAVORITE, favorite);

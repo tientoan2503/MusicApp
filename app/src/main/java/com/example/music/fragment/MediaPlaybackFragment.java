@@ -3,6 +3,7 @@ package com.example.music.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private Handler mHandler;
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
+    private int mPosition;
 
 
     public MediaPlaybackFragment(IMediaControl mediaControl) {
@@ -249,27 +251,35 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onClick(View view) {
         mArraySongs = mMediaPlaybackService.getArraySongs();
+        mPosition = mMediaPlaybackService.getPosition();
+        if (mPosition == -1) {
+            mPosition = 0;
+        }
+        mMediaPlaybackService.setPosition(mPosition);
+
         switch (view.getId()) {
 
             case R.id.img_play:
                 if (mMediaPlaybackService.isPlaying()) {
                     mMediaPlaybackService.pauseSong();
                 } else {
-                    mMediaPlaybackService.resumeSong();
+                    if (mMediaPlaybackService.getCurrentTime() == 0) {
+                        mMediaPlaybackService.playSong();
+                    } else {
+                        mMediaPlaybackService.resumeSong();
+                    }
                 }
-                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
+                mSong = mArraySongs.get(mPosition);
                 mMediaControl.onClickPlay(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_next:
                 mMediaPlaybackService.playNext();
-                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 mMediaControl.onClickNext(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
             case R.id.img_prev:
                 mMediaPlaybackService.playPrev();
-                mSong = mArraySongs.get(mMediaPlaybackService.getPosition());
                 mMediaControl.onClickPrev(mSong.getmId(), mMediaPlaybackService.isPlaying());
                 break;
 
@@ -306,8 +316,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 FavoriteSongsDB favoriteSongsDB = new FavoriteSongsDB(getContext());
                 if (mIsFavorite) {
                     mIsFavorite = false;
-                    favoriteSongsDB.setFavorite(mSong.getmId(), 0);
-                    favoriteSongsDB.updateCount(mSong.getmId(), 0);
+                    favoriteSongsDB.setFavorite(mSong.getmId(), 1);
                     Toast.makeText(mMediaPlaybackService, R.string.remove_favorite, Toast.LENGTH_SHORT).show();
                 } else {
                     mIsFavorite = true;
@@ -342,6 +351,4 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public void setService(MediaPlaybackService service) {
         mMediaPlaybackService = service;
     }
-
-
 }

@@ -1,5 +1,6 @@
 package com.example.music.fragment;
 
+
 public class AllSongsFragment extends BaseSongListFragment {
 
     @Override
