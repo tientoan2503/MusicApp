@@ -22,9 +22,9 @@ public abstract class BaseSongListFragment extends Fragment {
 
     private RecyclerView mRecyclerview;
     protected SongAdapter mSongAdapter;
+    public ArrayList mArrSong;
 
     public abstract void updateAdapter();
-
 
     @Nullable
     @Override
@@ -54,5 +54,9 @@ public abstract class BaseSongListFragment extends Fragment {
         mSongAdapter.mIsPlaying = isPlaying;
         mRecyclerview.smoothScrollToPosition(position);
         mSongAdapter.notifyDataSetChanged();
+    }
+
+    public ArrayList getArrSong() {
+        return mArrSong;
     }
 }

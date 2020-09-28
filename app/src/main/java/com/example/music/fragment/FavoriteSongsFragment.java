@@ -4,6 +4,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public void updateAdapter() {
-        mSongAdapter.getFavoriteList(getContext());
+        mArrSong = mSongAdapter.getFavoriteList(getContext());
     }
 }

@@ -105,7 +105,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     }
 
     //method read song from storage
-    public void getAllSongs(Context context) {
+    public ArrayList getAllSongs(Context context) {
 //        // TODO TrungTH dùng asyncTask đã được dậy chứ
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, MediaStore.Audio.Media.IS_MUSIC + "=1",
@@ -130,9 +130,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             }
             cursor.close();
         }
+        return mArraySongs;
     }
 
-    public void getFavoriteList(Context context) {
+    public ArrayList getFavoriteList(Context context) {
         Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
                 FavoriteSongsDB.IS_FAVORITE + "=2", null, null);
         mArraySongs = new ArrayList<>();
@@ -156,7 +157,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                         String duration = simpleDateFormat.format(time);
 
                         //add Song to songList
-                        if (idOfFavoriteSong == id) {
+                        if (id == idOfFavoriteSong) {
                             Song song = new Song(title, artist, id, albumId, duration, resource);
                             mArraySongs.add(song);
                         }
@@ -165,6 +166,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 }
             }
         }
+        return mArraySongs;
     }
 
 //    public class GetAllSongs extends AsyncTask<Context, Void, ArrayList<Song>> {

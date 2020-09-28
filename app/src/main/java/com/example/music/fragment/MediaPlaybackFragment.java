@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.music.ActivityMusic;
-import com.example.music.Interface.IUpdateFavorite;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.R;
 import com.example.music.Song;
@@ -310,8 +309,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     favoriteSongsDB.setFavorite(mSong.getmId(), 0);
                     favoriteSongsDB.updateCount(mSong.getmId(), 0);
                     Toast.makeText(mMediaPlaybackService, R.string.remove_favorite, Toast.LENGTH_SHORT).show();
-
-
                 } else {
                     mIsFavorite = true;
                     Toast.makeText(mMediaPlaybackService, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
