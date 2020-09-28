@@ -22,7 +22,6 @@ public abstract class BaseSongListFragment extends Fragment {
 
     private RecyclerView mRecyclerview;
     protected SongAdapter mSongAdapter;
-    public ArrayList mArrSong;
 
     public abstract void updateAdapter();
 
@@ -56,7 +55,7 @@ public abstract class BaseSongListFragment extends Fragment {
         mSongAdapter.notifyDataSetChanged();
     }
 
-    public ArrayList getArrSong() {
-        return mArrSong;
+    public SongAdapter getAdapter() {
+        return mSongAdapter;
     }
 }

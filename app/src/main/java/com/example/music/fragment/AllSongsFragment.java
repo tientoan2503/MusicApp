@@ -4,6 +4,6 @@ public class AllSongsFragment extends BaseSongListFragment {
 
     @Override
     public void updateAdapter() {
-        mArrSong = mSongAdapter.getAllSongs(getContext());
+        mSongAdapter.getAllSongs(getContext());
     }
 }
