@@ -13,7 +13,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +30,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.music.Interface.IClickItem;
+import com.example.music.Interface.IFavoriteControl;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.adapter.SongAdapter;
 import com.example.music.database.FavoriteSongsDB;
@@ -45,7 +45,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener,
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener, IFavoriteControl {
 
     private static final int REQUEST_PERMISSION_CODE = 1;
     public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
@@ -78,6 +78,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private BaseSongListFragment mBaseFragment;
     private int mIndexNavigation = 0;
     private SongAdapter mAdapter;
+    private int mId;
 
     public class BroadcastMusic extends BroadcastReceiver {
         @Override
@@ -85,7 +86,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             String action = intent.getAction();
             if (action.equals(MESSAGE_BROADCAST_UPDATE_UI)) {
                 mArraySongs = mService.getArraySongs();
-                mPosition = intent.getIntExtra(MediaPlaybackService.BROAD_POSITION, 0);
+                mPosition = mService.getPosition();
                 mSong = mArraySongs.get(mPosition);
                 getSongFromDB(mSong.getmId());
 
@@ -132,16 +133,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //add AllSongsFragment to Activity
         mSharedPrf = getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
-        mIndexNavigation = mSharedPrf.getInt(PRF_INDEX_KEY, 0);
-
-        //save state when change configuration
-        if (mIndexNavigation == 0) {
-            mBaseFragment = new AllSongsFragment();
-        } else {
-            mBaseFragment = new FavoriteSongsFragment();
-        }
-        mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
-        mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
 
 //      if app in portrait mode
         if (mIsPortrait) {
@@ -152,6 +143,20 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mInfoLayout.setOnClickListener(ActivityMusic.this);
         }
 
+        if (savedInstanceState != null) {
+            mIndexNavigation = savedInstanceState.getInt(PRF_INDEX_KEY);
+            if (mIndexNavigation == 0) {
+                mBaseFragment = new AllSongsFragment();
+                getSupportActionBar().setTitle(R.string.music_actionbar_title);
+            } else {
+                mBaseFragment = new FavoriteSongsFragment();
+                getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
+            }
+        } else {
+            mBaseFragment = new AllSongsFragment();
+        }
+        mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.all_song);
@@ -160,23 +165,34 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(PRF_INDEX_KEY, mIndexNavigation);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         mAdapter = mBaseFragment.getAdapter();
 
         switch (item.getItemId()) {
             case R.id.nav_all_songs:
-                mBaseFragment = new AllSongsFragment();
-                mIndexNavigation = 0;
-
+                if (mIndexNavigation != 0) {
+                    mBaseFragment = new AllSongsFragment();
+                    getSupportActionBar().setTitle(R.string.music_actionbar_title);
+                    mIndexNavigation = 0;
+                }
                 break;
 
             case R.id.nav_favorite:
-                mBaseFragment = new FavoriteSongsFragment();
-                mIndexNavigation = 1;
+                if (mIndexNavigation != 1) {
+                    mBaseFragment = new FavoriteSongsFragment();
+                    getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
+                    mIndexNavigation = 1;
+                }
                 break;
         }
-        mArraySongs = mAdapter.getArr();
 
+        mArraySongs = mAdapter.getArr();
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -221,7 +237,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     protected void onPause() {
         super.onPause();
-        mEditor.putInt(PRF_INDEX_KEY, mIndexNavigation);
     }
 
     @Override
@@ -264,8 +279,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mBound = false;
         }
 
-        mEditor.putInt(MediaPlaybackService.PRF_POSITION, mPosition);
-        mEditor.commit();
+        if (mSong != null) {
+            mEditor.putInt(MediaPlaybackService.PRF_ID, mSong.getmId());
+            mEditor.commit();
+        }
 
         //unregister Receiver
         this.unregisterReceiver(mBroadcast);
@@ -331,11 +348,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
             //get MediaPlaybackService from iBinder
             mService = binder.getService();
-            mPosition = mSharedPrf.getInt(MediaPlaybackService.PRF_POSITION, -1);
             mArraySongs = mService.getArraySongs();
+            mAdapter = mBaseFragment.getAdapter();
 
             if (mArraySongs == null) {
-                mAdapter = mBaseFragment.getAdapter();
                 mBaseFragment.updateAdapter();
                 mArraySongs = mAdapter.getArr();
             }
@@ -343,33 +359,41 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             //send ArraySongs to MediaPlaybackService
             mService.setArraySongs(mArraySongs);
 
+            mId = mSharedPrf.getInt(MediaPlaybackService.PRF_ID, -1);
+            if (mId != -1) {
+                int i = -1;
+                do {
+                    i++;
+                    mSong = mArraySongs.get(i);
+                } while (mSong.getmId() != mId);
+                mPosition = i;
+            }
+
             //set shuffle, repeat variable
             mService.setShuffle(mIsShuffle);
             mService.setRepeat(mRepeat);
+            mService.setPosition(mPosition);
 
             //if app in landscape mode
             if (!mIsPortrait) {
 
-                if (mPosition == -1) {
-                    mPosition = 0;
+                if (mId != -1) {
+                    mSong = mArraySongs.get(mPosition);
+                    getSongFromDB(mSong.getmId());
+
+                    //update real time of song
+                    updateUIMediaPlayback();
+                    setMediaPlaybackService();
+                    setShuffleAndRepeat(mIsShuffle, mRepeat);
                 }
 
-                mSong = mArraySongs.get(mPosition);
-                getSongFromDB(mSong.getmId());
-
-                //update real time of song
-                updateUIMediaPlayback();
-                setMediaPlaybackService();
-                setShuffleAndRepeat(mIsShuffle, mRepeat);
             }
 
             //if app in portrait mode
             else {
 
                 // if app opened 2nd time onwards
-                if (mPosition != -1 && findViewById(R.id.mediaPlayback_layout) == null) {
-
-                    mSong = mArraySongs.get(mPosition);
+                if (mId != -1 && findViewById(R.id.mediaPlayback_layout) == null) {
 
                     //initialize InfoSongLayout
                     mInfoLayout.setVisibility(View.VISIBLE);
@@ -381,7 +405,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     checkPlaying();
                 }
             }
-            mService.setPosition(mPosition);
 
             //set animation of Equalizer view
             setAnimation();
@@ -400,9 +423,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mService.setPosition(mPosition);
         mService.setArraySongs(mArraySongs);
         mSong = mArraySongs.get(mPosition);
+        mId = mSong.getmId();
 
         //play song
         mService.playSong();
+
         //set animation of Equalizer view
         setAnimation();
 
@@ -427,24 +452,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
         // add songs to Favorite Songs database
         mFavoriteSongsDB = new FavoriteSongsDB(getApplicationContext());
-        addToFavoriteDB(mSong.getmId());
-    }
-
-    private void addToFavoriteDB(int id) {
-        Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.COUNT_OF_PLAY,
-                FavoriteSongsDB.ID_PROVIDER}, FavoriteSongsDB.ID_PROVIDER + " = " + id, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-            if (cursor.getCount() > 0) {
-                int count = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.COUNT_OF_PLAY));
-                mFavoriteSongsDB.updateCount(id, ++count);
-                if (count >= 3) {
-                    mFavoriteSongsDB.updateFavorite(2);
-                }
-            } else {
-                mFavoriteSongsDB.insertDB(id, 1);
-            }
-        }
+        mFavoriteSongsDB.addToFavoriteDB(mId);
     }
 
     private void setSongInfo(Song song) {
@@ -523,13 +531,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 break;
 
             case R.id.song_info:
-                //hide Action bar
-//                if (mActionBar != null) {
-//                    mActionBar.hide();
-//                }
                 getSupportActionBar().hide();
 
-                mMediaPlaybackFragment = new MediaPlaybackFragment(this);
+                mMediaPlaybackFragment = new MediaPlaybackFragment(this, this);
                 sendBundleToMediaPlaybackFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mMediaPlaybackFragment).addToBackStack(null).commit();
 
@@ -562,13 +566,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void updateUIMediaPlayback() {
-        mMediaPlaybackFragment = new MediaPlaybackFragment(this);
+        mMediaPlaybackFragment = new MediaPlaybackFragment(this, this);
         sendBundleToMediaPlaybackFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_mediaPlayback, mMediaPlaybackFragment).commit();
     }
 
     private void setAnimation() {
-        if (mPosition != -1) {
+        if (mId != -1) {
             if (mPosition == 0) {
                 mBaseFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
             } else {
@@ -587,7 +591,15 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 mSong.setmIsFavorite(true);
             }
         }
+    }
 
+    @Override
+    public void onClick(boolean favorite) {
+        if (!mIsPortrait) {
+            if (mIndexNavigation == 1) {
+                mBaseFragment.updateAdapter();
+            }
+        }
     }
 
 }

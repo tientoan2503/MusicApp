@@ -5,4 +5,8 @@
     <string name="music_app">Music App</string>
     <string name="add_to_favorite">Đã thêm vào danh sách yêu thích</string>
     <string name="remove_favorite">Đã xóa khỏi danh sách yêu thích</string>
+    <string name="music_actionbar_title">Music</string>
+    <string name="favorite_actionbar_title">Favorite Songs</string>
+    <string name="add_to_favorite_songs">Thêm vào yêu thích</string>
+    <string name="remove">Xóa khỏi yêu thích</string>
 </resources>

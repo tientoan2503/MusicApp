@@ -31,7 +31,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     public static final String BROAD_POSITION = "BROAD_POSITION";
     public static final String PRF_NAME = "PRF_NAME";
-    public static final String PRF_POSITION = "PRF_POSITION";
+    public static final String PRF_ID = "PRF_ID";
     public static final String PRF_REPEAT = "PRF_REPEAT";
     public static final String PRF_SHUFFLE = "PRF_SHUFFLE";
     private static final String ACTION_PLAY = "ACTION_PLAY";
@@ -82,7 +82,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
 
-        mEditor.putInt(PRF_POSITION, mPosition);
+        mEditor.putInt(PRF_ID, mSong.getmId());
+        mEditor.commit();
     }
 
     @Override
@@ -179,7 +180,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     public void playSong() {
         mPlayer.reset();
-        mUri = Uri.parse(mArraySongs.get(mPosition).getmResource());
+        mSong = mArraySongs.get(mPosition);
+        mUri = Uri.parse(mSong.getmResource());
         try {
             mPlayer.setDataSource(getApplicationContext(), mUri);
             mPlayer.prepare();
@@ -188,6 +190,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             e.printStackTrace();
         }
 
+        mEditor.putInt(PRF_ID, mSong.getmId());
+        mEditor.commit();
         startForeground(NOTIFICATION_ID, createNotification(isPlaying()));
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
@@ -248,8 +252,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
-        mEditor.putInt(PRF_POSITION, mPosition);
-        mEditor.commit();
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
@@ -261,8 +263,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
-        mEditor.putInt(PRF_POSITION, mPosition);
-        mEditor.commit();
 
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
@@ -277,7 +277,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     private void sendBroadcastMessage(String action) {
         mIntent.setAction(action);
-        mIntent.putExtra(BROAD_POSITION, mPosition);
         sendBroadcast(mIntent);
     }
 

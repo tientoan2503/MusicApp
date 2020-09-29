@@ -136,20 +136,4 @@ public class SongProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
-
-
-    public void putSongToFavoriteDB(Context context, int id) {
-//        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI,
-//                null, FavoriteSongsDB.ID_PROVIDER, null, null);
-//
-//        if (cursor != null && cursor.moveToFirst()) {
-//            while (cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER)) != id) {
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(FavoriteSongsDB.ID_PROVIDER, id);
-                insert(SongProvider.CONTENT_URI, contentValues);
-//                cursor.moveToNext();
-//            }
-//            Log.d("ToanNTe", "putSongToFavoriteDB: " + cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER)));
-//        }
-    }
 }

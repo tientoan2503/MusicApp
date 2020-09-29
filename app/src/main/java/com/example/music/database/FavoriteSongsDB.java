@@ -2,6 +2,7 @@ package com.example.music.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -61,17 +62,27 @@ public class FavoriteSongsDB {
                 FavoriteSongsDB.ID_PROVIDER + "=" + id, null);
     }
 
-    public void updateFavorite(int favorite) {
-        mContentValues = new ContentValues();
-        mContentValues.put(FavoriteSongsDB.IS_FAVORITE, favorite);
-        mContext.getContentResolver().update(SongProvider.CONTENT_URI, mContentValues,
-                FavoriteSongsDB.COUNT_OF_PLAY + ">=" + 3, null);
-    }
-
     public void setFavorite(int id, int favorite) {
         mContentValues = new ContentValues();
         mContentValues.put(FavoriteSongsDB.IS_FAVORITE, favorite);
         mContext.getContentResolver().update(SongProvider.CONTENT_URI, mContentValues,
                 FavoriteSongsDB.ID_PROVIDER + "=" + id, null);
+    }
+
+    public void addToFavoriteDB(int id) {
+        Cursor cursor = mContext.getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.COUNT_OF_PLAY,
+                FavoriteSongsDB.ID_PROVIDER}, FavoriteSongsDB.ID_PROVIDER + " = " + id, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            if (cursor.getCount() > 0) {
+                int count = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.COUNT_OF_PLAY));
+                updateCount(id, ++count);
+                if (count >= 3) {
+                    setFavorite(id, 2);
+                }
+            } else {
+                insertDB(id, 1);
+            }
+        }
     }
 }

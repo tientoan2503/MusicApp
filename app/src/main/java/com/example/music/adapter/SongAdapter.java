@@ -6,9 +6,11 @@ import android.graphics.Typeface;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.database.FavoriteSongsDB;
 import com.example.music.database.SongProvider;
+import com.example.music.fragment.BaseSongListFragment;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -33,6 +36,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
     public int mPosition;
     public int mSongId;
     public boolean mIsPlaying;
+    private BaseSongListFragment mBaseFragment;
+
+    public SongAdapter(BaseSongListFragment fragment){
+        mBaseFragment = fragment;
+    };
 
     @NonNull
     @Override
@@ -67,6 +75,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
             holder.mEqualizer.setVisibility(View.GONE);
             holder.mSongOrder.setVisibility(View.VISIBLE);
         }
+
+
     }
 
     @Override
@@ -101,6 +111,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 }
             });
 
+            mActionMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mBaseFragment.updatePopupMenu(v);
+                }
+            });
         }
     }
 
@@ -128,6 +144,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
             }
+            notifyDataSetChanged();
             cursor.close();
         }
     }
@@ -165,6 +182,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                             mArraySongs.add(song);
                         }
                     }
+                    notifyDataSetChanged();
+
                     cursor1.close();
                 }
             }

@@ -3,8 +3,11 @@ package com.example.music.fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,25 +21,30 @@ import com.example.music.adapter.SongAdapter;
 
 import java.util.ArrayList;
 
-public abstract class BaseSongListFragment extends Fragment {
+public abstract class BaseSongListFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     private RecyclerView mRecyclerview;
     protected SongAdapter mSongAdapter;
+    protected PopupMenu mPopup;
+    protected View mView;
 
     public abstract void updateAdapter();
+    public abstract void updatePopupMenu(View view);
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_all_songs, container, false);
-        mSongAdapter = new SongAdapter();
+        mView = inflater.inflate(R.layout.fragment_all_songs, container, false);
+        mSongAdapter = new SongAdapter(this);
         updateAdapter();
-        mRecyclerview = view.findViewById(R.id.recyclerview);
+        mRecyclerview = mView.findViewById(R.id.recyclerview);
         initRecyclerView();
-        return view;
+
+        return mView;
     }
 
     public void initRecyclerView() {
+
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
 
@@ -51,7 +59,11 @@ public abstract class BaseSongListFragment extends Fragment {
     public void setAnimation(int position, int id, boolean isPlaying) {
         mSongAdapter.mSongId = id;
         mSongAdapter.mIsPlaying = isPlaying;
-        mRecyclerview.smoothScrollToPosition(position);
+        if (position == 0) {
+            mRecyclerview.smoothScrollToPosition(position);
+        } else {
+            mRecyclerview.smoothScrollToPosition(position + 1);
+        }
         mSongAdapter.notifyDataSetChanged();
     }
 
