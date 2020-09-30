@@ -1,11 +1,9 @@
 package com.example.music;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 

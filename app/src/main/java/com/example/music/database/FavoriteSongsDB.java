@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.music.Song;
-
 public class FavoriteSongsDB {
 
     public static final String DB_NAME = "FavoriteSongs";

@@ -24,6 +24,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -252,20 +253,21 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            //check Media Player is play or not to set play icon
-            checkPlaying();
+            if (mIsPortrait) {
+                //check Media Player is play or not to set play icon
+                checkPlaying();
 
-            mInfoLayout.setVisibility(View.VISIBLE);
-            setSongInfo(mSong);
+                mInfoLayout.setVisibility(View.VISIBLE);
+                setSongInfo(mSong);
 
-            //show Action Bar, InfoLayout
-            getSupportActionBar().show();
+                //show Action Bar, InfoLayout
+                getSupportActionBar().show();
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
 
-            //set animation of Equalizer view
-            setAnimation();
-
+                //set animation of Equalizer view
+                setAnimation();
+            }
         }
     }
 
@@ -336,6 +338,23 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_action_search, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) item.getActionView();
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setIconified(true);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -594,7 +613,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     @Override
-    public void onClick(boolean favorite) {
+    public void onClickFavorite(boolean favorite) {
         if (!mIsPortrait) {
             if (mIndexNavigation == 1) {
                 mBaseFragment.updateAdapter();

@@ -3,10 +3,8 @@ package com.example.music.fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
@@ -23,10 +21,11 @@ import java.util.ArrayList;
 
 public abstract class BaseSongListFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
-    private RecyclerView mRecyclerview;
+    public RecyclerView mRecyclerview;
     protected SongAdapter mSongAdapter;
     protected PopupMenu mPopup;
     protected View mView;
+    protected int mPosition;
 
     public abstract void updateAdapter();
     public abstract void updatePopupMenu(View view);
@@ -69,5 +68,9 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
 
     public SongAdapter getAdapter() {
         return mSongAdapter;
+    }
+
+    public void setPosition(int position) {
+        mPosition = position;
     }
 }

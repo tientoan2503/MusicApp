@@ -4,13 +4,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,17 +28,21 @@ import java.util.ArrayList;
 
 import es.claucookie.miniequalizerlibrary.EqualizerView;
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> implements Filterable {
 
-    public ArrayList<Song> mArraySongs;
     private IClickItem IClickItem;
     public int mPosition;
     public int mSongId;
     public boolean mIsPlaying;
     private BaseSongListFragment mBaseFragment;
+    public ArrayList<Song> mArraySongs;
+    private ArrayList<Song> mListFiltered;
+
+    public SongAdapter(){}
 
     public SongAdapter(BaseSongListFragment fragment){
         mBaseFragment = fragment;
+        mArraySongs = mListFiltered;
     };
 
     @NonNull
@@ -84,6 +87,35 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
         return mArraySongs.size();
     }
 
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String songTitle = charSequence.toString();
+                ArrayList<Song> filteredList = new ArrayList<>();
+                if (songTitle.isEmpty()) {
+                    filteredList = mListFiltered;
+                } else {
+                    for (Song song : mListFiltered) {
+                        if (song.getmTitle().toLowerCase().contains(songTitle.toLowerCase())) {
+                            filteredList.add(song);
+                        }
+                    }
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = filteredList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mArraySongs = (ArrayList<Song>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView mActionMore;
         TextView mTvSongName, mTvDuration, mSongOrder;
@@ -115,6 +147,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     mBaseFragment.updatePopupMenu(v);
+                    mBaseFragment.setPosition(getAdapterPosition());
                 }
             });
         }
@@ -145,6 +178,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                 mArraySongs.add(song);
             }
             notifyDataSetChanged();
+            mListFiltered = new ArrayList<>();
+            mListFiltered.addAll(mArraySongs);
             cursor.close();
         }
     }
@@ -183,7 +218,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
                         }
                     }
                     notifyDataSetChanged();
-
+                    mListFiltered = new ArrayList<>();
+                    mListFiltered.addAll(mArraySongs);
                     cursor1.close();
                 }
             }

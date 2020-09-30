@@ -323,7 +323,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     Toast.makeText(mMediaPlaybackService, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
                     favoriteSongsDB.setFavorite(mSong.getmId(), 2);
                 }
-                mFavoriteControl.onClick(mIsFavorite);
+                mFavoriteControl.onClickFavorite(mIsFavorite);
                 mSong.setmIsFavorite(mIsFavorite);
                 checkFavorite(mIsFavorite);
                 break;

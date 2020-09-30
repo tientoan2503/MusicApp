@@ -9,4 +9,5 @@
     <string name="favorite_actionbar_title">Favorite Songs</string>
     <string name="add_to_favorite_songs">Thêm vào yêu thích</string>
     <string name="remove">Xóa khỏi yêu thích</string>
+    <string name="search_hint">Nhập tên bài hát</string>
 </resources>
