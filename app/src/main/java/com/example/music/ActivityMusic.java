@@ -173,27 +173,24 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        mAdapter = mBaseFragment.getAdapter();
 
         switch (item.getItemId()) {
             case R.id.nav_all_songs:
                 if (mIndexNavigation != 0) {
-                    mBaseFragment = new AllSongsFragment();
                     getSupportActionBar().setTitle(R.string.music_actionbar_title);
+                    mBaseFragment = new AllSongsFragment();
                     mIndexNavigation = 0;
                 }
                 break;
 
             case R.id.nav_favorite:
                 if (mIndexNavigation != 1) {
-                    mBaseFragment = new FavoriteSongsFragment();
                     getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
+                    mBaseFragment = new FavoriteSongsFragment();
                     mIndexNavigation = 1;
                 }
                 break;
         }
-
-        mArraySongs = mAdapter.getArr();
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -332,30 +329,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         IntentFilter mFilter = new IntentFilter();
         mFilter.addAction(MESSAGE_BROADCAST_UPDATE_UI);
         this.registerReceiver(mBroadcast, mFilter);
-    }
-
-    //create icon Search on Action Bar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_action_search, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setQueryHint(getString(R.string.search_hint));
-        searchView.setIconified(true);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mAdapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mAdapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-        return super.onCreateOptionsMenu(menu);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {

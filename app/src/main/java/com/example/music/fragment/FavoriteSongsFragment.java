@@ -1,10 +1,15 @@
 package com.example.music.fragment;
 
 
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.example.music.R;
 import com.example.music.Song;
@@ -15,7 +20,9 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
     @Override
     public void updateAdapter() {
         mSongAdapter.getFavoriteList(getContext());
+        mSongAdapter.notifyDataSetChanged();
     }
+
 
     @Override
     public void updatePopupMenu(View view) {

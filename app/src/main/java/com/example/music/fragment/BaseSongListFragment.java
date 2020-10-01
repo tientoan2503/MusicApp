@@ -3,12 +3,16 @@ package com.example.music.fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,11 +34,40 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     public abstract void updateAdapter();
     public abstract void updatePopupMenu(View view);
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mSongAdapter = new SongAdapter(this);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_action_search, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) item.getActionView();
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setIconified(true);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mSongAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mSongAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_all_songs, container, false);
-        mSongAdapter = new SongAdapter(this);
         updateAdapter();
         mRecyclerview = mView.findViewById(R.id.recyclerview);
         initRecyclerView();
@@ -68,6 +101,10 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
 
     public SongAdapter getAdapter() {
         return mSongAdapter;
+    }
+
+    public ArrayList getArr() {
+        return mSongAdapter.getArr();
     }
 
     public void setPosition(int position) {
