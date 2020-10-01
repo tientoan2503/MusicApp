@@ -465,21 +465,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     //methods play or pause, next, prev
     @Override
-    public void onClickPlay(int id, boolean isPlaying) {
-
-        //set animation of Equalizer view
-        setAnimation();
-    }
-
-    @Override
-    public void onClickNext(int id, boolean isPlaying) {
-
-        //set animation of Equalizer view
-        setAnimation();
-    }
-
-    @Override
-    public void onClickPrev(int id, boolean isPlaying) {
+    public void onClick(int id, boolean isPlaying) {
 
         //set animation of Equalizer view
         setAnimation();
@@ -512,11 +498,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 if (mService.isPlaying()) {
                     mService.pauseSong();
                 } else {
-                    if (mService.getCurrentTime() == 0) {
+                    if (mService.getCurrentTime() == 0)
                         mService.playSong();
-                    } else {
+                    else
                         mService.resumeSong();
-                    }
                 }
                 setImgPlay(mService.isPlaying());
 
@@ -599,7 +584,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     public void updateUI(boolean favorite) {
         mMediaPlaybackFragment.checkFavorite(favorite);
-
     }
 
 }

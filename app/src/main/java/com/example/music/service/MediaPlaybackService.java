@@ -70,6 +70,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             if (!mIsShuffle) {
                 if (mPosition != mArraySongs.size() - 1) {
                     playNext();
+
                 }
             } else {
                 playNext();

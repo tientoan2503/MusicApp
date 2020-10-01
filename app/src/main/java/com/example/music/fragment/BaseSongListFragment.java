@@ -75,8 +75,8 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
             }
         });
 
-        int id= 0;
         if (mService != null) {
+            int id;
             ArrayList<Song> arraySong = mService.getArraySongs();
             int position = mService.getPosition();
             Song song = arraySong.get(position);

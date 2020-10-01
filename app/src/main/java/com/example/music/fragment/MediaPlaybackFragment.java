@@ -269,17 +269,14 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                     }
                 }
                 mSong = mArraySongs.get(mPosition);
-                mMediaControl.onClickPlay(mSong.getmId(), mService.isPlaying());
                 break;
 
             case R.id.img_next:
                 mService.playNext();
-                mMediaControl.onClickNext(mSong.getmId(), mService.isPlaying());
                 break;
 
             case R.id.img_prev:
                 mService.playPrev();
-                mMediaControl.onClickPrev(mSong.getmId(), mService.isPlaying());
                 break;
 
             case R.id.img_shuffle:
@@ -328,6 +325,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 checkFavorite(mIsFavorite);
                 break;
         }
+        mMediaControl.onClick(mSong.getmId(), mService.isPlaying());
     }
 
     private void updateTimeSong() {
