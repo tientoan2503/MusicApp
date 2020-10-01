@@ -45,7 +45,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private boolean mIsShuffle;
     private String mRepeat;
     private boolean mIsFavorite = false;
-    private MediaPlaybackService mMediaPlaybackService;
+    private MediaPlaybackService mService;
     private Handler mHandler;
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
@@ -93,7 +93,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         //event seek bar change
         seekBarChange();
 
-        if (mMediaPlaybackService != null) {
+        if (mService != null) {
             updateTimeSong();
             mHandler.postDelayed(mRunnable, 0);
         }
@@ -102,8 +102,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
         mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
 
-        if (mMediaPlaybackService != null) {
-            checkPlaying(mMediaPlaybackService.isPlaying());
+        if (mService != null) {
+            checkPlaying(mService.isPlaying());
         }
 
         mBundle = getArguments();
@@ -242,44 +242,44 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mMediaPlaybackService.playerSeekTo(mSbDuration.getProgress());
+                mService.playerSeekTo(mSbDuration.getProgress());
             }
         });
     }
 
     @Override
     public void onClick(View view) {
-        mArraySongs = mMediaPlaybackService.getArraySongs();
-        mPosition = mMediaPlaybackService.getPosition();
+        mArraySongs = mService.getArraySongs();
+        mPosition = mService.getPosition();
         if (mPosition == -1) {
             mPosition = 0;
         }
-        mMediaPlaybackService.setPosition(mPosition);
+        mService.setPosition(mPosition);
 
         switch (view.getId()) {
 
             case R.id.img_play:
-                if (mMediaPlaybackService.isPlaying()) {
-                    mMediaPlaybackService.pauseSong();
+                if (mService.isPlaying()) {
+                    mService.pauseSong();
                 } else {
-                    if (mMediaPlaybackService.getCurrentTime() == 0) {
-                        mMediaPlaybackService.playSong();
+                    if (mService.getCurrentTime() == 0) {
+                        mService.playSong();
                     } else {
-                        mMediaPlaybackService.resumeSong();
+                        mService.resumeSong();
                     }
                 }
                 mSong = mArraySongs.get(mPosition);
-                mMediaControl.onClickPlay(mSong.getmId(), mMediaPlaybackService.isPlaying());
+                mMediaControl.onClickPlay(mSong.getmId(), mService.isPlaying());
                 break;
 
             case R.id.img_next:
-                mMediaPlaybackService.playNext();
-                mMediaControl.onClickNext(mSong.getmId(), mMediaPlaybackService.isPlaying());
+                mService.playNext();
+                mMediaControl.onClickNext(mSong.getmId(), mService.isPlaying());
                 break;
 
             case R.id.img_prev:
-                mMediaPlaybackService.playPrev();
-                mMediaControl.onClickPrev(mSong.getmId(), mMediaPlaybackService.isPlaying());
+                mService.playPrev();
+                mMediaControl.onClickPrev(mSong.getmId(), mService.isPlaying());
                 break;
 
             case R.id.img_shuffle:
@@ -290,7 +290,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 }
                 checkShuffle();
 
-                mMediaPlaybackService.putShuffleToPrf(mIsShuffle);
+                mService.putShuffleToPrf(mIsShuffle);
                 mMediaControl.onClickShuffle(mIsShuffle);
                 break;
 
@@ -308,7 +308,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 }
                 checkRepeat();
                 mMediaControl.onClickRepeat(mRepeat);
-                mMediaPlaybackService.putRepeatToPrf(mRepeat);
+                mService.putRepeatToPrf(mRepeat);
                 break;
 
             case R.id.img_favorite:
@@ -316,14 +316,14 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 if (mIsFavorite) {
                     mIsFavorite = false;
                     favoriteSongsDB.setFavorite(mSong.getmId(), 1);
-                    Toast.makeText(mMediaPlaybackService, R.string.remove_favorite, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mService, R.string.remove_favorite, Toast.LENGTH_SHORT).show();
                 } else {
                     mIsFavorite = true;
                     favoriteSongsDB.addToFavoriteDB(mSong.getmId());
-                    Toast.makeText(mMediaPlaybackService, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mService, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
                     favoriteSongsDB.setFavorite(mSong.getmId(), 2);
                 }
-                mFavoriteControl.onClickFavorite(mIsFavorite);
+                mFavoriteControl.onClickFavorite();
                 mSong.setmIsFavorite(mIsFavorite);
                 checkFavorite(mIsFavorite);
                 break;
@@ -336,8 +336,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             @Override
             public void run() {
                 SimpleDateFormat format = new SimpleDateFormat("mm:ss");
-                int mCurrentTime = mMediaPlaybackService.getCurrentTime();
-                int mDuration = mMediaPlaybackService.getDuration();
+                int mCurrentTime = mService.getCurrentTime();
+                int mDuration = mService.getDuration();
                 setCurrentTime(format.format(mCurrentTime));
                 setCurrentSeekBar(mCurrentTime, mDuration);
                 mHandler.postDelayed(this, 1000);
@@ -346,6 +346,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
     public void setService(MediaPlaybackService service) {
-        mMediaPlaybackService = service;
+        mService = service;
     }
 }

@@ -50,7 +50,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
     public SongAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.song_row, parent, false);
-        Log.d("ToanNTe", "onCreateViewHolder: ");
         return new ViewHolder(view, this);
     }
 
@@ -58,7 +57,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
     @Override
     public void onBindViewHolder(@NonNull SongAdapter.ViewHolder holder, int position) {
         Song song = mArraySongs.get(position);
-        Log.d("ToanNTe", "onBindViewHolder: " );
         holder.mSongOrder.setText(position + 1 + "");
         holder.mTvSongName.setText(song.getmTitle());
         holder.mTvDuration.setText(song.getmDuration());

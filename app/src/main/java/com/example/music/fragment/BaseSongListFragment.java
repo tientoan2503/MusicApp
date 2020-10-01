@@ -17,9 +17,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
+import com.example.music.service.MediaPlaybackService;
 
 import java.util.ArrayList;
 
@@ -30,8 +32,18 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     protected PopupMenu mPopup;
     protected View mView;
     protected int mPosition;
+    private MediaPlaybackService mService;
+    protected IFavoriteControl mFavoriteControl;
+    protected boolean mIsFavorite;
+
+    public BaseSongListFragment() {}
+
+    public BaseSongListFragment(IFavoriteControl favoriteControl) {
+        mFavoriteControl = favoriteControl;
+    }
 
     public abstract void updateAdapter();
+
     public abstract void updatePopupMenu(View view);
 
     @Override
@@ -62,6 +74,23 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
                 return false;
             }
         });
+
+        int id= 0;
+        if (mService != null) {
+            ArrayList<Song> arraySong = mService.getArraySongs();
+            int position = mService.getPosition();
+            Song song = arraySong.get(position);
+            id = song.getmId();
+            int i = -1;
+            do {
+                i++;
+                song = arraySong.get(i);
+            } while (song.getmId() != id);
+            mPosition = i;
+            setAnimation(mPosition, id, mService.isPlaying());
+        }
+
+
     }
 
     @Nullable
@@ -103,11 +132,11 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
         return mSongAdapter;
     }
 
-    public ArrayList getArr() {
-        return mSongAdapter.getArr();
-    }
-
     public void setPosition(int position) {
         mPosition = position;
+    }
+
+    public void setService(MediaPlaybackService service) {
+        mService = service;
     }
 }

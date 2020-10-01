@@ -147,14 +147,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         if (savedInstanceState != null) {
             mIndexNavigation = savedInstanceState.getInt(PRF_INDEX_KEY);
             if (mIndexNavigation == 0) {
-                mBaseFragment = new AllSongsFragment();
+                mBaseFragment = new AllSongsFragment(this);
                 getSupportActionBar().setTitle(R.string.music_actionbar_title);
             } else {
-                mBaseFragment = new FavoriteSongsFragment();
+                mBaseFragment = new FavoriteSongsFragment(this);
                 getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
             }
         } else {
-            mBaseFragment = new AllSongsFragment();
+            mBaseFragment = new AllSongsFragment(this);
         }
         mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
 
@@ -178,7 +178,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             case R.id.nav_all_songs:
                 if (mIndexNavigation != 0) {
                     getSupportActionBar().setTitle(R.string.music_actionbar_title);
-                    mBaseFragment = new AllSongsFragment();
+                    mBaseFragment = new AllSongsFragment(this);
                     mIndexNavigation = 0;
                 }
                 break;
@@ -186,11 +186,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             case R.id.nav_favorite:
                 if (mIndexNavigation != 1) {
                     getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
-                    mBaseFragment = new FavoriteSongsFragment();
+                    mBaseFragment = new FavoriteSongsFragment(this);
                     mIndexNavigation = 1;
                 }
                 break;
         }
+
+        mBaseFragment.setService(mService);
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -586,12 +588,18 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     @Override
-    public void onClickFavorite(boolean favorite) {
+    public void onClickFavorite() {
         if (!mIsPortrait) {
             if (mIndexNavigation == 1) {
                 mBaseFragment.updateAdapter();
             }
         }
+    }
+
+    @Override
+    public void updateUI(boolean favorite) {
+        mMediaPlaybackFragment.checkFavorite(favorite);
+
     }
 
 }

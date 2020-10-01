@@ -7,12 +7,19 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.database.FavoriteSongsDB;
 
 
 public class AllSongsFragment extends BaseSongListFragment {
+
+    public AllSongsFragment() {}
+
+    public AllSongsFragment(IFavoriteControl favoriteControl) {
+        super(favoriteControl);
+    }
 
     @Override
     public void updateAdapter() {
@@ -39,15 +46,17 @@ public class AllSongsFragment extends BaseSongListFragment {
             case R.id.popup_remove:
                 favoriteSongsDB.setFavorite(id, 1);
                 favoriteSongsDB.updateCount(id, 0);
-                song.setmIsFavorite(false);
+                mIsFavorite = false;
                 Toast.makeText(getContext(), R.string.remove_favorite, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.popup_add:
                 favoriteSongsDB.setFavorite(id, 2);
-                song.setmIsFavorite(false);
+                mIsFavorite = true;
                 Toast.makeText(getContext(), R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
                 break;
         }
+        song.setmIsFavorite(mIsFavorite);
+        mFavoriteControl.updateUI(mIsFavorite);
         updateAdapter();
         return true;
     }
