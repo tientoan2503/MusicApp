@@ -3,6 +3,7 @@ package com.example.music.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,11 +61,18 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public MediaPlaybackFragment() {
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.d("ToanNTe", "onSaveInstanceState: fragment");
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_media_playback, container, false);
-
+        Log.d("ToanNTe", "onCreateView: ");
         mImgArtTop = view.findViewById(R.id.sub_art_top);
         mImgMore = view.findViewById(R.id.img_more_top);
         mImgSongArt = view.findViewById(R.id.music_art);
@@ -124,8 +132,16 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @Override

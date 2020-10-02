@@ -80,6 +80,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } else if (mRepeat.equals(REPEAT)) {
             playSong();
         }
+        startForeground(NOTIFICATION_ID, createNotification(isPlaying()));
 
         sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
 

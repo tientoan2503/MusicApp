@@ -100,7 +100,7 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
         updateAdapter();
         mRecyclerview = mView.findViewById(R.id.recyclerview);
         initRecyclerView();
-
+        Log.d("ToanNTe", "onCreateView: ");
         return mView;
     }
 

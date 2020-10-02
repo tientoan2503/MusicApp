@@ -120,6 +120,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("ToanNTe", "onCreate: ");
         setContentView(R.layout.drawer_layout);
 
         mActionPlay = findViewById(R.id.img_action_play);
@@ -145,7 +146,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         }
 
         if (savedInstanceState != null) {
+            Log.d("ToanNTe", "onCreate: save");
             mIndexNavigation = savedInstanceState.getInt(PRF_INDEX_KEY);
+
             if (mIndexNavigation == 0) {
                 mBaseFragment = new AllSongsFragment(this);
                 getSupportActionBar().setTitle(R.string.music_actionbar_title);
@@ -153,7 +156,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 mBaseFragment = new FavoriteSongsFragment(this);
                 getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
             }
+
         } else {
+            Log.d("ToanNTe", "onCreate: not save");
             mBaseFragment = new AllSongsFragment(this);
         }
         mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
@@ -166,9 +171,17 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d("ToanNTe", "onRestoreInstanceState: ");
+    }
+
+    @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        Log.d("ToanNTe", "onSaveInstanceState: ");
         outState.putInt(PRF_INDEX_KEY, mIndexNavigation);
+
     }
 
     @Override
@@ -232,6 +245,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     protected void onResume() {
         super.onResume();
+        Log.d("ToanNTe", "onResume: Activity");
     }
 
     @Override
@@ -244,6 +258,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         super.onStop();
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
 
     @Override
     public void onBackPressed() {
@@ -253,19 +271,22 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             if (mIsPortrait) {
-                //check Media Player is play or not to set play icon
-                checkPlaying();
+                if (mMediaPlaybackFragment != null ) {
+                    Log.d("ToanNTe", "onBackPressed: ");
+                    //check Media Player is play or not to set play icon
+                    checkPlaying();
 
-                mInfoLayout.setVisibility(View.VISIBLE);
-                setSongInfo(mSong);
+                    mInfoLayout.setVisibility(View.VISIBLE);
+                    setSongInfo(mSong);
 
-                //show Action Bar, InfoLayout
-                getSupportActionBar().show();
+                    //show Action Bar, InfoLayout
+                    getSupportActionBar().show();
 
-                getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
 
-                //set animation of Equalizer view
-                setAnimation();
+                    //set animation of Equalizer view
+                    setAnimation();
+                }
             }
         }
     }
@@ -385,7 +406,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
             //if app in portrait mode
             else {
-
                 // if app opened 2nd time onwards
                 if (mId != -1 && findViewById(R.id.mediaPlayback_layout) == null) {
 
