@@ -61,10 +61,19 @@ public class FavoriteSongsDB {
     }
 
     public void setFavorite(int id, int favorite) {
-        mContentValues = new ContentValues();
-        mContentValues.put(FavoriteSongsDB.IS_FAVORITE, favorite);
-        mContext.getContentResolver().update(SongProvider.CONTENT_URI, mContentValues,
-                FavoriteSongsDB.ID_PROVIDER + "=" + id, null);
+        Cursor cursor = mContext.getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.COUNT_OF_PLAY,
+                FavoriteSongsDB.ID_PROVIDER}, FavoriteSongsDB.ID_PROVIDER + " = " + id, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                mContentValues = new ContentValues();
+                mContentValues.put(FavoriteSongsDB.IS_FAVORITE, favorite);
+                mContext.getContentResolver().update(SongProvider.CONTENT_URI, mContentValues,
+                        FavoriteSongsDB.ID_PROVIDER + "=" + id, null);
+            } else {
+                insertDB(id, 0);
+                setFavorite(id, 2);
+            }
+        }
     }
 
     public void addToFavoriteDB(int id) {

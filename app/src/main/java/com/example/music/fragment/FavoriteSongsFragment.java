@@ -42,15 +42,16 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
     public boolean onMenuItemClick(MenuItem item) {
         FavoriteSongsDB favoriteSongsDB = new FavoriteSongsDB(getContext());
         Song song = (Song) mSongAdapter.getArr().get(mPosition);
+        int id = song.getmId();
         if (mPosition < mSongAdapter.getArr().size()) {
-            int id = song.getmId();
             favoriteSongsDB.setFavorite(id, 1);
             favoriteSongsDB.updateCount(id, 0);
             Toast.makeText(getContext(), R.string.remove_favorite, Toast.LENGTH_SHORT).show();
             updateAdapter();
+            mIsFavorite = false;
         }
         song.setmIsFavorite(mIsFavorite);
-        mFavoriteControl.updateUI(mIsFavorite);
+        mFavoriteControl.updateUI(id, mIsFavorite);
         return true;
     }
 }

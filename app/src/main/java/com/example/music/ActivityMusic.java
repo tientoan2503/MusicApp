@@ -120,7 +120,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("ToanNTe", "onCreate: ");
         setContentView(R.layout.drawer_layout);
 
         mActionPlay = findViewById(R.id.img_action_play);
@@ -146,7 +145,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         }
 
         if (savedInstanceState != null) {
-            Log.d("ToanNTe", "onCreate: save");
             mIndexNavigation = savedInstanceState.getInt(PRF_INDEX_KEY);
 
             if (mIndexNavigation == 0) {
@@ -158,7 +156,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             }
 
         } else {
-            Log.d("ToanNTe", "onCreate: not save");
             mBaseFragment = new AllSongsFragment(this);
         }
         mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
@@ -170,16 +167,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mNavigationView.setNavigationItemSelectedListener(this);
     }
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.d("ToanNTe", "onRestoreInstanceState: ");
-    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d("ToanNTe", "onSaveInstanceState: ");
         outState.putInt(PRF_INDEX_KEY, mIndexNavigation);
 
     }
@@ -271,8 +262,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             if (mIsPortrait) {
-                if (mMediaPlaybackFragment != null ) {
-                    Log.d("ToanNTe", "onBackPressed: ");
+                if (mMediaPlaybackFragment != null) {
                     //check Media Player is play or not to set play icon
                     checkPlaying();
 
@@ -282,7 +272,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     //show Action Bar, InfoLayout
                     getSupportActionBar().show();
 
-                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
+                    getSupportFragmentManager().beginTransaction().remove(mMediaPlaybackFragment).commit();
+
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mB)
 
                     //set animation of Equalizer view
                     setAnimation();
@@ -334,7 +327,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     REQUEST_PERMISSION_CODE);
         } else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
+            if (mMediaPlaybackFragment == null) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
+            }
 
             //start MediaPlaybackService
             startMediaPlaybackService();
@@ -602,8 +597,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     @Override
-    public void updateUI(boolean favorite) {
-        mMediaPlaybackFragment.checkFavorite(favorite);
+    public void updateUI(int id, boolean favorite) {
+        if (!mIsPortrait && mMediaPlaybackFragment != null) {
+            mMediaPlaybackFragment.setFavorite(id, favorite);
+        }
     }
 
 }

@@ -2,5 +2,5 @@ package com.example.music.Interface;
 
 public interface IFavoriteControl {
     void onClickFavorite();
-    void updateUI(boolean isFavorite);
+    void updateUI(int id, boolean isFavorite);
 }

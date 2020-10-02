@@ -56,7 +56,7 @@ public class AllSongsFragment extends BaseSongListFragment {
                 break;
         }
         song.setmIsFavorite(mIsFavorite);
-        mFavoriteControl.updateUI(mIsFavorite);
+        mFavoriteControl.updateUI(id, mIsFavorite);
         updateAdapter();
         return true;
     }

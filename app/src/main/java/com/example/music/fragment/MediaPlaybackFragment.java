@@ -51,6 +51,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
     private int mPosition;
+    private int mId;
 
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IFavoriteControl favoriteControl) {
@@ -183,7 +184,19 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    public void setFavorite(int id, boolean isFavorite) {
+        mPosition = mService.getPosition();
+        mArraySongs = mService.getArraySongs();
+        mSong = mArraySongs.get(mPosition);
+        mId = mSong.getmId();
+        mIsFavorite = isFavorite;
+        if (id == mId) {
+            checkFavorite(mIsFavorite);
+        }
+    }
+
     public void checkFavorite(boolean isFavorite) {
+        mIsFavorite = isFavorite;
         if (isFavorite) {
             setImgFavorite(R.drawable.ic_favorite_selected);
         } else {
@@ -333,8 +346,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 } else {
                     mIsFavorite = true;
                     favoriteSongsDB.addToFavoriteDB(mSong.getmId());
-                    Toast.makeText(mService, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
                     favoriteSongsDB.setFavorite(mSong.getmId(), 2);
+                    Toast.makeText(mService, R.string.add_to_favorite, Toast.LENGTH_SHORT).show();
                 }
                 mFavoriteControl.onClickFavorite();
                 mSong.setmIsFavorite(mIsFavorite);
