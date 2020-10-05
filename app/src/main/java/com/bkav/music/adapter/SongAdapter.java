@@ -1,10 +1,9 @@
-package com.example.music.adapter;
+package com.bkav.music.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.music.Interface.IClickItem;
-import com.example.music.R;
-import com.example.music.Song;
-import com.example.music.database.FavoriteSongsDB;
-import com.example.music.database.SongProvider;
-import com.example.music.fragment.BaseSongListFragment;
+import com.bkav.android.music.R;
+import com.bkav.music.Interface.IClickItem;
+import com.bkav.music.Song;
+import com.bkav.music.database.FavoriteSongsDB;
+import com.bkav.music.database.SongProvider;
+import com.bkav.music.fragment.BaseSongListFragment;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;

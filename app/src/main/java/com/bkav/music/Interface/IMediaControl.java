@@ -1,4 +1,4 @@
-package com.example.music.Interface;
+package com.bkav.music.Interface;
 
 
 public interface IMediaControl {

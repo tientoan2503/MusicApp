@@ -1,7 +1,6 @@
-package com.example.music.fragment;
+package com.bkav.music.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,11 +16,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.music.Interface.IFavoriteControl;
-import com.example.music.R;
-import com.example.music.Song;
-import com.example.music.adapter.SongAdapter;
-import com.example.music.service.MediaPlaybackService;
+import com.bkav.music.Interface.IFavoriteControl;
+import com.bkav.android.music.R;
+import com.bkav.music.Song;
+import com.bkav.music.adapter.SongAdapter;
+import com.bkav.music.service.MediaPlaybackService;
 
 import java.util.ArrayList;
 

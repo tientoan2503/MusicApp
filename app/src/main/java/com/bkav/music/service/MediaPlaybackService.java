@@ -1,4 +1,4 @@
-package com.example.music.service;
+package com.bkav.music.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -13,14 +13,13 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
-import com.example.music.ActivityMusic;
-import com.example.music.R;
-import com.example.music.Song;
+import com.bkav.android.music.ActivityMusic;
+import com.bkav.android.music.R;
+import com.bkav.music.Song;
 
 import java.io.IOException;
 import java.util.ArrayList;

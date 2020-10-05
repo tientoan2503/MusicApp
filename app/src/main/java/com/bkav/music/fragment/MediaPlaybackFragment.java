@@ -1,4 +1,4 @@
-package com.example.music.fragment;
+package com.bkav.music.fragment;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,13 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.music.ActivityMusic;
-import com.example.music.Interface.IFavoriteControl;
-import com.example.music.Interface.IMediaControl;
-import com.example.music.R;
-import com.example.music.Song;
-import com.example.music.database.FavoriteSongsDB;
-import com.example.music.service.MediaPlaybackService;
+import com.bkav.android.music.ActivityMusic;
+import com.bkav.android.music.R;
+import com.bkav.music.Interface.IFavoriteControl;
+import com.bkav.music.Interface.IMediaControl;
+import com.bkav.music.Song;
+import com.bkav.music.database.FavoriteSongsDB;
+import com.bkav.music.service.MediaPlaybackService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

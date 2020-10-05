@@ -1,23 +1,20 @@
-package com.example.music.fragment;
+package com.bkav.music.fragment;
 
-
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
 
-import com.example.music.Interface.IFavoriteControl;
-import com.example.music.R;
-import com.example.music.Song;
-import com.example.music.database.FavoriteSongsDB;
+import com.bkav.android.music.R;
+import com.bkav.music.Interface.IFavoriteControl;
+import com.bkav.music.Song;
+import com.bkav.music.database.FavoriteSongsDB;
 
 public class FavoriteSongsFragment extends BaseSongListFragment {
 
-    public FavoriteSongsFragment(){}
+    public FavoriteSongsFragment() {
+    }
 
     public FavoriteSongsFragment(IFavoriteControl favoriteControl) {
         super(favoriteControl);
@@ -28,7 +25,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
         mSongAdapter.getFavoriteList(getContext());
         mSongAdapter.notifyDataSetChanged();
     }
-
 
     @Override
     public void updatePopupMenu(View view) {

@@ -1,4 +1,4 @@
-package com.example.music;
+package com.bkav.android.music;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,23 +23,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.music.Interface.IClickItem;
-import com.example.music.Interface.IFavoriteControl;
-import com.example.music.Interface.IMediaControl;
-import com.example.music.adapter.SongAdapter;
-import com.example.music.database.FavoriteSongsDB;
-import com.example.music.database.SongProvider;
-import com.example.music.fragment.AllSongsFragment;
-import com.example.music.fragment.BaseSongListFragment;
-import com.example.music.fragment.FavoriteSongsFragment;
-import com.example.music.fragment.MediaPlaybackFragment;
-import com.example.music.service.MediaPlaybackService;
+import com.bkav.music.Interface.IClickItem;
+import com.bkav.music.Interface.IFavoriteControl;
+import com.bkav.music.Interface.IMediaControl;
+import com.bkav.music.Song;
+import com.bkav.music.adapter.SongAdapter;
+import com.bkav.music.database.FavoriteSongsDB;
+import com.bkav.music.database.SongProvider;
+import com.bkav.music.fragment.AllSongsFragment;
+import com.bkav.music.fragment.BaseSongListFragment;
+import com.bkav.music.fragment.FavoriteSongsFragment;
+import com.bkav.music.fragment.MediaPlaybackFragment;
+import com.bkav.music.service.MediaPlaybackService;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -271,11 +270,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                     //show Action Bar, InfoLayout
                     getSupportActionBar().show();
-
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
                     getSupportFragmentManager().beginTransaction().remove(mMediaPlaybackFragment).commit();
-
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mB)
 
                     //set animation of Equalizer view
                     setAnimation();
