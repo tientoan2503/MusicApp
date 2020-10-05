@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.bkav.android.music">
+    package="com.example.music">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
@@ -14,16 +14,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name="com.bkav.music.service.MediaPlaybackService"
+            android:name="com.example.music.service.MediaPlaybackService"
             android:enabled="true"
             android:exported="true" />
         
         <provider
-            android:authorities="com.bkav.android.music.databases"
+            android:authorities="com.example.music.databases"
             android:name=".database.SongProvider"
             android:exported="true"
-            android:readPermission="com.bkav.android.music.READ_DATABASE"
-            android:writePermission="com.bkav.android.music.WRITE_DATABASE"/>
+            android:readPermission="com.example.music.READ_DATABASE"
+            android:writePermission="com.example.music.WRITE_DATABASE"/>
 
         <activity android:name=".ActivityMusic"
             android:launchMode="singleTop">

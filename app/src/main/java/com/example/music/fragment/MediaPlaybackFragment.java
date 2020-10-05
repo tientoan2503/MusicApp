@@ -1,4 +1,4 @@
-package com.bkav.music.fragment;
+package com.example.music.fragment;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,13 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.bkav.android.music.ActivityMusic;
-import com.bkav.android.music.R;
-import com.bkav.music.Interface.IFavoriteControl;
-import com.bkav.music.Interface.IMediaControl;
-import com.bkav.music.Song;
-import com.bkav.music.database.FavoriteSongsDB;
-import com.bkav.music.service.MediaPlaybackService;
+import com.example.music.Interface.IFavoriteControl;
+import com.example.music.Interface.IMediaControl;
+import com.example.music.Song;
+import com.example.music.database.FavoriteSongsDB;
+import com.example.music.service.MediaPlaybackService;
+import com.example.music.ActivityMusic;
+import com.example.music.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,15 +33,17 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private Song mSong;
 
-    private ImageView mImgArtTop, mImgMore,
-            mImgQueue, mImgFavorite, mImgRepeat, mImgPrev, mImgPlay,
+    public final String FALSE = "false";
+    public final String TRUE = "true";
+    public final String REPEAT = "repeat";
+
+    private ImageView mImgArtTop,
+            mImgFavorite, mImgRepeat, mImgPrev, mImgPlay,
             mImgNext, mImgShuffle, mImgSongArt;
     private TextView mTvSongTitle, mTvArtist, mTvCurrentTime, mTvTotalTime;
     private SeekBar mSbDuration;
     private IMediaControl mMediaControl;
     private IFavoriteControl mFavoriteControl;
-    private Bundle mBundle;
-    private SharedPreferences mSharedPrf;
 
     private boolean mIsShuffle;
     private String mRepeat;
@@ -51,7 +53,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
     private int mPosition;
-    private int mId;
 
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IFavoriteControl favoriteControl) {
@@ -62,22 +63,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public MediaPlaybackFragment() {
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        Log.d("ToanNTe", "onSaveInstanceState: fragment");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_media_playback, container, false);
         Log.d("ToanNTe", "onCreateView: ");
         mImgArtTop = view.findViewById(R.id.sub_art_top);
-        mImgMore = view.findViewById(R.id.img_more_top);
         mImgSongArt = view.findViewById(R.id.music_art);
-        mImgQueue = view.findViewById(R.id.img_queu);
         mImgFavorite = view.findViewById(R.id.img_favorite);
         mImgRepeat = view.findViewById(R.id.img_repeat);
         mImgPrev = view.findViewById(R.id.img_prev);
@@ -96,7 +88,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mImgPrev.setOnClickListener(this);
         mImgRepeat.setOnClickListener(this);
         mImgShuffle.setOnClickListener(this);
-        mImgQueue.setOnClickListener(this);
         mImgFavorite.setOnClickListener(this);
 
         //event seek bar change
@@ -107,15 +98,15 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mHandler.postDelayed(mRunnable, 0);
         }
 
-        mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
+        SharedPreferences mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
         mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
-        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
+        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, FALSE);
 
         if (mService != null) {
             checkPlaying(mService.isPlaying());
         }
 
-        mBundle = getArguments();
+        Bundle mBundle = getArguments();
         if (mBundle != null) {
             mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
             setSongInfo(mSong);
@@ -129,6 +120,8 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         return view;
     }
+
+
 
     @Override
     public void onResume() {
@@ -164,13 +157,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private void checkRepeat() {
         switch (mRepeat) {
-            case ActivityMusic.FALSE:
+            case FALSE:
                 setImgRepeat(R.drawable.ic_play_repeat_default);
                 break;
-            case ActivityMusic.TRUE:
+            case TRUE:
                 setImgRepeat(R.drawable.ic_play_repeat_selected);
                 break;
-            case ActivityMusic.REPEAT:
+            case REPEAT:
                 setImgRepeat(R.drawable.ic_play_repeat_1);
                 break;
         }
@@ -188,7 +181,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mPosition = mService.getPosition();
         mArraySongs = mService.getArraySongs();
         mSong = mArraySongs.get(mPosition);
-        mId = mSong.getmId();
+        int mId = mSong.getmId();
         mIsFavorite = isFavorite;
         if (id == mId) {
             checkFavorite(mIsFavorite);
@@ -322,14 +315,14 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
             case R.id.img_repeat:
                 switch (mRepeat) {
-                    case ActivityMusic.FALSE:
-                        mRepeat = ActivityMusic.TRUE;
+                    case FALSE:
+                        mRepeat = TRUE;
                         break;
-                    case ActivityMusic.TRUE:
-                        mRepeat = ActivityMusic.REPEAT;
+                    case TRUE:
+                        mRepeat = REPEAT;
                         break;
-                    case ActivityMusic.REPEAT:
-                        mRepeat = ActivityMusic.FALSE;
+                    case REPEAT:
+                        mRepeat = FALSE;
                         break;
                 }
                 checkRepeat();

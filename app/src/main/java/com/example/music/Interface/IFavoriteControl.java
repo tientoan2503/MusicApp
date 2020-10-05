@@ -1,4 +1,4 @@
-package com.bkav.music.Interface;
+package com.example.music.Interface;
 
 public interface IFavoriteControl {
     void onClickFavorite();

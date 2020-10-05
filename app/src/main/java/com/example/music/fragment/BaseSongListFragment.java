@@ -1,4 +1,4 @@
-package com.bkav.music.fragment;
+package com.example.music.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,11 +16,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bkav.music.Interface.IFavoriteControl;
-import com.bkav.android.music.R;
-import com.bkav.music.Song;
-import com.bkav.music.adapter.SongAdapter;
-import com.bkav.music.service.MediaPlaybackService;
+import com.example.music.Interface.IFavoriteControl;
+import com.example.music.R;
+import com.example.music.Song;
+import com.example.music.adapter.SongAdapter;
+import com.example.music.service.MediaPlaybackService;
 
 import java.util.ArrayList;
 
@@ -80,13 +80,12 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
             int position = mService.getPosition();
             Song song = arraySong.get(position);
             id = song.getmId();
-            int i = -1;
+            int i = 0;
             do {
-                i++;
                 song = arraySong.get(i);
+                i++;
             } while (song.getmId() != id);
-            mPosition = i;
-            setAnimation(mPosition, id, mService.isPlaying());
+            setAnimation(position, id, mService.isPlaying());
         }
     }
 

@@ -1,4 +1,4 @@
-package com.bkav.music;
+package com.example.music;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,7 +7,6 @@ import android.media.MediaMetadataRetriever;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.bkav.android.music.R;
 
 public class Song implements Parcelable {
     private String mTitle, mArtist, mDuration, mResource;

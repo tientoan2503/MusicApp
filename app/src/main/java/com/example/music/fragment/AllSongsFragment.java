@@ -1,4 +1,4 @@
-package com.bkav.music.fragment;
+package com.example.music.fragment;
 
 
 import android.view.MenuItem;
@@ -6,10 +6,10 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.bkav.music.Interface.IFavoriteControl;
-import com.bkav.android.music.R;
-import com.bkav.music.Song;
-import com.bkav.music.database.FavoriteSongsDB;
+import com.example.music.Interface.IFavoriteControl;
+import com.example.music.R;
+import com.example.music.Song;
+import com.example.music.database.FavoriteSongsDB;
 
 
 public class AllSongsFragment extends BaseSongListFragment {

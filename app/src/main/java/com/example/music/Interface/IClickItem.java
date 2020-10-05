@@ -1,4 +1,4 @@
-package com.bkav.music.Interface;
+package com.example.music.Interface;
 
 
 public interface IClickItem {

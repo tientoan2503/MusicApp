@@ -1,4 +1,4 @@
-package com.bkav.music.adapter;
+package com.example.music.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -15,12 +15,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bkav.android.music.R;
-import com.bkav.music.Interface.IClickItem;
-import com.bkav.music.Song;
-import com.bkav.music.database.FavoriteSongsDB;
-import com.bkav.music.database.SongProvider;
-import com.bkav.music.fragment.BaseSongListFragment;
+import com.example.music.Interface.IClickItem;
+import com.example.music.R;
+import com.example.music.Song;
+import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongProvider;
+import com.example.music.fragment.BaseSongListFragment;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -30,7 +30,7 @@ import es.claucookie.miniequalizerlibrary.EqualizerView;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> implements Filterable {
 
-    private IClickItem IClickItem;
+    private com.example.music.Interface.IClickItem IClickItem;
     public int mPosition;
     public int mSongId;
     public boolean mIsPlaying;

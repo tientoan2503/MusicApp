@@ -1,4 +1,4 @@
-package com.bkav.music.database;
+package com.example.music.database;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
