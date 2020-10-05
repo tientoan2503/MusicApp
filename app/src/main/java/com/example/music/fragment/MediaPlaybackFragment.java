@@ -353,8 +353,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
 
             case R.id.img_queu:
-                mBaseFragment = new AllSongsFragment();
-                getFragmentManager().beginTransaction().replace(R.id.list_song, mBaseFragment).addToBackStack(null).commit();
+                getFragmentManager().beginTransaction().remove(this).commit();
+                getFragmentManager().popBackStack();
+                mMediaControl.onClickList();
 
         }
         mMediaControl.onClick(mSong.getmId(), mService.isPlaying());

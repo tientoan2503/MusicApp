@@ -13,8 +13,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -128,7 +126,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mSharedPrf = getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
 
-//      if app in portrait mode
+        //if app in portrait mode
         if (mIsPortrait) {
             //event click play or pause
             mActionPlay.setOnClickListener(ActivityMusic.this);
@@ -502,6 +500,12 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mService.setRepeat(mRepeat);
     }
 
+    @Override
+    public void onClickList() {
+        mInfoLayout.setVisibility(View.VISIBLE);
+        getSupportActionBar().show();
+    }
+
     private void setImgPlay(boolean isPlaying) {
         if (isPlaying) {
             mActionPlay.setImageResource(R.drawable.ic_media_pause);
@@ -546,7 +550,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 getSongFromDB(mSong.getmId());
                 break;
         }
-
     }
 
     private void setShuffleAndRepeat(boolean isShuffle, String repeat) {
