@@ -71,7 +71,7 @@
     </LinearLayout>
     
     <FrameLayout
-        android:id="@+id/layout_list_song"
+        android:id="@+id/list_song"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/song_info_top"

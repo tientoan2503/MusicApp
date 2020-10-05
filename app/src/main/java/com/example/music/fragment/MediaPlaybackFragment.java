@@ -3,7 +3,6 @@ package com.example.music.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public final String REPEAT = "repeat";
 
     private ImageView mImgArtTop,
-            mImgFavorite, mImgRepeat, mImgPrev, mImgPlay,
+            mImgQueue, mImgFavorite, mImgRepeat, mImgPrev, mImgPlay,
             mImgNext, mImgShuffle, mImgSongArt;
     private TextView mTvSongTitle, mTvArtist, mTvCurrentTime, mTvTotalTime;
     private SeekBar mSbDuration;
@@ -53,6 +52,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
     private int mPosition;
+    private BaseSongListFragment mBaseFragment;
 
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IFavoriteControl favoriteControl) {
@@ -67,9 +67,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_media_playback, container, false);
-        Log.d("ToanNTe", "onCreateView: ");
         mImgArtTop = view.findViewById(R.id.sub_art_top);
         mImgSongArt = view.findViewById(R.id.music_art);
+        mImgQueue = view.findViewById(R.id.img_queu);
         mImgFavorite = view.findViewById(R.id.img_favorite);
         mImgRepeat = view.findViewById(R.id.img_repeat);
         mImgPrev = view.findViewById(R.id.img_prev);
@@ -88,6 +88,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         mImgPrev.setOnClickListener(this);
         mImgRepeat.setOnClickListener(this);
         mImgShuffle.setOnClickListener(this);
+        mImgQueue.setOnClickListener(this);
         mImgFavorite.setOnClickListener(this);
 
         //event seek bar change
@@ -120,8 +121,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         return view;
     }
-
-
 
     @Override
     public void onResume() {
@@ -280,6 +279,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         switch (view.getId()) {
 
+            //click play button
             case R.id.img_play:
                 if (mService.isPlaying()) {
                     mService.pauseSong();
@@ -293,14 +293,17 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mSong = mArraySongs.get(mPosition);
                 break;
 
+            //click next button
             case R.id.img_next:
                 mService.playNext();
                 break;
 
+            //click prev button
             case R.id.img_prev:
                 mService.playPrev();
                 break;
 
+            //click shuffle
             case R.id.img_shuffle:
                 if (mIsShuffle) {
                     mIsShuffle = false;
@@ -313,6 +316,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mMediaControl.onClickShuffle(mIsShuffle);
                 break;
 
+            //click repeat
             case R.id.img_repeat:
                 switch (mRepeat) {
                     case FALSE:
@@ -330,6 +334,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mService.putRepeatToPrf(mRepeat);
                 break;
 
+            //click favorite
             case R.id.img_favorite:
                 FavoriteSongsDB favoriteSongsDB = new FavoriteSongsDB(getContext());
                 if (mIsFavorite) {
@@ -346,6 +351,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mSong.setmIsFavorite(mIsFavorite);
                 checkFavorite(mIsFavorite);
                 break;
+
+            case R.id.img_queu:
+                mBaseFragment = new AllSongsFragment();
+                getFragmentManager().beginTransaction().replace(R.id.list_song, mBaseFragment).addToBackStack(null).commit();
+
         }
         mMediaControl.onClick(mSong.getmId(), mService.isPlaying());
     }

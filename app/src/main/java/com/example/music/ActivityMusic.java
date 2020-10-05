@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,6 +51,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private final String PRF_INDEX_KEY = "shared index key";
     public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
+
 
     private RelativeLayout mInfoLayout;
     private TextView mTvTitle, mTvArtist;
@@ -396,7 +398,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     setMediaPlaybackService();
                     setShuffleAndRepeat(mIsShuffle, mRepeat);
                 }
-
             }
 
             //if app in portrait mode
@@ -440,18 +441,21 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //set animation of Equalizer view
         setAnimation();
 
-        /*check app in landscape or portrait mode
-         ** in portrait mode*/
+        //check app in landscape or portrait mode
+         // in portrait mode
         if (mIsPortrait) {
 
-            //initialize InfoSongLayout
-            mInfoLayout.setVisibility(View.VISIBLE);
+            if (mMediaPlaybackFragment != null) {
 
-            //set song info layout
-            setSongInfo(mSong);
+                //initialize InfoSongLayout
+                mInfoLayout.setVisibility(View.VISIBLE);
 
-            //check Media Player is playing or not to set play icon
-            checkPlaying();
+                //set song info layout
+                setSongInfo(mSong);
+
+                //check Media Player is playing or not to set play icon
+                checkPlaying();
+            }
         }
         //in landscape mode
         else {
@@ -542,6 +546,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 getSongFromDB(mSong.getmId());
                 break;
         }
+
     }
 
     private void setShuffleAndRepeat(boolean isShuffle, String repeat) {
