@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -49,6 +50,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private final String PRF_INDEX_KEY = "shared index key";
     public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
+    public static final String IS_PORTRAIT = "is portrait";
 
 
     private RelativeLayout mInfoLayout;
@@ -288,6 +290,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     protected void onDestroy() {
         super.onDestroy();
 
+        mEditor.putBoolean(IS_PORTRAIT, mIsPortrait);
+
         //unbound Service
         if (mBound) {
             unbindService(mConnection);
@@ -440,7 +444,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         setAnimation();
 
         //check app in landscape or portrait mode
-         // in portrait mode
+        // in portrait mode
         if (mIsPortrait) {
 
             if (mMediaPlaybackFragment != null) {
@@ -502,6 +506,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void onClickList() {
+        getSupportFragmentManager().beginTransaction().remove(mMediaPlaybackFragment).commit();
+        getSupportFragmentManager().popBackStack();
         mInfoLayout.setVisibility(View.VISIBLE);
         getSupportActionBar().show();
     }

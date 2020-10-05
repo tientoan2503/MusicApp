@@ -52,8 +52,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
     private int mPosition;
-    private BaseSongListFragment mBaseFragment;
-
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IFavoriteControl favoriteControl) {
         mFavoriteControl = favoriteControl;
@@ -118,6 +116,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         checkShuffle();
         checkRepeat();
         checkFavorite(mIsFavorite);
+
+        boolean isPortrait = mSharedPrf.getBoolean(ActivityMusic.IS_PORTRAIT, false);
+        if (isPortrait) {
+            mImgQueue.setVisibility(View.INVISIBLE);
+        } else {
+            mImgQueue.setVisibility(View.VISIBLE);
+        }
 
         return view;
     }
@@ -353,8 +358,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 break;
 
             case R.id.img_queu:
-                getFragmentManager().beginTransaction().remove(this).commit();
-                getFragmentManager().popBackStack();
                 mMediaControl.onClickList();
 
         }
