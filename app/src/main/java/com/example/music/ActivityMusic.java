@@ -188,15 +188,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     mIndexNavigation = 1;
                 }
                 break;
-
-
         }
 
         if (mId != -1) {
             mBaseFragment.setService(mService);
         }
 
-        if (mMediaPlaybackFragment != null) {
+        if (mMediaPlaybackFragment.isAdded()) {
             if (mIsPortrait) {
                 getSupportFragmentManager().beginTransaction().remove(mBaseFragment).commit();
 
@@ -207,7 +205,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
-
         return true;
     }
 
@@ -445,18 +442,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //check app in landscape or portrait mode
         // in portrait mode
         if (mIsPortrait) {
+            //set song info layout
+            setSongInfo(mSong);
 
-            if (mMediaPlaybackFragment != null) {
+            //check Media Player is playing or not to set play icon
+            checkPlaying();
 
-                //initialize InfoSongLayout
-                mInfoLayout.setVisibility(View.VISIBLE);
-
-                //set song info layout
-                setSongInfo(mSong);
-
-                //check Media Player is playing or not to set play icon
-                checkPlaying();
-            }
+            //initialize InfoSongLayout
+            mInfoLayout.setVisibility(View.VISIBLE);
         }
         //in landscape mode
         else {
