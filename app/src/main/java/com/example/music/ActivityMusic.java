@@ -159,7 +159,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mDrawerLayout.addDrawerListener(mToggle);
         navigationView.setNavigationItemSelectedListener(this);
         mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
-        mEditor.commit();
+        mEditor.apply();
     }
 
 

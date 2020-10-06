@@ -125,7 +125,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mImgQueue.setVisibility(View.INVISIBLE);
         }
 
-        Log.d("ToanNTe", "onCreateView:f ");
         return view;
     }
 

@@ -188,7 +188,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
     }
 
     public void getFavoriteList(Context context) {
-        mListFiltered = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
                 FavoriteSongsDB.IS_FAVORITE + "=2", null, null);
         mArraySongs = new ArrayList<>();
@@ -215,10 +214,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
                         if (id == idOfFavoriteSong) {
                             Song song = new Song(title, artist, id, albumId, duration, resource);
                             mArraySongs.add(song);
-
-                            mListFiltered.add(song);
                         }
                     }
+                    mListFiltered = new ArrayList<>();
+                    mListFiltered.addAll(mArraySongs);
                     cursor1.close();
                     notifyDataSetChanged();
                 }
