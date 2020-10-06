@@ -113,7 +113,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         }
 
         mIsFavorite = mSong.getIsIsFavorite();
-
         checkShuffle();
         checkRepeat();
         checkFavorite(mIsFavorite);

@@ -612,6 +612,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void updateUI(int id, boolean favorite) {
         if (mMediaPlaybackFragment != null) {
             mMediaPlaybackFragment.setFavorite(id, favorite);
+            Log.d("ToanNTe", "updateUI: " + favorite);
         }
     }
 
