@@ -194,8 +194,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mBaseFragment.setService(mService);
         }
 
-        if (mMediaPlaybackFragment.isAdded()) {
-            if (mIsPortrait) {
+        if (mMediaPlaybackFragment != null) {
+            if (mIsPortrait && mMediaPlaybackFragment.isAdded()) {
                 getSupportFragmentManager().beginTransaction().remove(mBaseFragment).commit();
 
                 getSupportFragmentManager().popBackStack();
@@ -205,6 +205,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
