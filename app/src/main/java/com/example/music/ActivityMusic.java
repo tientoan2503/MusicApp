@@ -151,7 +151,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 mBaseFragment = new FavoriteSongsFragment(this);
                 getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
             }
-
         } else {
             mBaseFragment = new AllSongsFragment(this);
         }
@@ -421,6 +420,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
             //set animation of Equalizer view
             setAnimation();
+
+
         }
 
         @Override

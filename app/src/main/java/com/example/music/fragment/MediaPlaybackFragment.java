@@ -190,6 +190,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         int mId = mSong.getmId();
         if (id == mId) {
             checkFavorite(mIsFavorite);
+            mSong.setmIsFavorite(mIsFavorite);
         }
     }
 
