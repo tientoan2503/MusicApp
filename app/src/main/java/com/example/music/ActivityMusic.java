@@ -13,12 +13,15 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -73,6 +76,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private BaseSongListFragment mBaseFragment;
     private int mIndexNavigation = 0;
     private int mId;
+
 
     public class BroadcastMusic extends BroadcastReceiver {
         @Override
@@ -605,7 +609,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void updateUI(int id, boolean favorite) {
-        if (!mIsPortrait && mMediaPlaybackFragment != null) {
+        if (mMediaPlaybackFragment != null) {
             mMediaPlaybackFragment.setFavorite(id, favorite);
         }
     }

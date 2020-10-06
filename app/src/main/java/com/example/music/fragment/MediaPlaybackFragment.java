@@ -183,11 +183,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
     public void setFavorite(int id, boolean isFavorite) {
+        mIsFavorite = isFavorite;
         mPosition = mService.getPosition();
         mArraySongs = mService.getArraySongs();
         mSong = mArraySongs.get(mPosition);
         int mId = mSong.getmId();
-        mIsFavorite = isFavorite;
         if (id == mId) {
             checkFavorite(mIsFavorite);
         }
@@ -195,7 +195,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     public void checkFavorite(boolean isFavorite) {
         mIsFavorite = isFavorite;
-        if (isFavorite) {
+        if (mIsFavorite) {
             setImgFavorite(R.drawable.ic_favorite_selected);
         } else {
             setImgFavorite(R.drawable.ic_favorite_default);

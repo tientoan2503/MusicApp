@@ -210,6 +210,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         return mPosition;
     }
 
+    public void stopSong() {
+        mPlayer.stop();
+    }
+
     public int shuffle() {
         int position = mPosition;
         Random random = new Random();
