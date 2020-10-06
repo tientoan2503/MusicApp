@@ -50,7 +50,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private final String PRF_INDEX_KEY = "shared index key";
     public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
-    public static final String IS_PORTRAIT = "is portrait";
+    public static final String PRF_IS_PORTRAIT = "is portrait";
 
 
     private RelativeLayout mInfoLayout;
@@ -158,6 +158,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.all_song);
         mDrawerLayout.addDrawerListener(mToggle);
         navigationView.setNavigationItemSelectedListener(this);
+        mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
+        mEditor.commit();
     }
 
 
@@ -165,7 +167,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(PRF_INDEX_KEY, mIndexNavigation);
-
     }
 
     @Override
@@ -289,8 +290,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        mEditor.putBoolean(IS_PORTRAIT, mIsPortrait);
 
         //unbound Service
         if (mBound) {

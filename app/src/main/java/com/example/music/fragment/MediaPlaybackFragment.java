@@ -3,6 +3,7 @@ package com.example.music.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,13 +118,14 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
         checkRepeat();
         checkFavorite(mIsFavorite);
 
-        boolean isPortrait = mSharedPrf.getBoolean(ActivityMusic.IS_PORTRAIT, false);
+        boolean isPortrait = mSharedPrf.getBoolean(ActivityMusic.PRF_IS_PORTRAIT, false);
         if (isPortrait) {
-            mImgQueue.setVisibility(View.INVISIBLE);
-        } else {
             mImgQueue.setVisibility(View.VISIBLE);
+        } else {
+            mImgQueue.setVisibility(View.INVISIBLE);
         }
 
+        Log.d("ToanNTe", "onCreateView:f ");
         return view;
     }
 

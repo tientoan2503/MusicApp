@@ -54,6 +54,7 @@
         <ImageView
             android:layout_marginRight="10dp"
             android:id="@+id/img_queu"
+            android:visibility="gone"
             android:layout_width="25dp"
             android:src="@drawable/ic_queue_music_default"
             android:layout_height="25dp"
