@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +24,7 @@ import com.example.music.Interface.IClickItem;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongLoader;
 import com.example.music.database.SongProvider;
 import com.example.music.fragment.BaseSongListFragment;
 
@@ -32,7 +34,7 @@ import java.util.ArrayList;
 
 import es.claucookie.miniequalizerlibrary.EqualizerView;
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> implements Filterable, LoaderManager.LoaderCallbacks {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> implements Filterable{
 
     private com.example.music.Interface.IClickItem IClickItem;
     public int mPosition;
@@ -41,15 +43,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
     private BaseSongListFragment mBaseFragment;
     public ArrayList<Song> mArraySongs;
     private ArrayList<Song> mListFiltered;
+    private Context mContext;
 
     public SongAdapter() {
     }
 
-    public SongAdapter(BaseSongListFragment fragment) {
+    public SongAdapter(BaseSongListFragment fragment, Context context) {
         mBaseFragment = fragment;
+        mContext = context;
     }
-
-    ;
 
     @NonNull
     @Override
@@ -83,8 +85,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
             holder.mEqualizer.setVisibility(View.GONE);
             holder.mSongOrder.setVisibility(View.VISIBLE);
         }
-
-
     }
 
     @Override
@@ -123,21 +123,23 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
         };
     }
 
-    @NonNull
-    @Override
-    public Loader onCreateLoader(int id, @Nullable Bundle args) {
-        return null;
+    public void setArray(ArrayList<Song> array) {
+        mArraySongs = array;
+        mListFiltered = mArraySongs;
     }
 
-    @Override
-    public void onLoadFinished(@NonNull Loader loader, Object data) {
+//    @NonNull
+//    @Override
+//    public Loader<ArrayList<Song>> onCreateLoader(int id, @Nullable Bundle args) {
+//        return new SongLoader(mContext);
+//    }
 
-    }
 
-    @Override
-    public void onLoaderReset(@NonNull Loader loader) {
+//    @Override
+//    public void onLoadFinished(@NonNull Loader<ArrayList<Song>> loader, ArrayList<Song> data) {
+//
+//    }
 
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView mActionMore;
@@ -178,33 +180,34 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
 
     //method read song from storage
     public void getAllSongs(Context context) {
-//        // TODO TrungTH dùng asyncTask đã được dậy chứ
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Audio.Media.IS_MUSIC + "=1",
-                null, MediaStore.Audio.Media.TITLE + " ASC");
-        mArraySongs = new ArrayList<>();
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+////        // TODO TrungTH dùng asyncTask đã được dậy chứ
+//        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                null, MediaStore.Audio.Media.IS_MUSIC + "=1",
+//                null, MediaStore.Audio.Media.TITLE + " ASC");
+//        mArraySongs = new ArrayList<>();
+//        if (cursor != null) {
+//            while (cursor.moveToNext()) {
+//                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+//                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+//                String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+//                int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+//                int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+//                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+//
+//                //format duration to mm:ss
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+//                String duration = simpleDateFormat.format(time);
+//
+//                //add Song to songList
+//                Song song = new Song(title, artist, id, albumId, duration, resource);
+//                mArraySongs.add(song);
+//            }
+//            mListFiltered = new ArrayList<>();
+//            mListFiltered.addAll(mArraySongs);
+//            cursor.close();
+//            notifyDataSetChanged();
+//        }
 
-                //format duration to mm:ss
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-                String duration = simpleDateFormat.format(time);
-
-                //add Song to songList
-                Song song = new Song(title, artist, id, albumId, duration, resource);
-                mArraySongs.add(song);
-            }
-            mListFiltered = new ArrayList<>();
-            mListFiltered.addAll(mArraySongs);
-            cursor.close();
-            notifyDataSetChanged();
-        }
     }
 
     public ArrayList getArr() {

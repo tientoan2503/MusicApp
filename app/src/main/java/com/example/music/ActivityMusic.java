@@ -13,29 +13,30 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 
 import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IFavoriteControl;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.adapter.SongAdapter;
 import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongLoader;
 import com.example.music.database.SongProvider;
 import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.BaseSongListFragment;
@@ -49,12 +50,11 @@ import java.util.ArrayList;
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener, IFavoriteControl {
 
-    private final int REQUEST_PERMISSION_CODE = 1;
-    private final String PRF_INDEX_KEY = "shared index key";
+    private static final int REQUEST_PERMISSION_CODE = 1;
+    private static final String PRF_INDEX_KEY = "shared index key";
     public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
     public static final String PRF_IS_PORTRAIT = "is portrait";
-
 
     private RelativeLayout mInfoLayout;
     private TextView mTvTitle, mTvArtist;
@@ -163,7 +163,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         navigationView.setNavigationItemSelectedListener(this);
         mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
         mEditor.apply();
-        getLoaderManager().initLoader(0, null, this);
     }
 
 

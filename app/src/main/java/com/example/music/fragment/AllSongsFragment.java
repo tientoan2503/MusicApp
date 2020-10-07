@@ -22,7 +22,7 @@ public class AllSongsFragment extends BaseSongListFragment {
 
     @Override
     public void updateAdapter() {
-        mSongAdapter.getAllSongs(getContext());
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
