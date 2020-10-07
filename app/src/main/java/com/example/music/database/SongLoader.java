@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.example.music.ActivityMusic;
 import com.example.music.Song;
 
 import java.text.SimpleDateFormat;
@@ -27,13 +26,13 @@ public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        forceLoad();
     }
 
     @Nullable
     @Override
     public ArrayList<Song> loadInBackground() {
         getAllSongs(mContext);
+        Log.d("ToanNTe", "loadInBackground: ");
         return mArraySongs;
     }
 

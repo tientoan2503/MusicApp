@@ -85,10 +85,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<Song>> loader, ArrayList<Song> data) {
+
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<ArrayList<Song>> loader) {
+    public void onLoaderReset(@NonNull Loader loader) {
 
     }
 
@@ -178,9 +179,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         navigationView.setNavigationItemSelectedListener(this);
         mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
         mEditor.apply();
-
+        getSupportLoaderManager().initLoader(1, null, this);
         if (getSupportLoaderManager().getLoader(4) != null ) {
-            getSupportLoaderManager().initLoader(4, null, this);
+            getSupportLoaderManager().initLoader(4, null, this).forceLoad();
         }
     }
 
