@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.music.Interface.IClickItem;
@@ -25,6 +27,7 @@ import com.example.music.fragment.BaseSongListFragment;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import es.claucookie.miniequalizerlibrary.EqualizerView;
 
@@ -157,75 +160,92 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
     }
 
     //method read song from storage
-    public void getAllSongs(Context context) {
-//        // TODO TrungTH dùng asyncTask đã được dậy chứ
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Audio.Media.IS_MUSIC + "=1",
-                null, MediaStore.Audio.Media.TITLE + " ASC");
-        mArraySongs = new ArrayList<>();
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-
-                //format duration to mm:ss
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-                String duration = simpleDateFormat.format(time);
-
-                //add Song to songList
-                Song song = new Song(title, artist, id, albumId, duration, resource);
-                mArraySongs.add(song);
-            }
-            mListFiltered = new ArrayList<>();
-            mListFiltered.addAll(mArraySongs);
-            cursor.close();
-            notifyDataSetChanged();
-        }
-    }
-
+//    public void getAllSongs(Context context) {
+////        // TODO TrungTH dùng asyncTask đã được dậy chứ
+//        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                null, MediaStore.Audio.Media.IS_MUSIC + "=1",
+//                null, MediaStore.Audio.Media.TITLE + " ASC");
+//        mArraySongs = new ArrayList<>();
+//        if (cursor != null) {
+//            while (cursor.moveToNext()) {
+//                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+//                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+//                String resource = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+//                int time = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+//                int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+//                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+//
+//                //format duration to mm:ss
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+//                String duration = simpleDateFormat.format(time);
+//
+//                //add Song to songList
+//                Song song = new Song(title, artist, id, albumId, duration, resource);
+//                mArraySongs.add(song);
+//            }
+//            mListFiltered = new ArrayList<>();
+//            mListFiltered.addAll(mArraySongs);
+//            cursor.close();
+//            notifyDataSetChanged();
+//        }
+//    }
+//
+//    public void setListFiltered(ArrayList<Song> arrayList) {
+//        mListFiltered.addAll(arrayList);
+//        notifyDataSetChanged();
+//    }
+//
     public ArrayList getArr() {
         return mArraySongs;
     }
+//
+//    public void getFavoriteList(Context context) {
+//        mListFiltered = new ArrayList<>();
+//        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
+//                FavoriteSongsDB.IS_FAVORITE + "=2", null, null);
+//        mArraySongs = new ArrayList<>();
+//        if (cursor != null) {
+//            while (cursor.moveToNext()) {
+//                int idOfFavoriteSong = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER));
+//                Cursor cursor1 = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                        null, MediaStore.Audio.Media.IS_MUSIC + "=1"
+//                                + " AND " + MediaStore.Audio.Media._ID + "=" + idOfFavoriteSong,
+//                        null, MediaStore.Audio.Media.TITLE + " ASC");
+//                if (cursor1 != null) {
+//                    while (cursor1.moveToNext()) {
+//                        String title = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.TITLE));
+//                        String artist = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+//                        String resource = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.DATA));
+//                        int time = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.DURATION));
+//                        int albumId = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+//                        int id = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media._ID));
+//
+//                        //format duration to mm:ss
+//                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+//                        String duration = simpleDateFormat.format(time);
+//
+//                        //add Song to songList
+//                        Song song = new Song(title, artist, id, albumId, duration, resource);
+//                        mArraySongs.add(song);
+//                        mListFiltered.add(song);
+//                    }
+//                    cursor1.close();
+//                    notifyDataSetChanged();
+//                }
+//            }
+//            cursor.close();
+//        }
+//    }
 
-    public void getFavoriteList(Context context) {
-        mListFiltered = new ArrayList<>();
-        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
-                FavoriteSongsDB.IS_FAVORITE + "=2", null, null);
-        mArraySongs = new ArrayList<>();
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                int idOfFavoriteSong = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER));
-                Cursor cursor1 = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        null, MediaStore.Audio.Media.IS_MUSIC + "=1"
-                                + " AND " + MediaStore.Audio.Media._ID + "=" + idOfFavoriteSong,
-                        null, MediaStore.Audio.Media.TITLE + " ASC");
-                if (cursor1 != null) {
-                    while (cursor1.moveToNext()) {
-                        String title = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                        String artist = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                        String resource = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.DATA));
-                        int time = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                        int albumId = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                        int id = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media._ID));
+    public void setData(Object arrayList) {
+        if (arrayList != null) {
+            mArraySongs.addAll((Collection<? extends Song>) arrayList);
+            mListFiltered.addAll((Collection<? extends Song>) arrayList);
+            notifyDataSetChanged();
 
-                        //format duration to mm:ss
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
-                        String duration = simpleDateFormat.format(time);
-
-                        //add Song to songList
-                        Song song = new Song(title, artist, id, albumId, duration, resource);
-                        mArraySongs.add(song);
-                        mListFiltered.add(song);
-                    }
-                    cursor1.close();
-                    notifyDataSetChanged();
-                }
-            }
-            cursor.close();
+        } else {
+            mArraySongs = new ArrayList<>();
+            mListFiltered = new ArrayList<>();
         }
     }
 

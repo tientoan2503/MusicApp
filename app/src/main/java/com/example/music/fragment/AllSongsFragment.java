@@ -10,6 +10,7 @@ import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongLoader;
 
 
 public class AllSongsFragment extends BaseSongListFragment {
@@ -22,7 +23,9 @@ public class AllSongsFragment extends BaseSongListFragment {
 
     @Override
     public void updateAdapter() {
-        mSongAdapter.getAllSongs(getContext());
+        mSongLoader.getSong();
+        mSongAdapter.setData(mSongLoader.getSongList());
+
     }
 
     @Override

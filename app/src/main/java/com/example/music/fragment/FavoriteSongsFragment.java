@@ -22,8 +22,10 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public void updateAdapter() {
-        mSongAdapter.getFavoriteList(getContext());
+        mSongLoader.getSong();
+        mSongAdapter.setData(mSongLoader.getFavoriteList());
         mSongAdapter.notifyDataSetChanged();
+
     }
 
     @Override

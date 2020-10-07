@@ -33,9 +33,9 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private Song mSong;
 
-    public final String FALSE = "false";
-    public final String TRUE = "true";
-    public final String REPEAT = "repeat";
+    public final static String FALSE = "false";
+    public final static String TRUE = "true";
+    public final static String REPEAT = "repeat";
 
     private ImageView mImgArtTop,
             mImgQueue, mImgFavorite, mImgRepeat, mImgPrev, mImgPlay,

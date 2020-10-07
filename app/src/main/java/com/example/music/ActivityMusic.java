@@ -49,12 +49,11 @@ import java.util.ArrayList;
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener, IFavoriteControl {
 
-    private final int REQUEST_PERMISSION_CODE = 1;
-    private final String PRF_INDEX_KEY = "shared index key";
+    private static final int REQUEST_PERMISSION_CODE = 1;
+    private static final String PRF_INDEX_KEY = "shared index key";
     public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
     public static final String PRF_IS_PORTRAIT = "is portrait";
-
 
     private RelativeLayout mInfoLayout;
     private TextView mTvTitle, mTvArtist;

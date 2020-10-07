@@ -1,6 +1,7 @@
 package com.example.music.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,12 +23,14 @@ import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
+import com.example.music.database.SongLoader;
 import com.example.music.service.MediaPlaybackService;
 
 import java.util.ArrayList;
 
 public abstract class BaseSongListFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
+    protected static final int LOADER_ID = 1;
     public RecyclerView mRecyclerview;
     protected SongAdapter mSongAdapter;
     protected PopupMenu mPopup;
@@ -34,6 +39,7 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     private MediaPlaybackService mService;
     protected IFavoriteControl mFavoriteControl;
     protected boolean mIsFavorite;
+    protected SongLoader mSongLoader;
 
     public BaseSongListFragment() {}
 
@@ -49,6 +55,7 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSongAdapter = new SongAdapter(this);
+        mSongLoader = new SongLoader(getContext());
         setHasOptionsMenu(true);
     }
 
