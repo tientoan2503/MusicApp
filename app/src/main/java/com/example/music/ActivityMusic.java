@@ -13,29 +13,30 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 
 import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IFavoriteControl;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.adapter.SongAdapter;
 import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongLoader;
 import com.example.music.database.SongProvider;
 import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.BaseSongListFragment;
@@ -47,7 +48,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener,
-        NavigationView.OnNavigationItemSelectedListener, IFavoriteControl {
+        NavigationView.OnNavigationItemSelectedListener, IFavoriteControl, LoaderManager.LoaderCallbacks<ArrayList<Song>> {
 
     private static final int REQUEST_PERMISSION_CODE = 1;
     private static final String PRF_INDEX_KEY = "shared index key";
@@ -75,6 +76,21 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private BaseSongListFragment mBaseFragment;
     private int mIndexNavigation = 0;
     private int mId;
+
+    @NonNull
+    @Override
+    public Loader<ArrayList<Song>> onCreateLoader(int id, @Nullable Bundle args) {
+        return new SongLoader(this);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<ArrayList<Song>> loader, ArrayList<Song> data) {
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<ArrayList<Song>> loader) {
+
+    }
 
 
     public class BroadcastMusic extends BroadcastReceiver {
@@ -162,6 +178,10 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         navigationView.setNavigationItemSelectedListener(this);
         mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
         mEditor.apply();
+
+        if (getSupportLoaderManager().getLoader(4) != null ) {
+            getSupportLoaderManager().initLoader(4, null, this);
+        }
     }
 
 
