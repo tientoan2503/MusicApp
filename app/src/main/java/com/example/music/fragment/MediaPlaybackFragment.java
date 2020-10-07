@@ -16,13 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.music.ActivityMusic;
 import com.example.music.Interface.IFavoriteControl;
 import com.example.music.Interface.IMediaControl;
-import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.database.FavoriteSongsDB;
 import com.example.music.service.MediaPlaybackService;
+import com.example.music.ActivityMusic;
+import com.example.music.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,15 +33,17 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private Song mSong;
 
-    private ImageView mImgArtTop, mImgMore,
+    public final String FALSE = "false";
+    public final String TRUE = "true";
+    public final String REPEAT = "repeat";
+
+    private ImageView mImgArtTop,
             mImgQueue, mImgFavorite, mImgRepeat, mImgPrev, mImgPlay,
             mImgNext, mImgShuffle, mImgSongArt;
     private TextView mTvSongTitle, mTvArtist, mTvCurrentTime, mTvTotalTime;
     private SeekBar mSbDuration;
     private IMediaControl mMediaControl;
     private IFavoriteControl mFavoriteControl;
-    private Bundle mBundle;
-    private SharedPreferences mSharedPrf;
 
     private boolean mIsShuffle;
     private String mRepeat;
@@ -51,8 +53,6 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     private Runnable mRunnable;
     private ArrayList<Song> mArraySongs;
     private int mPosition;
-    private int mId;
-
 
     public MediaPlaybackFragment(IMediaControl mediaControl, IFavoriteControl favoriteControl) {
         mFavoriteControl = favoriteControl;
@@ -62,20 +62,11 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     public MediaPlaybackFragment() {
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        Log.d("ToanNTe", "onSaveInstanceState: fragment");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_media_playback, container, false);
-        Log.d("ToanNTe", "onCreateView: ");
         mImgArtTop = view.findViewById(R.id.sub_art_top);
-        mImgMore = view.findViewById(R.id.img_more_top);
         mImgSongArt = view.findViewById(R.id.music_art);
         mImgQueue = view.findViewById(R.id.img_queu);
         mImgFavorite = view.findViewById(R.id.img_favorite);
@@ -107,25 +98,31 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
             mHandler.postDelayed(mRunnable, 0);
         }
 
-        mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
+        SharedPreferences mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
         mIsShuffle = mSharedPrf.getBoolean(MediaPlaybackService.PRF_SHUFFLE, false);
-        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, ActivityMusic.FALSE);
+        mRepeat = mSharedPrf.getString(MediaPlaybackService.PRF_REPEAT, FALSE);
 
         if (mService != null) {
             checkPlaying(mService.isPlaying());
         }
 
-        mBundle = getArguments();
+        Bundle mBundle = getArguments();
         if (mBundle != null) {
             mSong = mBundle.getParcelable(ActivityMusic.BUNDLE_SONG_KEY);
             setSongInfo(mSong);
         }
 
         mIsFavorite = mSong.getIsIsFavorite();
-
         checkShuffle();
         checkRepeat();
         checkFavorite(mIsFavorite);
+
+        boolean isPortrait = mSharedPrf.getBoolean(ActivityMusic.PRF_IS_PORTRAIT, false);
+        if (isPortrait) {
+            mImgQueue.setVisibility(View.VISIBLE);
+        } else {
+            mImgQueue.setVisibility(View.INVISIBLE);
+        }
 
         return view;
     }
@@ -164,13 +161,13 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     private void checkRepeat() {
         switch (mRepeat) {
-            case ActivityMusic.FALSE:
+            case FALSE:
                 setImgRepeat(R.drawable.ic_play_repeat_default);
                 break;
-            case ActivityMusic.TRUE:
+            case TRUE:
                 setImgRepeat(R.drawable.ic_play_repeat_selected);
                 break;
-            case ActivityMusic.REPEAT:
+            case REPEAT:
                 setImgRepeat(R.drawable.ic_play_repeat_1);
                 break;
         }
@@ -185,19 +182,20 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
     }
 
     public void setFavorite(int id, boolean isFavorite) {
+        mIsFavorite = isFavorite;
         mPosition = mService.getPosition();
         mArraySongs = mService.getArraySongs();
         mSong = mArraySongs.get(mPosition);
-        mId = mSong.getmId();
-        mIsFavorite = isFavorite;
+        int mId = mSong.getmId();
         if (id == mId) {
             checkFavorite(mIsFavorite);
+            mSong.setmIsFavorite(mIsFavorite);
         }
     }
 
     public void checkFavorite(boolean isFavorite) {
         mIsFavorite = isFavorite;
-        if (isFavorite) {
+        if (mIsFavorite) {
             setImgFavorite(R.drawable.ic_favorite_selected);
         } else {
             setImgFavorite(R.drawable.ic_favorite_default);
@@ -287,6 +285,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
         switch (view.getId()) {
 
+            //click play button
             case R.id.img_play:
                 if (mService.isPlaying()) {
                     mService.pauseSong();
@@ -300,14 +299,17 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mSong = mArraySongs.get(mPosition);
                 break;
 
+            //click next button
             case R.id.img_next:
                 mService.playNext();
                 break;
 
+            //click prev button
             case R.id.img_prev:
                 mService.playPrev();
                 break;
 
+            //click shuffle
             case R.id.img_shuffle:
                 if (mIsShuffle) {
                     mIsShuffle = false;
@@ -320,16 +322,17 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mMediaControl.onClickShuffle(mIsShuffle);
                 break;
 
+            //click repeat
             case R.id.img_repeat:
                 switch (mRepeat) {
-                    case ActivityMusic.FALSE:
-                        mRepeat = ActivityMusic.TRUE;
+                    case FALSE:
+                        mRepeat = TRUE;
                         break;
-                    case ActivityMusic.TRUE:
-                        mRepeat = ActivityMusic.REPEAT;
+                    case TRUE:
+                        mRepeat = REPEAT;
                         break;
-                    case ActivityMusic.REPEAT:
-                        mRepeat = ActivityMusic.FALSE;
+                    case REPEAT:
+                        mRepeat = FALSE;
                         break;
                 }
                 checkRepeat();
@@ -337,6 +340,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mService.putRepeatToPrf(mRepeat);
                 break;
 
+            //click favorite
             case R.id.img_favorite:
                 FavoriteSongsDB favoriteSongsDB = new FavoriteSongsDB(getContext());
                 if (mIsFavorite) {
@@ -353,6 +357,10 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mSong.setmIsFavorite(mIsFavorite);
                 checkFavorite(mIsFavorite);
                 break;
+
+            case R.id.img_queu:
+                mMediaControl.onClickList();
+
         }
         mMediaControl.onClick(mSong.getmId(), mService.isPlaying());
     }

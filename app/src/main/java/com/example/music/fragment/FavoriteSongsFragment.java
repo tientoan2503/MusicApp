@@ -1,9 +1,5 @@
 package com.example.music.fragment;
 
-
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -17,7 +13,8 @@ import com.example.music.database.FavoriteSongsDB;
 
 public class FavoriteSongsFragment extends BaseSongListFragment {
 
-    public FavoriteSongsFragment(){}
+    public FavoriteSongsFragment() {
+    }
 
     public FavoriteSongsFragment(IFavoriteControl favoriteControl) {
         super(favoriteControl);
@@ -28,7 +25,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
         mSongAdapter.getFavoriteList(getContext());
         mSongAdapter.notifyDataSetChanged();
     }
-
 
     @Override
     public void updatePopupMenu(View view) {
@@ -52,6 +48,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
         }
         song.setmIsFavorite(mIsFavorite);
         mFavoriteControl.updateUI(id, mIsFavorite);
+        updateAdapter();
         return true;
     }
 }

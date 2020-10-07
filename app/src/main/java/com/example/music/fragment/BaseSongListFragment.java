@@ -1,7 +1,6 @@
 package com.example.music.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -81,13 +80,12 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
             int position = mService.getPosition();
             Song song = arraySong.get(position);
             id = song.getmId();
-            int i = -1;
+            int i = 0;
             do {
-                i++;
                 song = arraySong.get(i);
+                i++;
             } while (song.getmId() != id);
-            mPosition = i;
-            setAnimation(mPosition, id, mService.isPlaying());
+            setAnimation(position, id, mService.isPlaying());
         }
     }
 

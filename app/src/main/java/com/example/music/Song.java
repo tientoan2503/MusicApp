@@ -7,6 +7,7 @@ import android.media.MediaMetadataRetriever;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+
 public class Song implements Parcelable {
     private String mTitle, mArtist, mDuration, mResource;
     private int mAlbumID, mId;

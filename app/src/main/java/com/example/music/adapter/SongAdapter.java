@@ -3,8 +3,8 @@ package com.example.music.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.music.Interface.IClickItem;
@@ -29,9 +32,9 @@ import java.util.ArrayList;
 
 import es.claucookie.miniequalizerlibrary.EqualizerView;
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> implements Filterable {
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> implements Filterable, LoaderManager.LoaderCallbacks {
 
-    private IClickItem IClickItem;
+    private com.example.music.Interface.IClickItem IClickItem;
     public int mPosition;
     public int mSongId;
     public boolean mIsPlaying;
@@ -39,11 +42,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
     public ArrayList<Song> mArraySongs;
     private ArrayList<Song> mListFiltered;
 
-    public SongAdapter(){}
+    public SongAdapter() {
+    }
 
-    public SongAdapter(BaseSongListFragment fragment){
+    public SongAdapter(BaseSongListFragment fragment) {
         mBaseFragment = fragment;
-    };
+    }
+
+    ;
 
     @NonNull
     @Override
@@ -116,6 +122,23 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
             }
         };
     }
+
+    @NonNull
+    @Override
+    public Loader onCreateLoader(int id, @Nullable Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader loader, Object data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader loader) {
+
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView mActionMore;
         TextView mTvSongName, mTvDuration, mSongOrder;
@@ -197,7 +220,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
             while (cursor.moveToNext()) {
                 int idOfFavoriteSong = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER));
                 Cursor cursor1 = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        null, MediaStore.Audio.Media.IS_MUSIC + "=1",
+                        null, MediaStore.Audio.Media.IS_MUSIC + "=1"
+                                + " AND " + MediaStore.Audio.Media._ID + "=" + idOfFavoriteSong,
                         null, MediaStore.Audio.Media.TITLE + " ASC");
                 if (cursor1 != null) {
                     while (cursor1.moveToNext()) {
@@ -213,12 +237,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
                         String duration = simpleDateFormat.format(time);
 
                         //add Song to songList
-                        if (id == idOfFavoriteSong) {
-                            Song song = new Song(title, artist, id, albumId, duration, resource);
-                            mArraySongs.add(song);
-
-                            mListFiltered.add(song);
-                        }
+                        Song song = new Song(title, artist, id, albumId, duration, resource);
+                        mArraySongs.add(song);
+                        mListFiltered.add(song);
                     }
                     cursor1.close();
                     notifyDataSetChanged();

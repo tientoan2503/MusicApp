@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
@@ -29,14 +28,13 @@ import java.util.Random;
 public class MediaPlaybackService extends Service implements MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener,
         MediaPlayer.OnErrorListener {
 
-    public static final String BROAD_POSITION = "BROAD_POSITION";
     public static final String PRF_NAME = "PRF_NAME";
     public static final String PRF_ID = "PRF_ID";
     public static final String PRF_REPEAT = "PRF_REPEAT";
     public static final String PRF_SHUFFLE = "PRF_SHUFFLE";
-    private static final String ACTION_PLAY = "ACTION_PLAY";
-    public static final String ACTION_PLAY_PREV = "ACTION_PLAY_PREV";
-    public static final String ACTION_PLAY_NEXT = "ACTION_PLAY_NEXT";
+    private final String ACTION_PLAY = "ACTION_PLAY";
+    public final String ACTION_PLAY_PREV = "ACTION_PLAY_PREV";
+    public final String ACTION_PLAY_NEXT = "ACTION_PLAY_NEXT";
 
     private MediaPlayer mPlayer;
     private Uri mUri;
@@ -51,20 +49,16 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public final String TRUE = "true";
     public final String REPEAT = "repeat";
     private Song mSong;
-    private RemoteViews mNormalView, mExpandedView;
 
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "CHANNEL_ID";
-    private NotificationManager mNotifyManager;
-    private Notification mNotification;
     private Context mContext;
-    private Intent mPlayIntent, mNextIntent, mPrevIntent;
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
 
         mIsShuffle = mSharedPrf.getBoolean(PRF_SHUFFLE, false);
-        mRepeat = mSharedPrf.getString(PRF_REPEAT, ActivityMusic.FALSE);
+        mRepeat = mSharedPrf.getString(PRF_REPEAT, FALSE);
 
         if (mRepeat.equals(FALSE)) {
             if (!mIsShuffle) {
@@ -141,19 +135,21 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
         String action = intent.getAction();
         if (action != null) {
-            if (action.equals(ACTION_PLAY)) {
-                if (isPlaying()) {
-                    pauseSong();
-                } else {
-                    resumeSong();
-                }
-            } else if (action.equals(ACTION_PLAY_NEXT)) {
-                playNext();
-            } else if (action.equals(ACTION_PLAY_PREV)) {
-                playPrev();
+            switch (action) {
+                case ACTION_PLAY:
+                    if (isPlaying())
+                        pauseSong();
+                    else
+                        resumeSong();
+                    break;
+                case ACTION_PLAY_NEXT:
+                    playNext();
+                    break;
+                case ACTION_PLAY_PREV:
+                    playPrev();
+                    break;
             }
         }
-
         return START_NOT_STICKY;
     }
 
@@ -212,6 +208,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
     public int getPosition() {
         return mPosition;
+    }
+
+    public void stopSong() {
+        mPlayer.stop();
     }
 
     public int shuffle() {
@@ -297,61 +297,61 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     }
 
     public void createChannel() {
-        mNotifyManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notifyManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "Music Notification",
                     NotificationManager.IMPORTANCE_LOW);
 
             notificationChannel.setSound(null, null);
-            mNotifyManager.createNotificationChannel(notificationChannel);
+            notifyManager.createNotificationChannel(notificationChannel);
         }
     }
 
     public Notification createNotification(boolean isPlaying) {
-        mNormalView = new RemoteViews(mContext.getPackageName(), R.layout.custom_normal_notification);
-        mExpandedView = new RemoteViews(mContext.getPackageName(), R.layout.custom_expanded_notification);
+        RemoteViews normalView = new RemoteViews(mContext.getPackageName(), R.layout.custom_normal_notification);
+        RemoteViews expandedView = new RemoteViews(mContext.getPackageName(), R.layout.custom_expanded_notification);
 
         mSong = mArraySongs.get(mPosition);
 
-        mNormalView.setImageViewBitmap(R.id.noti_normal_art, mSong.getAlbumArt(mContext, mSong.getmResource()));
-        mExpandedView.setImageViewBitmap(R.id.noti_expanded_art, mSong.getAlbumArt(mContext, mSong.getmResource()));
-        mExpandedView.setTextViewText(R.id.noti_expanded_song_title, mSong.getmTitle());
-        mExpandedView.setTextViewText(R.id.noti_expanded_artist, mSong.getmArtist());
+        normalView.setImageViewBitmap(R.id.noti_normal_art, mSong.getAlbumArt(mContext, mSong.getmResource()));
+        expandedView.setImageViewBitmap(R.id.noti_expanded_art, mSong.getAlbumArt(mContext, mSong.getmResource()));
+        expandedView.setTextViewText(R.id.noti_expanded_song_title, mSong.getmTitle());
+        expandedView.setTextViewText(R.id.noti_expanded_artist, mSong.getmArtist());
 
         if (isPlaying) {
-            mNormalView.setImageViewResource(R.id.noti_normal_play, R.drawable.ic_action_pause);
-            mExpandedView.setImageViewResource(R.id.noti_expanded_play, R.drawable.ic_action_pause);
+            normalView.setImageViewResource(R.id.noti_normal_play, R.drawable.ic_action_pause);
+            expandedView.setImageViewResource(R.id.noti_expanded_play, R.drawable.ic_action_pause);
         } else {
-            mNormalView.setImageViewResource(R.id.noti_normal_play, R.drawable.ic_action_play);
-            mExpandedView.setImageViewResource(R.id.noti_expanded_play, R.drawable.ic_action_play);
+            normalView.setImageViewResource(R.id.noti_normal_play, R.drawable.ic_action_play);
+            expandedView.setImageViewResource(R.id.noti_expanded_play, R.drawable.ic_action_play);
         }
 
-        mPlayIntent = new Intent(this, MediaPlaybackService.class).setAction(ACTION_PLAY);
-        PendingIntent pPlayIntent = PendingIntent.getService(this, NOTIFICATION_ID, mPlayIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mNextIntent = new Intent(this, MediaPlaybackService.class).setAction(ACTION_PLAY_NEXT);
-        PendingIntent pNextIntent = PendingIntent.getService(this, NOTIFICATION_ID, mNextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mPrevIntent = new Intent(this, MediaPlaybackService.class).setAction(ACTION_PLAY_PREV);
-        PendingIntent pPrevIntent = PendingIntent.getService(this, NOTIFICATION_ID, mPrevIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent playIntent = new Intent(this, MediaPlaybackService.class).setAction(ACTION_PLAY);
+        PendingIntent pendingPlayIntent = PendingIntent.getService(this, NOTIFICATION_ID, playIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent nextIntent = new Intent(this, MediaPlaybackService.class).setAction(ACTION_PLAY_NEXT);
+        PendingIntent pendingNextIntent = PendingIntent.getService(this, NOTIFICATION_ID, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent prevIntent = new Intent(this, MediaPlaybackService.class).setAction(ACTION_PLAY_PREV);
+        PendingIntent pendingPrevIntent = PendingIntent.getService(this, NOTIFICATION_ID, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        mNormalView.setOnClickPendingIntent(R.id.noti_normal_play, pPlayIntent);
-        mNormalView.setOnClickPendingIntent(R.id.noti_normal_next, pNextIntent);
-        mNormalView.setOnClickPendingIntent(R.id.noti_normal_prev, pPrevIntent);
+        normalView.setOnClickPendingIntent(R.id.noti_normal_play, pendingPlayIntent);
+        normalView.setOnClickPendingIntent(R.id.noti_normal_next, pendingNextIntent);
+        normalView.setOnClickPendingIntent(R.id.noti_normal_prev, pendingPrevIntent);
 
-        mExpandedView.setOnClickPendingIntent(R.id.noti_expanded_play, pPlayIntent);
-        mExpandedView.setOnClickPendingIntent(R.id.noti_expanded_next, pNextIntent);
-        mExpandedView.setOnClickPendingIntent(R.id.noti_expanded_prev, pPrevIntent);
+        expandedView.setOnClickPendingIntent(R.id.noti_expanded_play, pendingPlayIntent);
+        expandedView.setOnClickPendingIntent(R.id.noti_expanded_next, pendingNextIntent);
+        expandedView.setOnClickPendingIntent(R.id.noti_expanded_prev, pendingPrevIntent);
 
         Intent intent = new Intent(mContext, ActivityMusic.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mContext, NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mNotification = new NotificationCompat.Builder(mContext, CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(mContext, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                 .setShowWhen(false)
-                .setCustomContentView(mNormalView)
-                .setCustomBigContentView(mExpandedView)
+                .setCustomContentView(normalView)
+                .setCustomBigContentView(expandedView)
                 .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build();
-        return mNotification;
+        return notification;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.music;
+package com.bkav.music;
 
 import org.junit.Test;
 

@@ -13,18 +13,19 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -48,13 +49,12 @@ import java.util.ArrayList;
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener, IFavoriteControl {
 
-    private static final int REQUEST_PERMISSION_CODE = 1;
+    private final int REQUEST_PERMISSION_CODE = 1;
+    private final String PRF_INDEX_KEY = "shared index key";
     public static final String MESSAGE_BROADCAST_UPDATE_UI = "MESSAGE_BROADCAST_UPDATE_UI";
     public static final String BUNDLE_SONG_KEY = "BUNDLE_SONG_KEY";
-    public static final String FALSE = "false";
-    public static final String TRUE = "true";
-    public static final String REPEAT = "repeat";
-    private static final String PRF_INDEX_KEY = "shared index key";
+    public static final String PRF_IS_PORTRAIT = "is portrait";
+
 
     private RelativeLayout mInfoLayout;
     private TextView mTvTitle, mTvArtist;
@@ -71,21 +71,18 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private boolean mIsPortrait;
     private BroadcastReceiver mBroadcast;
     private boolean mBound;
-    private Bundle mBundle;
-    private FavoriteSongsDB mFavoriteSongsDB;
     private DrawerLayout mDrawerLayout;
-    private NavigationView mNavigationView;
     private ActionBarDrawerToggle mToggle;
     private BaseSongListFragment mBaseFragment;
     private int mIndexNavigation = 0;
-    private SongAdapter mAdapter;
     private int mId;
+
 
     public class BroadcastMusic extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(MESSAGE_BROADCAST_UPDATE_UI)) {
+            if (action != null && action.equals(MESSAGE_BROADCAST_UPDATE_UI)) {
                 mArraySongs = mService.getArraySongs();
                 mPosition = mService.getPosition();
                 mSong = mArraySongs.get(mPosition);
@@ -129,13 +126,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         mImgArt = findViewById(R.id.sub_art);
         mIsPortrait = findViewById(R.id.frame_mediaPlayback) == null;
         mDrawerLayout = findViewById(R.id.drawer_layout);
-        mNavigationView = findViewById(R.id.navigation_view);
+        NavigationView navigationView = findViewById(R.id.navigation_view);
 
         //add AllSongsFragment to Activity
         mSharedPrf = getSharedPreferences(MediaPlaybackService.PRF_NAME, MODE_PRIVATE);
         mEditor = mSharedPrf.edit();
 
-//      if app in portrait mode
+        //if app in portrait mode
         if (mIsPortrait) {
             //event click play or pause
             mActionPlay.setOnClickListener(ActivityMusic.this);
@@ -154,17 +151,19 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 mBaseFragment = new FavoriteSongsFragment(this);
                 getSupportActionBar().setTitle(R.string.favorite_actionbar_title);
             }
-
         } else {
             mBaseFragment = new AllSongsFragment(this);
         }
-        mNavigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
+        navigationView.getMenu().getItem(mIndexNavigation).setChecked(true);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.all_song);
         mDrawerLayout.addDrawerListener(mToggle);
-        mNavigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);
+        mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
+        mEditor.apply();
+        getLoaderManager().initLoader(0, null, this);
     }
 
 
@@ -172,7 +171,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(PRF_INDEX_KEY, mIndexNavigation);
-
     }
 
     @Override
@@ -196,9 +194,22 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 break;
         }
 
-        mBaseFragment.setService(mService);
+        if (mId != -1) {
+            mBaseFragment.setService(mService);
+        }
+
+        if (mMediaPlaybackFragment != null) {
+            if (mIsPortrait && mMediaPlaybackFragment.isAdded()) {
+                getSupportFragmentManager().beginTransaction().remove(mBaseFragment).commit();
+
+                getSupportFragmentManager().popBackStack();
+                getSupportActionBar().show();
+                mInfoLayout.setVisibility(View.VISIBLE);
+            }
+        }
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
         mDrawerLayout.closeDrawer(GravityCompat.START);
+
         return true;
     }
 
@@ -236,7 +247,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     protected void onResume() {
         super.onResume();
-        Log.d("ToanNTe", "onResume: Activity");
     }
 
     @Override
@@ -271,11 +281,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                     //show Action Bar, InfoLayout
                     getSupportActionBar().show();
-
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
-                    getSupportFragmentManager().beginTransaction().remove(mMediaPlaybackFragment).commit();
-
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mB)
 
                     //set animation of Equalizer view
                     setAnimation();
@@ -337,16 +342,16 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void startMediaPlaybackService() {
-        Intent mIntent = new Intent(this, MediaPlaybackService.class);
-        bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
-        startService(mIntent);
+        Intent intent = new Intent(this, MediaPlaybackService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        startService(intent);
     }
 
     private void registerReceiver() {
         mBroadcast = new BroadcastMusic();
-        IntentFilter mFilter = new IntentFilter();
-        mFilter.addAction(MESSAGE_BROADCAST_UPDATE_UI);
-        this.registerReceiver(mBroadcast, mFilter);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(MESSAGE_BROADCAST_UPDATE_UI);
+        this.registerReceiver(mBroadcast, filter);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -359,11 +364,11 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             //get MediaPlaybackService from iBinder
             mService = binder.getService();
             mArraySongs = mService.getArraySongs();
-            mAdapter = mBaseFragment.getAdapter();
+            SongAdapter adapter = mBaseFragment.getAdapter();
 
             if (mArraySongs == null) {
                 mBaseFragment.updateAdapter();
-                mArraySongs = mAdapter.getArr();
+                mArraySongs = adapter.getArr();
             }
 
             //send ArraySongs to MediaPlaybackService
@@ -396,7 +401,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                     setMediaPlaybackService();
                     setShuffleAndRepeat(mIsShuffle, mRepeat);
                 }
-
             }
 
             //if app in portrait mode
@@ -417,6 +421,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
             //set animation of Equalizer view
             setAnimation();
+
+
         }
 
         @Override
@@ -440,18 +446,17 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         //set animation of Equalizer view
         setAnimation();
 
-        /*check app in landscape or portrait mode
-         ** in portrait mode*/
+        //check app in landscape or portrait mode
+        // in portrait mode
         if (mIsPortrait) {
-
-            //initialize InfoSongLayout
-            mInfoLayout.setVisibility(View.VISIBLE);
-
             //set song info layout
             setSongInfo(mSong);
 
             //check Media Player is playing or not to set play icon
             checkPlaying();
+
+            //initialize InfoSongLayout
+            mInfoLayout.setVisibility(View.VISIBLE);
         }
         //in landscape mode
         else {
@@ -460,8 +465,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         }
 
         // add songs to Favorite Songs database
-        mFavoriteSongsDB = new FavoriteSongsDB(getApplicationContext());
-        mFavoriteSongsDB.addToFavoriteDB(mId);
+        FavoriteSongsDB favoriteSongsDB = new FavoriteSongsDB(getApplicationContext());
+        favoriteSongsDB.addToFavoriteDB(mId);
     }
 
     private void setSongInfo(Song song) {
@@ -496,6 +501,14 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickRepeat(String repeat) {
         mRepeat = repeat;
         mService.setRepeat(mRepeat);
+    }
+
+    @Override
+    public void onClickList() {
+        getSupportFragmentManager().beginTransaction().remove(mMediaPlaybackFragment).commit();
+        getSupportFragmentManager().popBackStack();
+        mInfoLayout.setVisibility(View.VISIBLE);
+        getSupportActionBar().show();
     }
 
     private void setImgPlay(boolean isPlaying) {
@@ -554,9 +567,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void sendBundleToMediaPlaybackFragment() {
-        mBundle = new Bundle();
-        mBundle.putParcelable(BUNDLE_SONG_KEY, mSong);
-        mMediaPlaybackFragment.setArguments(mBundle);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(BUNDLE_SONG_KEY, mSong);
+        mMediaPlaybackFragment.setArguments(bundle);
     }
 
     private void updateUIMediaPlayback() {
@@ -598,8 +611,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
     @Override
     public void updateUI(int id, boolean favorite) {
-        if (!mIsPortrait && mMediaPlaybackFragment != null) {
+        if (mMediaPlaybackFragment != null) {
             mMediaPlaybackFragment.setFavorite(id, favorite);
+            Log.d("ToanNTe", "updateUI: " + favorite);
         }
     }
 
