@@ -1,10 +1,6 @@
 package com.example.music.fragment;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,11 +23,8 @@ import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
-import com.example.music.database.FavoriteSongsDB;
-import com.example.music.database.SongProvider;
 import com.example.music.service.MediaPlaybackService;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public abstract class BaseSongListFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
@@ -41,40 +33,25 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     protected SongAdapter mSongAdapter;
     protected PopupMenu mPopup;
     protected View mView;
-    protected ArrayList<Song> mArraySongs;
     protected int mPosition;
-    protected MediaPlaybackService mService;
+    private MediaPlaybackService mService;
     protected IFavoriteControl mFavoriteControl;
     protected boolean mIsFavorite;
-    protected Song mSong;
-    protected SharedPreferences mSharePrf;
 
-    public BaseSongListFragment() {
-    }
-
-    public Song getSong() {
-        return mSong;
-    }
+    public BaseSongListFragment() {}
 
     public BaseSongListFragment(IFavoriteControl favoriteControl) {
         mFavoriteControl = favoriteControl;
     }
 
-    public void updateAdapter() {
-        mSongAdapter.setArray(mArraySongs);
-        mSongAdapter.notifyDataSetChanged();
-    }
+    public abstract void updateAdapter();
 
     public abstract void updatePopupMenu(View view);
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences mSharedPrf = getActivity().getSharedPreferences(MediaPlaybackService.PRF_NAME, Context.MODE_PRIVATE);
-        mArraySongs = new ArrayList<Song>();
         mSongAdapter = new SongAdapter(this);
-        updateAdapter();
-
         setHasOptionsMenu(true);
     }
 
@@ -100,44 +77,42 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
             }
         });
 
-//        if (mService != null) {
-//            int id;
-//            ArrayList<Song> arraySong = mService.getArraySongs();
-//            int position = mService.getPosition();
-////            Song song = arraySong.get(position);
-//            id = mSong.getmId();
-//            int i = 0;
-//            do {
-//                mSong = arraySong.get(i);
-//                i++;
-//            } while (mSong.getmId() != id);
-//            setAnimation(position, id, mService.isPlaying());
-//        }
+        if (mService != null) {
+            int id;
+            ArrayList<Song> arraySong = mService.getArraySongs();
+            int position = mService.getPosition();
+            Song song = arraySong.get(position);
+            id = song.getmId();
+            int i = 0;
+            do {
+                song = arraySong.get(i);
+                i++;
+            } while (song.getmId() != id);
+            setAnimation(position, id, mService.isPlaying());
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_all_songs, container, false);
+        updateAdapter();
         mRecyclerview = mView.findViewById(R.id.recyclerview);
         initRecyclerView();
         return mView;
     }
-
-    public abstract void setArraySongs();
 
     public void initRecyclerView() {
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
 
-        setArraySongs();
         mRecyclerview.setAdapter(mSongAdapter);
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
     public ArrayList<Song> getArraySongs() {
-        return mArraySongs;
+        return mSongAdapter.mArraySongs;
     }
 
     public void setAnimation(int position, int id, boolean isPlaying) {

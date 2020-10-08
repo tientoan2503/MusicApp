@@ -13,15 +13,17 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -362,28 +364,23 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mArraySongs = mService.getArraySongs();
             SongAdapter adapter = mBaseFragment.getAdapter();
 
-//            if (mArraySongs == null) {
-//                try {
-//                    Thread.sleep(3000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                mArraySongs = mBaseFragment.getArraySongs();
-//                Log.d("ToanNTe", "onServiceConnected: " + mArraySongs.size());
-//            }
+            if (mArraySongs == null) {
+                mBaseFragment.updateAdapter();
+                mArraySongs = adapter.getArr();
+            }
 
             //send ArraySongs to MediaPlaybackService
             mService.setArraySongs(mArraySongs);
 
-//            mId = mSharedPrf.getInt(MediaPlaybackService.PRF_ID, -1);
-//            if (mId != -1) {
-//                int i = -1;
-//                do {
-//                    i++;
-//                    mSong = mArraySongs.get(i);
-//                } while (mSong.getmId() != mId);
-//                mPosition = i;
-//            }
+            mId = mSharedPrf.getInt(MediaPlaybackService.PRF_ID, -1);
+            if (mId != -1) {
+                int i = -1;
+                do {
+                    i++;
+                    mSong = mArraySongs.get(i);
+                } while (mSong.getmId() != mId);
+                mPosition = i;
+            }
 
             //set shuffle, repeat variable
             mService.setShuffle(mIsShuffle);
@@ -394,7 +391,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             if (!mIsPortrait) {
 
                 if (mId != -1) {
-                    mSong = mBaseFragment.getSong();
+                    mSong = mArraySongs.get(mPosition);
                     getSongFromDB(mSong.getmId());
 
                     //update real time of song
@@ -471,9 +468,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setSongInfo(Song song) {
-//        mTvTitle.setText(song.getmTitle());
-//        mTvArtist.setText(song.getmArtist());
-//        mImgArt.setImageBitmap(mSong.getAlbumArt(getApplicationContext(), mSong.getmResource()));
+        mTvTitle.setText(song.getmTitle());
+        mTvArtist.setText(song.getmArtist());
+        mImgArt.setImageBitmap(mSong.getAlbumArt(getApplicationContext(), mSong.getmResource()));
     }
 
     private void checkPlaying() {
@@ -580,13 +577,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setAnimation() {
-//        if (mId != -1) {
-//            if (mPosition == 0) {
-//                mBaseFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
-//            } else {
-//                mBaseFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
-//            }
-//        }
+        if (mId != -1) {
+            if (mPosition == 0) {
+                mBaseFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
+            } else {
+                mBaseFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
+            }
+        }
     }
 
     public void getSongFromDB(int id) {
@@ -605,8 +602,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickFavorite() {
         if (!mIsPortrait) {
             if (mIndexNavigation == 1) {
-                mBaseFragment.setArraySongs();
-
+                mBaseFragment.updateAdapter();
             }
         }
     }
