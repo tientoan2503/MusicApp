@@ -179,9 +179,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         navigationView.setNavigationItemSelectedListener(this);
         mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
         mEditor.apply();
-        getSupportLoaderManager().initLoader(1, null, this);
         if (getSupportLoaderManager().getLoader(4) != null ) {
-            getSupportLoaderManager().initLoader(4, null, this).forceLoad();
+            getSupportLoaderManager().initLoader(4, null, this);
         }
     }
 
