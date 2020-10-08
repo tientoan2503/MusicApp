@@ -13,15 +13,12 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -75,6 +72,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private BaseSongListFragment mBaseFragment;
     private int mIndexNavigation = 0;
     private int mId;
+    private boolean mIsFavorite;
 
 
     public class BroadcastMusic extends BroadcastReceiver {
@@ -85,7 +83,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 mArraySongs = mService.getArraySongs();
                 mPosition = mService.getPosition();
                 mSong = mArraySongs.get(mPosition);
-                getSongFromDB(mSong.getmId());
+                mIsFavorite = mSong.getIsIsFavorite();
+                setSongToFavoriteDB(mSong.getmId());
 
                 //if app in portrait mode
                 if (mIsPortrait) {
@@ -392,7 +391,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
 
                 if (mId != -1) {
                     mSong = mArraySongs.get(mPosition);
-                    getSongFromDB(mSong.getmId());
+                    setSongToFavoriteDB(mSong.getmId());
 
                     //update real time of song
                     updateUIMediaPlayback();
@@ -550,7 +549,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 //update real time of song
                 setMediaPlaybackService();
 
-                getSongFromDB(mSong.getmId());
+                setSongToFavoriteDB(mSong.getmId());
                 break;
         }
     }
@@ -586,7 +585,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         }
     }
 
-    public void getSongFromDB(int id) {
+    public void setSongToFavoriteDB(int id) {
         Cursor cursor = getContentResolver().query(SongProvider.CONTENT_URI, new String[]{FavoriteSongsDB.ID_PROVIDER,
                 FavoriteSongsDB.IS_FAVORITE}, FavoriteSongsDB.ID_PROVIDER + "=" + id + " AND " +
                 FavoriteSongsDB.IS_FAVORITE + "=" + 2, null, null);
@@ -611,8 +610,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void updateUI(int id, boolean favorite) {
         if (mMediaPlaybackFragment != null) {
             mMediaPlaybackFragment.setFavorite(id, favorite);
-            Log.d("ToanNTe", "updateUI: " + favorite);
         }
+        mIsFavorite = favorite;
     }
 
 }

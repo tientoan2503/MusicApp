@@ -161,7 +161,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
 
     //method read song from storage
     public void getAllSongs(Context context) {
-//        // TODO TrungTH dùng asyncTask đã được dậy chứ
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, MediaStore.Audio.Media.IS_MUSIC + "=1",
                 null, MediaStore.Audio.Media.TITLE + " ASC");

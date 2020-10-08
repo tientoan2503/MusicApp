@@ -1,6 +1,7 @@
 package com.example.music.fragment;
 
 
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -45,8 +46,8 @@ public class AllSongsFragment extends BaseSongListFragment {
             case R.id.popup_remove:
                 favoriteSongsDB.setFavorite(id, 1);
                 favoriteSongsDB.updateCount(id, 0);
-                mIsFavorite = false;
                 Toast.makeText(getContext(), R.string.remove_favorite, Toast.LENGTH_SHORT).show();
+                mIsFavorite = false;
                 break;
             case R.id.popup_add:
                 favoriteSongsDB.setFavorite(id, 2);
