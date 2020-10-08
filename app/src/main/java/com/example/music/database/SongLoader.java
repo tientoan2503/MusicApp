@@ -17,10 +17,20 @@ import java.util.ArrayList;
 public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
     private Context mContext;
     private ArrayList<Song> mArraySongs;
+    private ArrayList<Song> mFavorites;
+
+    public ArrayList<Song> getAllSongs() {
+        return mArraySongs;
+    }
+
+    public ArrayList<Song> getFavorites() {
+        return mFavorites;
+    }
 
     public SongLoader(@NonNull Context context) {
         super(context);
-        mContext  = context;
+        mContext = context;
+        forceLoad();
     }
 
     @Override
@@ -33,12 +43,20 @@ public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
     @Override
     public ArrayList<Song> loadInBackground() {
         getAllSongs(mContext);
-        Log.d("ToanNTe", "loadInBackground: ");
-        return mArraySongs;
+        getFavoriteList(mContext);
+        return null;
+    }
+
+    @Override
+    public void deliverResult(@Nullable ArrayList<Song> data) {
+        super.deliverResult(data);
+        onFinishQuery();
+    }
+
+    public void onFinishQuery() {
     }
 
     public void getAllSongs(Context context) {
-//        // TODO TrungTH dùng asyncTask đã được dậy chứ
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, MediaStore.Audio.Media.IS_MUSIC + "=1",
                 null, MediaStore.Audio.Media.TITLE + " ASC");
@@ -59,6 +77,42 @@ public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
                 //add Song to songList
                 Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
+            }
+            Log.d("ToanNTe", "getAllSongs: "+mArraySongs.size());
+            cursor.close();
+        }
+    }
+
+    public void getFavoriteList(Context context) {
+        Cursor cursor = context.getContentResolver().query(SongProvider.CONTENT_URI, null,
+                FavoriteSongsDB.IS_FAVORITE + "=2", null, null);
+        mFavorites = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int idOfFavoriteSong = cursor.getInt(cursor.getColumnIndex(FavoriteSongsDB.ID_PROVIDER));
+                Cursor cursor1 = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null, MediaStore.Audio.Media.IS_MUSIC + "=1"
+                                + " AND " + MediaStore.Audio.Media._ID + "=" + idOfFavoriteSong,
+                        null, MediaStore.Audio.Media.TITLE + " ASC");
+                if (cursor1 != null) {
+                    while (cursor1.moveToNext()) {
+                        String title = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                        String artist = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                        String resource = cursor1.getString(cursor1.getColumnIndex(MediaStore.Audio.Media.DATA));
+                        int time = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.DURATION));
+                        int albumId = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                        int id = cursor1.getInt(cursor1.getColumnIndex(MediaStore.Audio.Media._ID));
+
+                        //format duration to mm:ss
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+                        String duration = simpleDateFormat.format(time);
+
+                        //add Song to songList
+                        Song song = new Song(title, artist, id, albumId, duration, resource);
+                        mFavorites.add(song);
+                    }
+                    cursor1.close();
+                }
             }
             cursor.close();
         }

@@ -28,15 +28,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
 
 import com.example.music.Interface.IClickItem;
 import com.example.music.Interface.IFavoriteControl;
 import com.example.music.Interface.IMediaControl;
 import com.example.music.adapter.SongAdapter;
 import com.example.music.database.FavoriteSongsDB;
-import com.example.music.database.SongLoader;
 import com.example.music.database.SongProvider;
 import com.example.music.fragment.AllSongsFragment;
 import com.example.music.fragment.BaseSongListFragment;
@@ -48,7 +45,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 
 public class ActivityMusic extends AppCompatActivity implements IClickItem, IMediaControl, View.OnClickListener,
-        NavigationView.OnNavigationItemSelectedListener, IFavoriteControl, LoaderManager.LoaderCallbacks<ArrayList<Song>> {
+        NavigationView.OnNavigationItemSelectedListener, IFavoriteControl {
 
     private static final int REQUEST_PERMISSION_CODE = 1;
     private static final String PRF_INDEX_KEY = "shared index key";
@@ -76,22 +73,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     private BaseSongListFragment mBaseFragment;
     private int mIndexNavigation = 0;
     private int mId;
-
-    @NonNull
-    @Override
-    public Loader<ArrayList<Song>> onCreateLoader(int id, @Nullable Bundle args) {
-        return new SongLoader(this);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<ArrayList<Song>> loader, ArrayList<Song> data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader loader) {
-
-    }
 
 
     public class BroadcastMusic extends BroadcastReceiver {
@@ -179,9 +160,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         navigationView.setNavigationItemSelectedListener(this);
         mEditor.putBoolean(PRF_IS_PORTRAIT, mIsPortrait);
         mEditor.apply();
-        if (getSupportLoaderManager().getLoader(4) != null ) {
-            getSupportLoaderManager().initLoader(4, null, this);
-        }
     }
 
 
@@ -384,23 +362,28 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             mArraySongs = mService.getArraySongs();
             SongAdapter adapter = mBaseFragment.getAdapter();
 
-            if (mArraySongs == null) {
-                mBaseFragment.updateAdapter();
-                mArraySongs = adapter.getArr();
-            }
+//            if (mArraySongs == null) {
+//                try {
+//                    Thread.sleep(3000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                mArraySongs = mBaseFragment.getArraySongs();
+//                Log.d("ToanNTe", "onServiceConnected: " + mArraySongs.size());
+//            }
 
             //send ArraySongs to MediaPlaybackService
             mService.setArraySongs(mArraySongs);
 
-            mId = mSharedPrf.getInt(MediaPlaybackService.PRF_ID, -1);
-            if (mId != -1) {
-                int i = -1;
-                do {
-                    i++;
-                    mSong = mArraySongs.get(i);
-                } while (mSong.getmId() != mId);
-                mPosition = i;
-            }
+//            mId = mSharedPrf.getInt(MediaPlaybackService.PRF_ID, -1);
+//            if (mId != -1) {
+//                int i = -1;
+//                do {
+//                    i++;
+//                    mSong = mArraySongs.get(i);
+//                } while (mSong.getmId() != mId);
+//                mPosition = i;
+//            }
 
             //set shuffle, repeat variable
             mService.setShuffle(mIsShuffle);
@@ -411,7 +394,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             if (!mIsPortrait) {
 
                 if (mId != -1) {
-                    mSong = mArraySongs.get(mPosition);
+                    mSong = mBaseFragment.getSong();
                     getSongFromDB(mSong.getmId());
 
                     //update real time of song
@@ -488,9 +471,9 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setSongInfo(Song song) {
-        mTvTitle.setText(song.getmTitle());
-        mTvArtist.setText(song.getmArtist());
-        mImgArt.setImageBitmap(mSong.getAlbumArt(getApplicationContext(), mSong.getmResource()));
+//        mTvTitle.setText(song.getmTitle());
+//        mTvArtist.setText(song.getmArtist());
+//        mImgArt.setImageBitmap(mSong.getAlbumArt(getApplicationContext(), mSong.getmResource()));
     }
 
     private void checkPlaying() {
@@ -597,13 +580,13 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     }
 
     private void setAnimation() {
-        if (mId != -1) {
-            if (mPosition == 0) {
-                mBaseFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
-            } else {
-                mBaseFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
-            }
-        }
+//        if (mId != -1) {
+//            if (mPosition == 0) {
+//                mBaseFragment.setAnimation(mPosition, mSong.getmId(), mService.isPlaying());
+//            } else {
+//                mBaseFragment.setAnimation(mPosition + 1, mSong.getmId(), mService.isPlaying());
+//            }
+//        }
     }
 
     public void getSongFromDB(int id) {
@@ -622,7 +605,8 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
     public void onClickFavorite() {
         if (!mIsPortrait) {
             if (mIndexNavigation == 1) {
-                mBaseFragment.updateAdapter();
+                mBaseFragment.setArraySongs();
+
             }
         }
     }
