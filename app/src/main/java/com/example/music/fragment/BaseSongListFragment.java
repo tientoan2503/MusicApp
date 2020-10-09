@@ -33,12 +33,14 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     protected SongAdapter mSongAdapter;
     protected PopupMenu mPopup;
     protected View mView;
+    protected ArrayList<Song> mArraySongs;
     protected int mPosition;
     private MediaPlaybackService mService;
     protected IFavoriteControl mFavoriteControl;
     protected boolean mIsFavorite;
 
-    public BaseSongListFragment() {}
+    public BaseSongListFragment() {
+    }
 
     public BaseSongListFragment(IFavoriteControl favoriteControl) {
         mFavoriteControl = favoriteControl;
@@ -51,7 +53,10 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mArraySongs = new ArrayList<Song>();
         mSongAdapter = new SongAdapter(this);
+        updateAdapter();
+
         setHasOptionsMenu(true);
     }
 
@@ -96,39 +101,39 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_all_songs, container, false);
-        updateAdapter();
         mRecyclerview = mView.findViewById(R.id.recyclerview);
         initRecyclerView();
         return mView;
     }
+
+    public abstract void setArraySongs();
 
     public void initRecyclerView() {
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
         linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
 
+        setArraySongs();
         mRecyclerview.setAdapter(mSongAdapter);
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
     public ArrayList<Song> getArraySongs() {
-        return mSongAdapter.mArraySongs;
+        return mArraySongs;
     }
 
     public void setAnimation(int position, int id, boolean isPlaying) {
-        mSongAdapter.mSongId = id;
-        mSongAdapter.mIsPlaying = isPlaying;
+        mSongAdapter.setId(id);
+        mSongAdapter.setPlaying(isPlaying);
         if (position == 0) {
             mRecyclerview.smoothScrollToPosition(position);
         } else {
             mRecyclerview.smoothScrollToPosition(position + 1);
         }
+
         mSongAdapter.notifyDataSetChanged();
     }
 
-    public SongAdapter getAdapter() {
-        return mSongAdapter;
-    }
 
     public void setPosition(int position) {
         mPosition = position;
