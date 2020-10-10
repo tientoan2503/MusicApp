@@ -2,12 +2,15 @@ package com.example.music.database;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 import com.example.music.Song;
 
@@ -29,7 +32,7 @@ public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
 
     public SongLoader(@NonNull Context context) {
         super(context);
-        mContext = context;
+        mContext  = context;
         forceLoad();
     }
 
@@ -53,8 +56,7 @@ public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
         onFinishQuery();
     }
 
-    public void onFinishQuery() {
-    }
+    public void onFinishQuery(){ }
 
     public void getAllSongs(Context context) {
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -78,7 +80,6 @@ public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
                 Song song = new Song(title, artist, id, albumId, duration, resource);
                 mArraySongs.add(song);
             }
-            Log.d("ToanNTe", "getAllSongs: "+mArraySongs.size());
             cursor.close();
         }
     }

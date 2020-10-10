@@ -1,5 +1,6 @@
 package com.example.music.fragment;
 
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -10,6 +11,9 @@ import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.database.FavoriteSongsDB;
+import com.example.music.database.SongLoader;
+
+import java.util.ArrayList;
 
 public class FavoriteSongsFragment extends BaseSongListFragment {
 
@@ -22,8 +26,21 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public void updateAdapter() {
-        mSongAdapter.getFavoriteList(getContext());
+        mSongAdapter.setArray(mArraySongs);
         mSongAdapter.notifyDataSetChanged();
+        Log.d("ToanNTe", "updateAdapter: ");
+
+    }
+
+    public void setArraySongs(){
+        new SongLoader(getContext()){
+            @Override
+            public void onFinishQuery() {
+                super.onFinishQuery();
+                mArraySongs = getFavorites();
+                updateAdapter();
+            }
+        };
     }
 
     @Override
@@ -43,8 +60,8 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
             favoriteSongsDB.setFavorite(id, 1);
             favoriteSongsDB.updateCount(id, 0);
             Toast.makeText(getContext(), R.string.remove_favorite, Toast.LENGTH_SHORT).show();
-            updateAdapter();
             mIsFavorite = false;
+            setArraySongs();
         }
         song.setmIsFavorite(mIsFavorite);
         mFavoriteControl.updateUI(id, mIsFavorite);
