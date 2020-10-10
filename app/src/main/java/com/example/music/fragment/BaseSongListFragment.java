@@ -38,7 +38,6 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     private MediaPlaybackService mService;
     protected IFavoriteControl mFavoriteControl;
     protected boolean mIsFavorite;
-    private Song mSong;
 
     public BaseSongListFragment() {
     }
@@ -59,7 +58,6 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
         updateAdapter();
 
         setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -116,6 +114,7 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
                 i++;
             } while (song.getmId() != id);
             setAnimation(position, id, mService.isPlaying());
+            Log.d("ToanNTe", "initRecyclerView: ");
         }
 
         mRecyclerview.setAdapter(mSongAdapter);

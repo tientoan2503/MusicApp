@@ -150,7 +150,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
             //get MediaPlaybackService from iBinder
             mService = binder.getService();
             mArraySongs = mService.getArraySongs();
-            mBaseFragment.setService(mService);
 
             if (mArraySongs == null) {
                 mArraySongs = mBaseFragment.getArraySongs();
@@ -170,6 +169,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 } while (mSong.getmId() != mId);
                 mPosition = i;
             }
+            mBaseFragment.setService(mService);
 
             //set shuffle, repeat variable
             mService.setShuffle(mIsShuffle);
@@ -292,6 +292,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 break;
         }
 
+        mBaseFragment.setService(mService);
 
         if (mMediaPlaybackFragment != null) {
             if (mIsPortrait && mMediaPlaybackFragment.isAdded()) {
@@ -300,13 +301,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 getSupportFragmentManager().popBackStack();
                 getSupportActionBar().show();
                 mInfoLayout.setVisibility(View.VISIBLE);
-            }
-        }
-        mBaseFragment.setService(mService);
-        if (mId != -1) {
-            mArraySongs = mBaseFragment.getArraySongs();
-            if (mArraySongs != null) {
-                setAnimation();
             }
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.all_song, mBaseFragment).commit();
