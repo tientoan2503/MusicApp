@@ -3,7 +3,6 @@ package com.example.music.fragment;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +15,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.music.ActivityMusic;
 import com.example.music.Interface.IFavoriteControl;
 import com.example.music.Interface.IMediaControl;
+import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.database.FavoriteSongsDB;
 import com.example.music.service.MediaPlaybackService;
-import com.example.music.ActivityMusic;
-import com.example.music.R;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -233,13 +232,12 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
 
     public void setSongInfo(Song song) {
         mSong = song;
-        mIsFavorite = mSong.getIsIsFavorite();
         mTvSongTitle.setText(mSong.getmTitle());
         mTvArtist.setText(mSong.getmArtist());
         mTvTotalTime.setText(mSong.getmDuration());
         mImgArtTop.setImageBitmap(mSong.getAlbumArt(getContext(), mSong.getmResource()));
         mImgSongArt.setImageBitmap(mSong.getAlbumArt(getContext(), mSong.getmResource()));
-        checkFavorite(mIsFavorite);
+        checkFavorite(mSong.getIsIsFavorite());
     }
 
     @Override
@@ -356,6 +354,7 @@ public class MediaPlaybackFragment extends Fragment implements View.OnClickListe
                 mFavoriteControl.onClickFavorite();
                 mSong.setmIsFavorite(mIsFavorite);
                 checkFavorite(mIsFavorite);
+
                 break;
 
             case R.id.img_queu:

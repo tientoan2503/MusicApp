@@ -39,7 +39,6 @@ public class SongLoader extends AsyncTaskLoader<ArrayList<Song>> {
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        forceLoad();
     }
 
     @Nullable

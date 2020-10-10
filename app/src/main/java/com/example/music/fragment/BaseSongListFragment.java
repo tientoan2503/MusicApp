@@ -1,7 +1,6 @@
 package com.example.music.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,8 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,6 +20,7 @@ import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
 import com.example.music.adapter.SongAdapter;
+import com.example.music.database.FavoriteSongsDB;
 import com.example.music.service.MediaPlaybackService;
 
 import java.util.ArrayList;
@@ -30,14 +28,15 @@ import java.util.ArrayList;
 public abstract class BaseSongListFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     public RecyclerView mRecyclerview;
-    protected SongAdapter mSongAdapter;
+    public SongAdapter mSongAdapter;
     protected PopupMenu mPopup;
     protected View mView;
-    protected ArrayList<Song> mArraySongs;
     protected int mPosition;
     private MediaPlaybackService mService;
     protected IFavoriteControl mFavoriteControl;
     protected boolean mIsFavorite;
+    protected FavoriteSongsDB mFavoriteSongsDB;
+
 
     public BaseSongListFragment() {
     }
@@ -53,10 +52,8 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mArraySongs = new ArrayList<Song>();
         mSongAdapter = new SongAdapter(this);
-        updateAdapter();
-
+        mFavoriteSongsDB = new FavoriteSongsDB(getContext());
         setHasOptionsMenu(true);
     }
 
@@ -82,26 +79,6 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
             }
         });
 
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_all_songs, container, false);
-        mRecyclerview = mView.findViewById(R.id.recyclerview);
-        initRecyclerView();
-        return mView;
-    }
-
-    public abstract void setArraySongs();
-
-    public void initRecyclerView() {
-
-        LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
-        linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
-
-        setArraySongs();
-
         if (mService != null) {
             int id;
             ArrayList<Song> arraySong = mService.getArraySongs();
@@ -114,26 +91,45 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
                 i++;
             } while (song.getmId() != id);
             setAnimation(position, id, mService.isPlaying());
-            Log.d("ToanNTe", "initRecyclerView: ");
         }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.fragment_all_songs, container, false);
+        updateAdapter();
+        mRecyclerview = mView.findViewById(R.id.recyclerview);
+        initRecyclerView();
+        return mView;
+    }
+
+    public void initRecyclerView() {
+
+        LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
+        linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
 
         mRecyclerview.setAdapter(mSongAdapter);
         mRecyclerview.setLayoutManager(linearLayout);
     }
 
     public ArrayList<Song> getArraySongs() {
-        return mArraySongs;
+        return mSongAdapter.getArr();
     }
 
     public void setAnimation(int position, int id, boolean isPlaying) {
-        mSongAdapter.setId(id);
-        mSongAdapter.setPlaying(isPlaying);
+        mSongAdapter.mSongId = id;
+        mSongAdapter.mIsPlaying = isPlaying;
         if (position == 0) {
             mRecyclerview.smoothScrollToPosition(position);
         } else {
             mRecyclerview.smoothScrollToPosition(position + 1);
         }
         mSongAdapter.notifyDataSetChanged();
+    }
+
+    public SongAdapter getAdapter() {
+        return mSongAdapter;
     }
 
     public void setPosition(int position) {
