@@ -85,6 +85,7 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
                 mSong = mArraySongs.get(mPosition);
                 mIsFavorite = mSong.getIsIsFavorite();
                 setSongToFavoriteDB(mSong.getmId());
+                Log.d("ToanNTe", "onReceive: " + mSong.getIsIsFavorite());
 
                 //if app in portrait mode
                 if (mIsPortrait) {
@@ -611,7 +612,6 @@ public class ActivityMusic extends AppCompatActivity implements IClickItem, IMed
         if (mMediaPlaybackFragment != null) {
             mMediaPlaybackFragment.setFavorite(id, favorite);
         }
-        mIsFavorite = favorite;
     }
 
 }

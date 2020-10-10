@@ -254,7 +254,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
-        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
     public void playPrev() {
@@ -265,8 +264,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             }
         }
         playSong();
-
-        sendBroadcastMessage(ActivityMusic.MESSAGE_BROADCAST_UPDATE_UI);
     }
 
     public void setShuffle(boolean shuffle) {
