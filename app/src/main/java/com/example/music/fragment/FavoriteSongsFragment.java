@@ -1,19 +1,13 @@
 package com.example.music.fragment;
 
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-
 import com.example.music.Interface.IFavoriteControl;
 import com.example.music.R;
 import com.example.music.Song;
-import com.example.music.database.FavoriteSongsDB;
-import com.example.music.database.SongLoader;
-
-import java.util.ArrayList;
 
 public class FavoriteSongsFragment extends BaseSongListFragment {
 
@@ -26,22 +20,10 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public void updateAdapter() {
-        mSongAdapter.setArray(mArraySongs);
+        mSongAdapter.getFavoriteList(getContext());
         mSongAdapter.notifyDataSetChanged();
-        Log.d("ToanNTe", "updateAdapter: ");
-
     }
 
-    public void setArraySongs(){
-        new SongLoader(getContext()){
-            @Override
-            public void onFinishQuery() {
-                super.onFinishQuery();
-                mArraySongs = getFavorites();
-                updateAdapter();
-            }
-        };
-    }
 
     @Override
     public void updatePopupMenu(View view) {
@@ -53,18 +35,17 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        FavoriteSongsDB favoriteSongsDB = new FavoriteSongsDB(getContext());
         Song song = (Song) mSongAdapter.getArr().get(mPosition);
         int id = song.getmId();
         if (mPosition < mSongAdapter.getArr().size()) {
-            favoriteSongsDB.setFavorite(id, 1);
-            favoriteSongsDB.updateCount(id, 0);
+            mFavoriteSongsDB.setFavorite(id, 1);
+            mFavoriteSongsDB.updateCount(id, 0);
             Toast.makeText(getContext(), R.string.remove_favorite, Toast.LENGTH_SHORT).show();
             mIsFavorite = false;
-            setArraySongs();
         }
         song.setmIsFavorite(mIsFavorite);
         mFavoriteControl.updateUI(id, mIsFavorite);
+        updateAdapter();
         return true;
     }
 }
