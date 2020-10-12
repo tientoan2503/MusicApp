@@ -56,7 +56,6 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
         mArraySongs = new ArrayList<Song>();
         mSongAdapter = new SongAdapter(this);
         updateAdapter();
-
         setHasOptionsMenu(true);
     }
 
@@ -88,12 +87,13 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
             int position = mService.getPosition();
             Song song = arraySong.get(position);
             id = song.getmId();
-            int i = 0;
+            int i = -1;
             do {
-                song = arraySong.get(i);
                 i++;
+                song = arraySong.get(i);
             } while (song.getmId() != id);
-            setAnimation(position, id, mService.isPlaying());
+            mPosition = i;
+            setAnimation(mPosition, id, mService.isPlaying());
         }
     }
 
@@ -123,14 +123,13 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     }
 
     public void setAnimation(int position, int id, boolean isPlaying) {
-        mSongAdapter.setId(id);
-        mSongAdapter.setPlaying(isPlaying);
+        mSongAdapter.mSongId = id;
+        mSongAdapter.mIsPlaying = isPlaying;
         if (position == 0) {
             mRecyclerview.smoothScrollToPosition(position);
         } else {
             mRecyclerview.smoothScrollToPosition(position + 1);
         }
-
         mSongAdapter.notifyDataSetChanged();
     }
 
@@ -142,4 +141,5 @@ public abstract class BaseSongListFragment extends Fragment implements PopupMenu
     public void setService(MediaPlaybackService service) {
         mService = service;
     }
+
 }

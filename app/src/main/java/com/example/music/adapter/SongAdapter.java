@@ -174,5 +174,4 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
         return mArraySongs;
     }
 
-
 }
